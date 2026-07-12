@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { SignupRequest } from "@/types/auth";
 import { signup } from "@/services/auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
@@ -53,12 +53,18 @@ const signupSchema = z
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+interface SignupFormProps extends React.HTMLAttributes<HTMLDivElement> {
+  loading: boolean;
+  setLoader: React.Dispatch<React.SetStateAction<boolean>>;
+}
 export function SignupForm({
   className,
+  loading,
+  setLoader,
   ...props
-}: React.ComponentProps<"div">) {
+}: SignupFormProps) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -71,7 +77,7 @@ export function SignupForm({
   const [showPasswordc, setShowPasswordc] = useState(false);
 
   const onSubmit = async (values: SignupRequest) => {
-    setLoading(true);
+    setLoader(true);
     try {
       await signup(values);
       router.push("/login");
@@ -86,8 +92,9 @@ export function SignupForm({
 
         return;
       }
+      console.log(err);
     } finally {
-      setLoading(false);
+      setLoader(false);
     }
   };
 
