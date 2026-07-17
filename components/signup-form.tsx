@@ -54,7 +54,7 @@ const signupSchema = z
     path: ["confirmPassword"],
   });
 
-interface SignupFormProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SignupFormProps extends React.HTMLAttributes<HTMLDivElement> {
   loading: boolean;
   setLoader: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -80,7 +80,7 @@ export function SignupForm({
     setLoader(true);
     try {
       await signup(values);
-      router.push("/login");
+      router.push("/signin");
     } catch (err) {
       const error = (err as { error: any })?.error;
 
@@ -92,6 +92,7 @@ export function SignupForm({
 
         return;
       }
+
       console.log(err);
     } finally {
       setLoader(false);
@@ -197,11 +198,9 @@ export function SignupForm({
                 </Field>
               </Field>
               <Field>
-                <Button type="submit">
-                  {loading ? `Creating Account` : "Create Account"}
-                </Button>
+                <Button type="submit">Create Account</Button>
                 <FieldDescription className="text-center">
-                  Already have an account? <a href="#">Sign in</a>
+                  Already have an account? <a href="/signin">Sign in</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>
