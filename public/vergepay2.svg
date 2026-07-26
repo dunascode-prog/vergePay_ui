@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4a2599"/>
+      <stop offset="100%" stop-color="#2e1560"/>
+    </linearGradient>
+    <linearGradient id="waveGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#e9ddff"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="512" height="512" rx="115" ry="115" fill="url(#bgGrad)"/>
+
+  <g>
+    <rect x="140.00" y="249.00" width="3.19" height="14.00" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="145.80" y="241.70" width="3.19" height="28.61" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="151.60" y="226.48" width="3.19" height="59.04" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="157.40" y="230.06" width="3.19" height="51.88" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="163.20" y="214.33" width="3.19" height="83.34" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="169.00" y="213.23" width="3.19" height="85.55" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="174.80" y="217.81" width="3.19" height="76.39" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="180.60" y="199.88" width="3.19" height="112.24" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="186.40" y="212.16" width="3.19" height="87.68" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="192.20" y="194.85" width="3.19" height="122.30" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="198.00" y="205.82" width="3.19" height="100.36" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="203.80" y="202.78" width="3.19" height="106.44" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="209.60" y="186.78" width="3.19" height="138.45" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="215.40" y="167.19" width="3.19" height="177.63" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="221.20" y="196.16" width="3.19" height="119.68" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="227.00" y="190.40" width="3.19" height="131.20" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="232.80" y="170.69" width="3.19" height="170.62" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="238.60" y="154.72" width="3.19" height="202.56" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="244.40" y="171.35" width="3.19" height="169.29" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="250.20" y="179.54" width="3.19" height="152.91" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="256.00" y="152.17" width="3.19" height="207.65" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="261.80" y="196.31" width="3.19" height="119.38" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="267.60" y="158.88" width="3.19" height="194.23" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="273.40" y="186.27" width="3.19" height="139.46" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="279.20" y="193.99" width="3.19" height="124.03" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="285.00" y="196.43" width="3.19" height="119.15" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="290.80" y="189.65" width="3.19" height="132.69" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="296.60" y="170.31" width="3.19" height="171.37" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="302.40" y="199.13" width="3.19" height="113.74" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="308.20" y="185.95" width="3.19" height="140.11" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="314.00" y="187.27" width="3.19" height="137.46" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="319.80" y="200.50" width="3.19" height="110.99" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="325.60" y="198.57" width="3.19" height="114.85" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="331.40" y="217.66" width="3.19" height="76.68" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="337.20" y="221.47" width="3.19" height="69.06" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="343.00" y="222.15" width="3.19" height="67.70" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="348.80" y="217.88" width="3.19" height="76.24" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="354.60" y="230.00" width="3.19" height="52.00" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="360.40" y="239.99" width="3.19" height="32.01" rx="1.59" fill="url(#waveGrad)"/>
+    <rect x="366.20" y="249.00" width="3.19" height="14.00" rx="1.59" fill="url(#waveGrad)"/>
+  </g>
+</svg>

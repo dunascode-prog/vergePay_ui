@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { SignupRequest } from "@/types/auth";
 import { signup } from "@/services/auth";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
@@ -54,7 +54,7 @@ const signupSchema = z
     path: ["confirmPassword"],
   });
 
-export interface SignupFormProps extends React.HTMLAttributes<HTMLDivElement> {
+interface SignupFormProps extends React.HTMLAttributes<HTMLDivElement> {
   loading: boolean;
   setLoader: React.Dispatch<React.SetStateAction<boolean>>;
 }
