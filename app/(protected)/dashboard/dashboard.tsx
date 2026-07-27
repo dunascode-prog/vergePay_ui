@@ -1,48 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { apiFetch } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import {
-  AlertTriangle,
-  ArrowLeftRight,
-  ArrowUpRight,
-  Badge,
-  Dot,
-  FileText,
-  Plus,
-  ReceiptCent,
-  Send,
-} from "lucide-react";
+import { ArrowLeftRight, Badge, Dot, FileText, Plus, Send } from "lucide-react";
 
-import * as React from "react";
-import { TrendingUp } from "lucide-react";
-import {
-  Area,
-  AreaChart,
-  Label,
-  Pie,
-  PieChart,
-  PolarRadiusAxis,
-  RadialBar,
-  RadialBarChart,
-} from "recharts";
+import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts";
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@/components/ui/chart";
+import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { UpcomingBillButton } from "@/components/BillItem";
 import Metric from "@/components/metric";
 import { Sparkline } from "@/components/sparkline";
@@ -57,12 +27,6 @@ const chartData1 = [
     fill: "var(--chart-2)",
   },
 ];
-
-const chartConfig1 = {
-  value: {
-    label: "Health",
-  },
-} satisfies ChartConfig;
 
 const chartConfig = {
   score: {
@@ -137,7 +101,7 @@ export default function Dashboard() {
   //   verifySession();
   // });
   return (
-    <div className="bg-sidebar-border2">
+    <div className="">
       <div className="grid grid-col-1 md:grid-cols-9 lg:grid-cols-12 2xl:grid-cols-12 gap-2 px-4 pt-4">
         <div className="col-span-1 md:col-span-3 lg:col-span-12 2xl:col-span-12">
           <Card className="col-span-12">

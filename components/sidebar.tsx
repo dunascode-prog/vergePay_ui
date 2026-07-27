@@ -256,21 +256,31 @@ export function AppSidebar() {
     //   </SidebarContent>
     // </Sidebar>
     <Sidebar collapsible="icon">
-      {/* ================= HEADER ================= */}
       <SidebarHeader className="border-b px-4 py-5">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
               render={
-                <Link href="/" className="flex items-center justify-start">
+                <Link
+                  href="/"
+                  className="flex items-center justify-center gap-3"
+                >
                   <Image
                     src="/vergepay_final.svg"
                     alt="VergePay"
-                    width={136}
-                    height={136}
+                    width={134}
+                    height={134}
                     className="rounded-lg"
                   />
+
+                  {/* <div className="leading-tight">
+                    <p className="font-semibold tracking-tight">VergePay</p>
+
+                    <span className="text-xs text-muted-foreground">
+                      Enterprisedashboard
+                    </span>
+                  </div> */}
                 </Link>
               }
             />
