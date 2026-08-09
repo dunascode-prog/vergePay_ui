@@ -24,6 +24,7 @@ import {
   Banknote,
   Target,
   Mail,
+  CreditCard,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -37,12 +38,12 @@ const sidebarMenu = {
     items: [
       {
         title: "Home",
-        url: "/",
+        url: "/dashboard",
         icon: Home,
       },
       {
         title: "Analytics",
-        url: "/analytics",
+        url: "/dashboard/analytics",
         icon: ChartColumn,
       },
     ],
@@ -53,18 +54,18 @@ const sidebarMenu = {
     items: [
       {
         title: "Invoices",
-        url: "/invoices",
+        url: "/dashboard/invoices",
         icon: FileText,
         badge: 4,
       },
       {
         title: "Recurring billing",
-        url: "/recurring-billing",
+        url: "dashboard/recurring-billing",
         icon: Repeat,
       },
       {
         title: "Clients",
-        url: "/clients",
+        url: "dashboard/clients",
         icon: Users,
       },
     ],
@@ -111,152 +112,8 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   return (
-    // <Sidebar collapsible="icon">
-    //   <SidebarHeader>
-    //     <SidebarMenuButton
-    //       render={
-    //         <Link href="/">
-    //           <Image src="/vergepay2.svg" alt="logo" width={30} height={30} />
-    //           <div className="flex flex-col">
-    //             <h6 className="-mb-2">VergePay</h6>
-    //             <small>Enterprise</small>
-    //           </div>
-    //         </Link>
-    //       }
-    //     />
-    //   </SidebarHeader>
-    //   <SidebarContent>
-    //     {Object.values(sidebarMenu).map((section) => (
-    //       <SidebarGroup key={section.title}>
-    //         <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
-    //         {section.items.map((item) => {
-    //           return (
-    //             <SidebarMenuItem key={item.title}>
-    //               <SidebarMenuButton
-    //                 render={
-    //                   <Link href={item.url}>
-    //                     <item.icon />
-    //                     <span>{item.title}</span>
-    //                   </Link>
-    //                 }
-    //               />
-    //             </SidebarMenuItem>
-    //           );
-    //         })}
-    //       </SidebarGroup>
-    //     ))}
-    //     <SidebarGroup className="bg-popover rounded-lg">
-    //       <SidebarGroupLabel>Wallets</SidebarGroupLabel>
-    //       <SidebarMenu>
-    //         <SidebarMenuItem>
-    //           <SidebarMenuButton
-    //             className="py-2"
-    //             render={
-    //               <Link
-    //                 href="/"
-    //                 className="flex flex-row justify-between items-center py-5 px-2"
-    //               >
-    //                 <div className="flex flex-row items-center gap-3">
-    //                   <div className="relative flex h-3 w-3 items-center justify-center">
-    //                     <span className="absolute h-3 w-3 rounded-full bg-green-500 blur-sm opacity-70" />
-    //                     <span className="relative h-2 w-2 rounded-full bg-green-500" />
-    //                   </div>
-
-    //                   <span>Personal</span>
-    //                 </div>
-    //                 <div className="text-xs text-muted-foreground">600k</div>
-    //               </Link>
-    //             }
-    //             isActive
-    //           >
-    //             {" "}
-    //           </SidebarMenuButton>
-    //         </SidebarMenuItem>
-
-    //         <SidebarMenuItem>
-    //           <SidebarMenuButton
-    //             render={
-    //               <Link
-    //                 href="/"
-    //                 className="flex flex-row justify-between items-center py-5 px-2"
-    //               >
-    //                 <div className="flex flex-row items-center gap-3">
-    //                   <div className="relative flex h-3 w-3 items-center justify-center">
-    //                     <span className="absolute h-3 w-3 rounded-full bg-blue-500 blur-sm opacity-70" />
-    //                     <span className="relative h-2 w-2 rounded-full bg-blue-500" />
-    //                   </div>
-
-    //                   <span>Business</span>
-    //                 </div>
-    //                 <div className="text-xs text-muted-foreground">300k</div>
-    //               </Link>
-    //             }
-    //           >
-    //             {" "}
-    //           </SidebarMenuButton>
-    //         </SidebarMenuItem>
-    //         <SidebarMenuItem>
-    //           <SidebarMenuButton
-    //             render={
-    //               <Link href="/">
-    //                 <CirclePlus />
-    //                 <span>Add Wallet</span>
-    //               </Link>
-    //             }
-    //           >
-    //             {" "}
-    //           </SidebarMenuButton>
-    //         </SidebarMenuItem>
-    //       </SidebarMenu>
-    //     </SidebarGroup>
-    //     <SidebarFooter className="py-3">
-    //       <SidebarMenu>
-    //         <SidebarMenuItem>
-    //           <SidebarMenuButton
-    //             className="py-8"
-    //             render={
-    //               <div className="flex flex-row items-center justify-between">
-    //                 <div className="flex flex-row items-center gap-2">
-    //                   <Avatar>
-    //                     <AvatarImage
-    //                       src="https://i.pravatar.cc/300"
-    //                       alt="@shadcn"
-    //                     />
-    //                     <AvatarFallback>CN</AvatarFallback>
-    //                     <AvatarBadge className="bg-green-600 dark:bg-green-800" />
-    //                   </Avatar>
-    //                   <div className="flex flex-col justify-center">
-    //                     <div className="text-sm font-medium tracking-tight -mb-1">
-    //                       Seun Adeyemi
-    //                     </div>
-    //                     <div className="text-xs text-muted-foreground">
-    //                       seun@example.com
-    //                     </div>
-    //                   </div>
-    //                 </div>
-    //                 <div>
-    //                   <Settings className="h-4 w-4" />
-    //                 </div>
-    //               </div>
-    //             }
-    //           ></SidebarMenuButton>
-    //         </SidebarMenuItem>
-    //         <SidebarMenuItem>
-    //           <SidebarMenuButton
-    //             render={
-    //               <Link href="/">
-    //                 <LogOut />
-    //                 <span>Sign out</span>
-    //               </Link>
-    //             }
-    //           />
-    //         </SidebarMenuItem>
-    //       </SidebarMenu>
-    //     </SidebarFooter>
-    //   </SidebarContent>
-    // </Sidebar>
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b px-4 py-5">
+      <SidebarHeader className="border-b px-2 py-3">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -266,21 +123,23 @@ export function AppSidebar() {
                   href="/"
                   className="flex items-center justify-center gap-3"
                 >
-                  <Image
-                    src="/vergepay_final.svg"
-                    alt="VergePay"
-                    width={134}
-                    height={134}
-                    className="rounded-lg"
-                  />
-
-                  {/* <div className="leading-tight">
-                    <p className="font-semibold tracking-tight">VergePay</p>
-
-                    <span className="text-xs text-muted-foreground">
-                      Enterprisedashboard
-                    </span>
-                  </div> */}
+                  {collapsed ? (
+                    <Image
+                      src="/final_vergePay_logoc.svg"
+                      alt="VergePay"
+                      width={34}
+                      height={34}
+                      className="rounded-lg"
+                    />
+                  ) : (
+                    <Image
+                      src="/final_vergePay_logo.svg"
+                      alt="VergePay"
+                      width={154}
+                      height={154}
+                      className="rounded-lg"
+                    />
+                  )}
                 </Link>
               }
             />
@@ -288,8 +147,7 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
 
-      {/* ================= MAIN NAV ================= */}
-      <SidebarContent className="px-2 py-4">
+      <SidebarContent className={collapsed ? "" : "px-2 py-4"}>
         {Object.values(sidebarMenu).map((section) => (
           <SidebarGroup key={section.title} className="mb-5">
             <SidebarGroupLabel className="px-2 text-[11px] uppercase tracking-widest text-muted-foreground">
@@ -312,15 +170,31 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroup>
         ))}
-        <WalletSwitcher />
+        {collapsed ? (
+          <SidebarGroup>
+            <SidebarMenu className="flex items-center">
+              <SidebarMenuButton
+                render={
+                  <Link href="/">
+                    <CreditCard className="size-4" />
+                  </Link>
+                }
+              />
+            </SidebarMenu>
+          </SidebarGroup>
+        ) : (
+          <WalletSwitcher />
+        )}
       </SidebarContent>
 
       {collapsed ? (
-        <Avatar className="h-9 w-9">
-          <AvatarImage src="https://i.pravatar.cc/300" />
-          <AvatarFallback>SA</AvatarFallback>
-          <AvatarBadge className="bg-emerald-500" />
-        </Avatar>
+        <SidebarFooter className="flex items-center pb-2">
+          <Avatar className="h-9 w-9">
+            <AvatarImage src="https://i.pravatar.cc/300" />
+            <AvatarFallback>SA</AvatarFallback>
+            <AvatarBadge className="bg-emerald-500" />
+          </Avatar>
+        </SidebarFooter>
       ) : (
         <SidebarFooter className="border-t px-2 py-3">
           <UserNav />

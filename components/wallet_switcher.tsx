@@ -1,3 +1,4 @@
+"use client";
 import { CirclePlus } from "lucide-react";
 
 import {
@@ -20,7 +21,7 @@ export function WalletSwitcher() {
         <WalletCard
           href="/wallets/personal"
           name="Personal Wallet"
-          balance="$600,000"
+          balance="$600k"
           description="Main spending wallet"
           color="green"
           active
@@ -29,7 +30,7 @@ export function WalletSwitcher() {
         <WalletCard
           href="/wallets/business"
           name="Business Wallet"
-          balance="$300,000"
+          balance="$300k"
           description="Client payments"
           color="blue"
         />

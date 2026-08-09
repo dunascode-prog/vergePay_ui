@@ -8,7 +8,7 @@ export default function Loader() {
       <div className="flex flex-col items-center gap-6">
         <div className="animate-pulse">
           <Image
-            src="/vergepay_logo.svg"
+            src="/final_vergepay_logoc.svg"
             alt="VergePay"
             width={120}
             height={120}

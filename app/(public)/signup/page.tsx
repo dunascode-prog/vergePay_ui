@@ -16,7 +16,7 @@ export default function SignupPage() {
           <Link href="/">
             <div className="flex h-10 w-40 items-center justify-start rounded-md overflow-hidden">
               <Image
-                src="/vergePay_logo.svg"
+                src="/final_vergePay_logo.svg"
                 alt="VergePay Logo"
                 width={160}
                 height={40}
