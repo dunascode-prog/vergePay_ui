@@ -58,7 +58,7 @@ const badgeStyles = {
 export default function RecentTransactions() {
   return (
     <Card className="rounded-2xl shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between gap-2">
         <CardTitle className="text-sm font-semibold tracking-wide uppercase text-muted-foreground">
           Recent Transactions
         </CardTitle>
@@ -74,10 +74,12 @@ export default function RecentTransactions() {
           <TableHeader>
             <TableRow>
               <TableHead>Description</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead className="hidden sm:table-cell">Category</TableHead>
+              <TableHead className="hidden md:table-cell">Date</TableHead>
               <TableHead className="text-right">Amount</TableHead>
-              <TableHead className="text-right">Balance After</TableHead>
+              <TableHead className="hidden text-right sm:table-cell">
+                Balance After
+              </TableHead>
             </TableRow>
           </TableHeader>
 
@@ -90,9 +92,22 @@ export default function RecentTransactions() {
                   <div className="text-xs text-muted-foreground mt-1">
                     {transaction.subtitle}
                   </div>
+
+                  <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground sm:hidden">
+                    <Badge
+                      className={
+                        badgeStyles[
+                          transaction.category as keyof typeof badgeStyles
+                        ]
+                      }
+                    >
+                      {transaction.category.replace("_", " ")}
+                    </Badge>
+                    <span className="md:hidden">{transaction.date}</span>
+                  </div>
                 </TableCell>
 
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <Badge
                     className={
                       badgeStyles[
@@ -104,7 +119,7 @@ export default function RecentTransactions() {
                   </Badge>
                 </TableCell>
 
-                <TableCell className="text-muted-foreground">
+                <TableCell className="hidden text-muted-foreground md:table-cell">
                   {transaction.date}
                 </TableCell>
 
@@ -117,7 +132,7 @@ export default function RecentTransactions() {
                   {Math.abs(transaction.amount).toLocaleString()}
                 </TableCell>
 
-                <TableCell className="text-right font-medium">
+                <TableCell className="hidden text-right font-medium sm:table-cell">
                   ₦{transaction.balance.toLocaleString()}
                 </TableCell>
               </TableRow>

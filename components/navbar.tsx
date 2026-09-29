@@ -88,9 +88,13 @@ const pageTitles: Record<string, PageTitle> = {
     title: "Invoices",
     description: "Manage client invoices in one place.",
   },
-  "/dashboard/transactions": {
-    title: "Analytics",
-    description: "Freelancer financial health, income patterns & habits",
+  "/dashboard/recurring": {
+    title: "Recurring Billing",
+    description: "Manage Recurrent Billings Here",
+  },
+  "/dashboard/business": {
+    title: "Business Overview",
+    description: "Current Profit Status",
   },
 };
 const months = [
@@ -107,7 +111,6 @@ const months = [
   "November",
   "December",
 ];
-const filters = ["All", "Draft", "Sent", "Overdue", "Paid"];
 const accounts = ["Personal", "Business", "Combined"];
 
 interface AccountSwitcherProps {
@@ -156,27 +159,6 @@ export function AccountSwitcher({
   );
 }
 
-// function AccountSwitcher({ className, ...props }: React.ComponentProps<"div">) {
-//   const [accountType, setAccountType] = useState("Personal");
-
-//   return (
-//     <div className={cn("flex items-center gap-3", className)}>
-//       <Select value={accountType} onValueChange={setAccountType}>
-//         <SelectTrigger className="h-10 w-30 rounded-xl border-0 bg-muted px-4 shadow-sm hover:bg-muted/80 transition-colors">
-//           <SelectValue />
-//         </SelectTrigger>
-
-//         <SelectContent>
-//           <SelectItem value="Personal">Personal</SelectItem>
-
-//           <SelectItem value="Business">Business</SelectItem>
-
-//           <SelectItem value="Combined">Combined</SelectItem>
-//         </SelectContent>
-//       </Select>
-//     </div>
-//   );
-// }
 interface MonthSelectorProps extends React.HTMLAttributes<HTMLDivElement> {
   selectedMonth: string;
   setSelectedMonth: Dispatch<SetStateAction<string>>;
@@ -213,7 +195,6 @@ const Navbar = ({ className, ...props }: React.ComponentProps<"div">) => {
   const pathname = usePathname();
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const [filter, setFilter] = useState<InvoiceFilter>("all");
   const [accountType, setAccountType] = useState("Personal");
   const { title, description } = pageTitles[pathname] ?? {
     title: "Dashboard",
@@ -238,31 +219,11 @@ const Navbar = ({ className, ...props }: React.ComponentProps<"div">) => {
       </div>
       <div className="flex flex-row justify-between gap-2 items-center">
         {pathname === "/dashboard" ||
-        pathname === "/dashboard/analytics" ||
-        pathname === "/dashboard/invoices" ? (
-          // <div className="hidden lg:flex lg:items-center gap-1 rounded-lg bg-sidebar-border p-1">
-          //   <SidebarMenuButton
-          //     isActive
-          //     className="rounded-md px-3 py-1.5 text-sm font-medium"
-          //   >
-          //     Personal
-          //   </SidebarMenuButton>
-
-          //   <SidebarMenuButton className="rounded-md px-3 py-1.5 text-sm font-medium">
-          //     Business
-          //   </SidebarMenuButton>
-
-          //   <SidebarMenuButton className="rounded-md px-3 py-1.5 text-sm font-medium">
-          //     Combined
-          //   </SidebarMenuButton>
-          // </div>
+        pathname === "/dashboard/analytics/*" ||
+        pathname === "/dashboard/invoices/*" ? (
           <AccountScopeToggle />
         ) : (
-          <>
-            {/* <div className="hidden md:hidden lg:flex 2xl:flex mr-2">
-              <InvoiceFilters value={filter} onChange={setFilter} />
-            </div> */}
-          </>
+          <></>
         )}
         <div
           className={cn(
@@ -370,57 +331,35 @@ const Navbar = ({ className, ...props }: React.ComponentProps<"div">) => {
         <div>
           {" "}
           {pathname == "/dashboard" ? (
-            <Button size="sm" className="h-9">
-              <Plus />
-              {!collapsed ? (
-                <span className="hidden">Add Money</span>
-              ) : (
-                <span className="hidden md:flex lg:flex 2xl:flex">
-                  Add Money
-                </span>
-              )}
-            </Button>
-          ) : pathname == "/dashboard/analytics" ? (
-            <div className="flex flex-row gap-1">
-              <Button size="sm" className="h-9">
-                <LuDownload className="h-3.5 w-3.5 mr-1.5" />
-                Export report
+            <Link href="">
+              <Button className="bg-emerald-700 hover:bg-emerald-800">
+                <Plus />
+                Add Money
               </Button>
-              {/* <Button>
-                <Download />
-
-                {!collapsed ? (
-                  <></>
-                ) : (
-                  <span className="hidden md:flex lg:flex 2xl:flex">
-                    Download
-                  </span>
-                )}
-              </Button> */}
-              {/* <DaySelector
-                selectedMonth={selectedMonth}
-                setSelectedMonth={setSelectedMonth}
-                className="hidden lg:flex md:flex 2xl:flex"
-              /> */}
-            </div>
+            </Link>
+          ) : pathname == "/dashboard/analytics" ? (
+            <Link href="">
+              <Button className="bg-emerald-700 hover:bg-emerald-800">
+                <LuDownload />
+                Export Report
+              </Button>
+            </Link>
           ) : pathname == "/dashboard/invoices" ? (
             <Link href="/dashboard/invoices/new">
-              <Button size="sm" className="h-9">
+              <Button className="bg-emerald-700 hover:bg-emerald-800">
                 <Plus />
-                {!collapsed ? (
-                  <span className="hidden">New Invoice</span>
-                ) : (
-                  <span className="hidden md:flex lg:flex 2xl:flex">
-                    New Invoice
-                  </span>
-                )}
+                New Invoice
+              </Button>
+            </Link>
+          ) : pathname == "/dashboard/recurring" ? (
+            <Link href="/dashboard/recurring/new">
+              <Button className="bg-emerald-700 hover:bg-emerald-800">
+                <Plus />
+                New Plan
               </Button>
             </Link>
           ) : (
-            <Button size="sm" className="h-9">
-              <Plus />
-              Add Money
-            </Button>
+            ""
           )}
         </div>
 

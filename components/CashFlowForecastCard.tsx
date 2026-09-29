@@ -23,35 +23,35 @@ export function CashFlowForecastCard({ buckets }: CashFlowForecastCardProps) {
   );
 
   return (
-    <Card className="border-gray-200 shadow-none">
+    <Card className="shadow-none">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
-          <LuTrendingUp className="h-4 w-4 text-emerald-600" />
+        <CardTitle className="text-sm font-medium text-foreground flex items-center gap-1.5">
+          <LuTrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           Expected cash flow
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
         {currencies.length === 0 ? (
-          <p className="text-sm text-gray-400">No invoices expected to settle soon.</p>
+          <p className="text-sm text-muted-foreground">No invoices expected to settle soon.</p>
         ) : (
           currencies.map((currency) => (
             <div key={currency}>
-              <p className="text-xs font-medium text-gray-500 mb-2">{currency}</p>
+              <p className="text-xs font-medium text-muted-foreground mb-2">{currency}</p>
               <div className="space-y-2">
                 {grouped[currency].map((bucket) => (
                   <div
                     key={bucket.label}
-                    className="flex items-center justify-between text-sm rounded-md bg-gray-50 px-3 py-2"
+                    className="flex items-center justify-between text-sm rounded-md bg-muted px-3 py-2"
                   >
                     <div>
-                      <p className="text-gray-700">{bucket.label}</p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-foreground/90">{bucket.label}</p>
+                      <p className="text-xs text-muted-foreground">
                         {bucket.invoiceCount === 0
                           ? "No invoices due"
                           : `${bucket.invoiceCount} invoice${bucket.invoiceCount === 1 ? "" : "s"}`}
                       </p>
                     </div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-foreground">
                       {bucket.expected === 0 ? "—" : formatMoney(bucket.expected, currency)}
                     </p>
                   </div>
@@ -60,7 +60,7 @@ export function CashFlowForecastCard({ buckets }: CashFlowForecastCardProps) {
             </div>
           ))
         )}
-        <p className="text-xs text-gray-400 pt-1">
+        <p className="text-xs text-muted-foreground pt-1">
           Based on due dates of currently sent and partially paid invoices — not a guarantee.
         </p>
       </CardContent>

@@ -19,9 +19,9 @@ const FACTOR_ICON = {
 };
 
 const FACTOR_TONE = {
-  good: "text-emerald-600",
-  watch: "text-amber-600",
-  risk: "text-red-600",
+  good: "text-emerald-600 dark:text-emerald-400",
+  watch: "text-amber-600 dark:text-amber-400",
+  risk: "text-red-600 dark:text-red-400",
 };
 
 export function HealthScoreCard({ currentScore, history, factors }: HealthScoreCardProps) {
@@ -29,18 +29,18 @@ export function HealthScoreCard({ currentScore, history, factors }: HealthScoreC
   const delta = currentScore - previous;
 
   return (
-    <Card className="border-gray-200 shadow-none">
+    <Card className="shadow-none">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-gray-700">Freelancer Health Score</CardTitle>
+        <CardTitle className="text-sm font-medium text-foreground">Freelancer Health Score</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-4xl font-semibold text-gray-900">{currentScore}</p>
+            <p className="text-4xl font-semibold text-foreground">{currentScore}</p>
             <p
               className={cn(
                 "text-xs font-medium mt-1",
-                delta >= 0 ? "text-emerald-600" : "text-red-600"
+                delta >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
               )}
             >
               {delta >= 0 ? "+" : ""}
@@ -54,7 +54,7 @@ export function HealthScoreCard({ currentScore, history, factors }: HealthScoreC
                 <Line
                   type="monotone"
                   dataKey="score"
-                  stroke="#047857"
+                  stroke="var(--chart-1)"
                   strokeWidth={2}
                   dot={false}
                 />
@@ -63,15 +63,15 @@ export function HealthScoreCard({ currentScore, history, factors }: HealthScoreC
           </div>
         </div>
 
-        <div className="mt-4 space-y-2.5 border-t border-gray-100 pt-4">
+        <div className="mt-4 space-y-2.5 border-t border-border pt-4">
           {factors.map((factor) => {
             const Icon = FACTOR_ICON[factor.status];
             return (
               <div key={factor.label} className="flex items-start gap-2.5">
                 <Icon className={cn("h-3.5 w-3.5 mt-0.5 shrink-0", FACTOR_TONE[factor.status])} />
                 <div>
-                  <p className="text-sm text-gray-800">{factor.label}</p>
-                  <p className="text-xs text-gray-400">{factor.detail}</p>
+                  <p className="text-sm text-foreground/90">{factor.label}</p>
+                  <p className="text-xs text-muted-foreground">{factor.detail}</p>
                 </div>
               </div>
             );

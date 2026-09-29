@@ -16,24 +16,24 @@ interface ClientLeaderboardTableProps {
 }
 
 function healthTone(score: number) {
-  if (score >= 80) return "text-emerald-700 bg-emerald-50";
-  if (score >= 55) return "text-amber-700 bg-amber-50";
-  return "text-red-700 bg-red-50";
+  if (score >= 80) return "text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/40";
+  if (score >= 55) return "text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/40";
+  return "text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-950/40";
 }
 
 function onTimeTone(rate: number) {
-  if (rate >= 85) return "text-emerald-700";
-  if (rate >= 60) return "text-amber-700";
-  return "text-red-700";
+  if (rate >= 85) return "text-emerald-700 dark:text-emerald-400";
+  if (rate >= 60) return "text-amber-700 dark:text-amber-400";
+  return "text-red-700 dark:text-red-400";
 }
 
 export function ClientLeaderboardTable({ clients }: ClientLeaderboardTableProps) {
   const sorted = [...clients].sort((a, b) => b.shareOfTotal - a.shareOfTotal);
 
   return (
-    <Card className="border-gray-200 shadow-none">
+    <Card className="shadow-none">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-gray-700">Client leaderboard</CardTitle>
+        <CardTitle className="text-sm font-medium text-foreground">Client leaderboard</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <Table>
@@ -41,8 +41,8 @@ export function ClientLeaderboardTable({ clients }: ClientLeaderboardTableProps)
             <TableRow className="hover:bg-transparent">
               <TableHead>Client</TableHead>
               <TableHead className="text-right">Revenue</TableHead>
-              <TableHead className="text-right">Share</TableHead>
-              <TableHead className="text-right">Avg. collection</TableHead>
+              <TableHead className="hidden text-right sm:table-cell">Share</TableHead>
+              <TableHead className="hidden text-right md:table-cell">Avg. collection</TableHead>
               <TableHead className="text-right">On-time rate</TableHead>
               <TableHead className="text-right">Health</TableHead>
             </TableRow>
@@ -50,12 +50,14 @@ export function ClientLeaderboardTable({ clients }: ClientLeaderboardTableProps)
           <TableBody>
             {sorted.map((client) => (
               <TableRow key={client.clientId}>
-                <TableCell className="font-medium text-gray-800">{client.name}</TableCell>
-                <TableCell className="text-right text-gray-700">
+                <TableCell className="font-medium text-foreground/90">{client.name}</TableCell>
+                <TableCell className="text-right text-foreground/90">
                   {formatMoney(client.revenue, client.currency)}
                 </TableCell>
-                <TableCell className="text-right text-gray-500">{client.shareOfTotal}%</TableCell>
-                <TableCell className="text-right text-gray-500">
+                <TableCell className="hidden text-right text-muted-foreground sm:table-cell">
+                  {client.shareOfTotal}%
+                </TableCell>
+                <TableCell className="hidden text-right text-muted-foreground md:table-cell">
                   {client.avgCollectionDays}d
                 </TableCell>
                 <TableCell className={cn("text-right font-medium", onTimeTone(client.onTimeRate))}>

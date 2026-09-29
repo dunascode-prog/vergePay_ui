@@ -33,48 +33,48 @@ export function AnalyticsPage() {
   const [period, setPeriod] = useState<Period>("this_month");
 
   return (
-    <div className="min-h-screen">
-      <div className="">
-        <div className="flex justify-end mb-4">
-          <div className="flex items-right gap-3">
-            <PeriodSelector value={period} onChange={setPeriod} />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-          <HealthScoreCard
-            currentScore={currentHealthScore}
-            history={healthScoreHistory}
-            factors={healthScoreFactors}
-          />
-          <CollectionMetricsCard clients={clientRevenueShares} />
-          <ConcentrationRiskCard clients={clientRevenueShares} currency="NGN" />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-          <div className="lg:col-span-2">
-            <RevenueTrendChart data={revenueTrend} />
-          </div>
-          <CashFlowForecastCard buckets={cashFlowForecast} />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-          <div className="lg:col-span-2">
-            <ClientLeaderboardTable clients={clientRevenueShares} />
-          </div>
-          <InvoiceBehaviorCard
-            reminders={reminderEffectiveness}
-            latePayments={latePaymentDistribution}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-          <ExpenseBreakdownCard categories={expenseCategories} />
-          <GoalsProgressCard goals={goals} />
-        </div>
-
-        <AIInsightsFeed insights={aiInsights} />
+    <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 sm:gap-5 lg:gap-6">
+      <div className="flex justify-end overflow-x-auto">
+        <PeriodSelector value={period} onChange={setPeriod} />
       </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
+        <HealthScoreCard
+          currentScore={currentHealthScore}
+          history={healthScoreHistory}
+          factors={healthScoreFactors}
+        />
+        <CollectionMetricsCard clients={clientRevenueShares} />
+        <ConcentrationRiskCard
+          clients={clientRevenueShares}
+          currency="NGN"
+          className="sm:col-span-2 xl:col-span-1"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <RevenueTrendChart data={revenueTrend} />
+        </div>
+        <CashFlowForecastCard buckets={cashFlowForecast} />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <ClientLeaderboardTable clients={clientRevenueShares} />
+        </div>
+        <InvoiceBehaviorCard
+          reminders={reminderEffectiveness}
+          latePayments={latePaymentDistribution}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+        <ExpenseBreakdownCard categories={expenseCategories} />
+        <GoalsProgressCard goals={goals} />
+      </div>
+
+      <AIInsightsFeed insights={aiInsights} />
     </div>
   );
 }

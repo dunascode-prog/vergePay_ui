@@ -16,13 +16,13 @@ export function ExpenseBreakdownCard({ categories }: ExpenseBreakdownCardProps) 
     .reduce((sum, c) => sum + c.amount, 0);
 
   return (
-    <Card className="border-gray-200 shadow-none">
+    <Card className="shadow-none">
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm font-medium text-gray-700">Expenses by category</CardTitle>
-        <span className="text-sm font-semibold text-gray-900">{formatMoney(total, currency)}</span>
+        <CardTitle className="text-sm font-medium text-foreground">Expenses by category</CardTitle>
+        <span className="text-sm font-semibold text-foreground">{formatMoney(total, currency)}</span>
       </CardHeader>
       <CardContent>
-        <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-gray-100 mb-4">
+        <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-muted mb-4">
           {categories.map((c) => (
             <div
               key={c.category}
@@ -38,11 +38,11 @@ export function ExpenseBreakdownCard({ categories }: ExpenseBreakdownCardProps) 
             .sort((a, b) => b.amount - a.amount)
             .map((c) => (
               <div key={c.category} className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2 text-gray-700">
+                <span className="flex items-center gap-2 text-foreground/90">
                   <span className={cn("h-2 w-2 rounded-full", c.colorClass)} />
                   {c.category}
                 </span>
-                <span className="text-gray-500">{formatMoney(c.amount, c.currency)}</span>
+                <span className="text-muted-foreground">{formatMoney(c.amount, c.currency)}</span>
               </div>
             ))}
         </div>

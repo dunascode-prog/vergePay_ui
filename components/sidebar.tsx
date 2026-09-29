@@ -31,6 +31,8 @@ import Link from "next/link";
 import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { WalletSwitcher } from "./wallet_switcher";
 import { UserNav } from "./user_nav";
+import { cn } from "@/lib/utils";
+import { WalletsSidebarGroup } from "./wallet";
 
 const sidebarMenu = {
   main: {
@@ -60,12 +62,12 @@ const sidebarMenu = {
       },
       {
         title: "Recurring billing",
-        url: "dashboard/recurring-billing",
+        url: "/dashboard/recurring",
         icon: Repeat,
       },
       {
         title: "Clients",
-        url: "dashboard/clients",
+        url: "/dashboard/clients",
         icon: Users,
       },
     ],
@@ -76,17 +78,17 @@ const sidebarMenu = {
     items: [
       {
         title: "Business overview",
-        url: "/business",
+        url: "/dashboard/business",
         icon: Briefcase,
       },
       {
         title: "Expenses",
-        url: "/expenses",
+        url: "/dashboard/expenses",
         icon: Wallet,
       },
       {
         title: "Payroll",
-        url: "/payroll",
+        url: "/dashboard/payroll",
         icon: Banknote,
       },
     ],
@@ -97,12 +99,12 @@ const sidebarMenu = {
     items: [
       {
         title: "Goals",
-        url: "/goals",
+        url: "/dashboard/goals",
         icon: Target,
       },
       {
         title: "Envelopes",
-        url: "/envelopes",
+        url: "/dashboard/envelopes",
         icon: Mail,
       },
     ],
@@ -121,25 +123,34 @@ export function AppSidebar() {
               render={
                 <Link
                   href="/"
-                  className="flex items-center justify-center gap-3"
+                  className="relative flex items-center justify-center gap-3"
                 >
-                  {collapsed ? (
-                    <Image
-                      src="/final_vergePay_logoc.svg"
-                      alt="VergePay"
-                      width={34}
-                      height={34}
-                      className="rounded-lg"
-                    />
-                  ) : (
-                    <Image
-                      src="/final_vergePay_logo.svg"
-                      alt="VergePay"
-                      width={154}
-                      height={154}
-                      className="rounded-lg"
-                    />
-                  )}
+                  <Image
+                    src="/final_vergePay_logoc.svg"
+                    alt="VergePay"
+                    width={34}
+                    height={34}
+                    priority
+                    className={cn(
+                      "rounded-lg transition-opacity duration-150",
+                      collapsed
+                        ? "opacity-100"
+                        : "absolute opacity-0 pointer-events-none",
+                    )}
+                  />
+                  <Image
+                    src="/final_vergePay_logo.svg"
+                    alt="VergePay"
+                    width={154}
+                    height={154}
+                    priority
+                    className={cn(
+                      "rounded-lg transition-opacity duration-150",
+                      collapsed
+                        ? "absolute opacity-0 pointer-events-none"
+                        : "opacity-100",
+                    )}
+                  />
                 </Link>
               }
             />
@@ -183,7 +194,7 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroup>
         ) : (
-          <WalletSwitcher />
+          <WalletsSidebarGroup />
         )}
       </SidebarContent>
 

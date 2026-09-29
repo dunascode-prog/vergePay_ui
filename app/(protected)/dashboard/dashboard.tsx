@@ -35,19 +35,8 @@ import { AIEnvelopeSummary } from "@/components/ai_envelope_summary";
 import RecentTransactions from "@/components/notification_table";
 import OutstandingInvoiceCard from "@/components/invoice_card";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { useSidebar } from "@/components/ui/sidebar";
 
 export const description = "A donut chart with text";
-const healthScore = 96;
-
-const chartData1 = [
-  {
-    name: "health",
-    value: healthScore,
-    fill: "var(--chart-2)",
-  },
-];
 
 const chartConfig = {
   score: {
@@ -66,6 +55,7 @@ const chartConfig = {
     color: "var(--chart-3)",
   },
 } satisfies ChartConfig;
+
 const incomeData = [
   { value: 120 },
   { value: 145 },
@@ -123,8 +113,13 @@ const buttonsTxt = [
 
 export default function Dashboard() {
   const healthScore = 89;
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
+  const chartData1 = [
+    {
+      name: "health",
+      value: healthScore,
+      fill: "var(--chart-2)",
+    },
+  ];
 
   // useEffect(() => {
   //   async function verifySession() {
@@ -146,283 +141,243 @@ export default function Dashboard() {
   //   verifySession();
   // });
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 lg:grid-cols-12 2xl:grid-cols-12 gap-5">
-      <div className="col-span-1 md:col-span-12 lg:col-span-12 2xl:col-span-12">
-        <Card className="col-span-12">
-          <CardHeader className="flex flex-row items-center justify-between pb-4">
-            <div>
-              <CardTitle>Performance Overview</CardTitle>
-              <CardDescription>
-                Key financial metrics for this month
-              </CardDescription>
-            </div>
+    <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 sm:gap-5 lg:gap-6">
+      {/* Performance overview */}
+      <Card>
+        <CardHeader className="flex flex-col gap-2 pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle>Performance Overview</CardTitle>
+            <CardDescription>
+              Key financial metrics for this month
+            </CardDescription>
+          </div>
 
-            <Badge variant="secondary">This Month</Badge>
-          </CardHeader>
+          <Badge variant="secondary" className="w-fit">
+            This Month
+          </Badge>
+        </CardHeader>
 
-          <CardContent>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
-              <Metric
-                title="Income"
-                value="₦300k"
-                change="+67% vs Oct"
-                positive
-                chart={<Sparkline data={incomeData} color="var(--chart-1)" />}
-              />
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">
+            <Metric
+              title="Income"
+              value="₦300k"
+              change="+67% vs Oct"
+              positive
+              chart={<Sparkline data={incomeData} color="var(--chart-1)" />}
+            />
 
-              <Metric
-                title="Spent"
-                value="₦140k"
-                change="-12% vs Oct"
-                chart={<Sparkline data={expenseData} color="var(--chart-5)" />}
-              />
+            <Metric
+              title="Spent"
+              value="₦140k"
+              change="-12% vs Oct"
+              chart={<Sparkline data={expenseData} color="var(--chart-5)" />}
+            />
 
-              <Metric
-                title="Net"
-                value="+₦160k"
-                change="Healthy cash flow"
-                positive
-                chart={<Sparkline data={netData} color="var(--chart-2)" />}
-              />
+            <Metric
+              title="Net"
+              value="+₦160k"
+              change="Healthy cash flow"
+              positive
+              chart={<Sparkline data={netData} color="var(--chart-2)" />}
+            />
 
-              <Metric
-                title="Investment Rate"
-                value="20%"
-                change="Target achieved"
-                positive
-                chart={
-                  <Sparkline data={investmentData} color="var(--chart-3)" />
-                }
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      <div
-        className={cn(
-          collapsed
-            ? "grid grid-cols-12 gap-3 col-span-1 md:col-span-12 lg:col-span-9 2xl:col-span-9 rounded"
-            : "grid grid-cols-12 gap-3 col-span-1 md:col-span-12 lg:col-span-12 2xl:col-span-12 rounded",
-        )}
-      >
-        <div
-          className={cn(
-            collapsed
-              ? "col-span-12 md:col-span-6 lg:col-span-4 2xl:col-span-4 rounded"
-              : "col-span-12 md:col-span-6 lg:col-span-6 2xl:col-span-6 rounded",
-          )}
-        >
-          <Card className="flex flex-col">
-            <CardHeader>
-              <CardTitle className="text-base font-semibold">
-                Personal Wallet
-              </CardTitle>
-            </CardHeader>
+            <Metric
+              title="Investment Rate"
+              value="20%"
+              change="Target achieved"
+              positive
+              chart={<Sparkline data={investmentData} color="var(--chart-3)" />}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Available Balance
-                </p>
+      {/* Main content + side rail */}
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-3 lg:items-start lg:gap-6">
+        {/* Main column */}
+        <div className="flex flex-col gap-4 sm:gap-5 lg:col-span-2">
+          {/* Wallets + client health */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
+            <Card className="flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-base font-semibold">
+                  Personal Wallet
+                </CardTitle>
+              </CardHeader>
 
-                <h2 className="text-3xl font-bold tracking-tight tabular-nums">
-                  $1,125
-                </h2>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Available Balance
+                  </p>
 
-                <div className="flex items-center">
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <span>Account: 110324567</span>
-                    <Dot className="size-4" />
+                  <h2 className="text-3xl font-bold tracking-tight tabular-nums">
+                    $1,125
+                  </h2>
+
+                  <div className="flex flex-wrap items-center gap-x-1">
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <span>Account: 110324567</span>
+                      <Dot className="size-4" />
+                    </div>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-0 font-medium"
+                    >
+                      Copy
+                    </Button>
                   </div>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <Button className="w-full">
+                    <Plus />
+                    Add
+                  </Button>
 
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-auto p-0 font-medium"
-                  >
-                    Copy
+                  <Button className="w-full" variant="secondary">
+                    <Send />
+                    Send
+                  </Button>
+
+                  <Button className="w-full" variant="outline">
+                    <ArrowLeftRight />
+                    Transfer
                   </Button>
                 </div>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <Button className="w-full">
-                  <Plus />
-                  Add
-                </Button>
+              </CardContent>
+            </Card>
 
-                <Button className="w-full" variant="secondary">
-                  <Send />
-                  Send
-                </Button>
+            <Card className="flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-base font-semibold">
+                  Business Wallet
+                </CardTitle>
+              </CardHeader>
 
-                <Button className="w-full" variant="outline">
-                  <ArrowLeftRight />
-                  Transfer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <div
-          className={cn(
-            collapsed
-              ? "col-span-12 md:col-span-6 lg:col-span-4 2xl:col-span-4 rounded"
-              : "col-span-12 md:col-span-6 lg:col-span-6 2xl:col-span-6 rounded",
-          )}
-        >
-          <Card className="flex flex-col">
-            <CardHeader>
-              <CardTitle className="text-base font-semibold">
-                Business Wallet
-              </CardTitle>
-            </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Available Balance
+                  </p>
 
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Available Balance
-                </p>
+                  <h2 className="text-3xl font-bold tracking-tight tabular-nums">
+                    $5,225
+                  </h2>
 
-                <h2 className="text-3xl font-bold tracking-tight tabular-nums">
-                  $5,225
-                </h2>
-
-                <div className="flex items-center">
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <span>Seun Design Studio</span>
+                  <div className="flex items-center">
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <span>Seun Design Studio</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <Button className="w-full">
-                  <FileText />
-                  Invoice
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button className="w-full">
+                    <FileText />
+                    Invoice
+                  </Button>
 
-                <Button className="w-full" variant="secondary">
-                  <Plus />
-                  Expense
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <div
-          className={cn(
-            collapsed
-              ? "col-span-12 md:col-span-6 lg:col-span-4 2xl:col-span-4"
-              : "col-span-12 md:col-span-6 lg:col-span-6 2xl:col-span-6",
-          )}
-        >
-          <Card>
-            <CardContent className="space-y-3 p-4">
-              <div>
-                <h3 className="text-base font-semibold">Client Health</h3>
+                  <Button className="w-full" variant="secondary">
+                    <Plus />
+                    Expense
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
-                <p className="text-sm text-muted-foreground">
-                  Overall recurring portfolio
-                </p>
-              </div>
+            <Card className="sm:col-span-2 xl:col-span-1">
+              <CardContent className="space-y-3 p-4">
+                <div>
+                  <h3 className="text-base font-semibold">Client Health</h3>
 
-              {/* Center the chart */}
-              <div className="flex flex-col items-center">
-                <ChartContainer
-                  config={chartConfig}
-                  className="h-[130px] w-[130px]"
-                >
-                  <RadialBarChart
-                    data={chartData1}
-                    startAngle={90}
-                    endAngle={90 - (healthScore / 100) * 360}
-                    innerRadius={42}
-                    outerRadius={58}
+                  <p className="text-sm text-muted-foreground">
+                    Overall recurring portfolio
+                  </p>
+                </div>
+
+                {/* Center the chart */}
+                <div className="flex flex-col items-center">
+                  <ChartContainer
+                    config={chartConfig}
+                    className="h-[130px] w-[130px]"
                   >
-                    <PolarRadiusAxis
-                      tick={false}
-                      tickLine={false}
-                      axisLine={false}
+                    <RadialBarChart
+                      data={chartData1}
+                      startAngle={90}
+                      endAngle={90 - (healthScore / 100) * 360}
+                      innerRadius={42}
+                      outerRadius={58}
                     >
-                      <Label
-                        content={({ viewBox }) => {
-                          if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                            return (
-                              <text
-                                x={viewBox.cx}
-                                y={viewBox.cy}
-                                textAnchor="middle"
-                                dominantBaseline="middle"
-                              >
-                                <tspan
+                      <PolarRadiusAxis
+                        tick={false}
+                        tickLine={false}
+                        axisLine={false}
+                      >
+                        <Label
+                          content={({ viewBox }) => {
+                            if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                              return (
+                                <text
                                   x={viewBox.cx}
                                   y={viewBox.cy}
-                                  className="fill-foreground text-xl font-bold"
+                                  textAnchor="middle"
+                                  dominantBaseline="middle"
                                 >
-                                  {healthScore}%
-                                </tspan>
-                              </text>
-                            );
-                          }
-                        }}
-                      />
-                    </PolarRadiusAxis>
+                                  <tspan
+                                    x={viewBox.cx}
+                                    y={viewBox.cy}
+                                    className="fill-foreground text-xl font-bold"
+                                  >
+                                    {healthScore}%
+                                  </tspan>
+                                </text>
+                              );
+                            }
+                          }}
+                        />
+                      </PolarRadiusAxis>
 
-                    <RadialBar dataKey="value" background cornerRadius={999} />
-                  </RadialBarChart>
-                </ChartContainer>
+                      <RadialBar dataKey="value" background cornerRadius={999} />
+                    </RadialBarChart>
+                  </ChartContainer>
 
-                <Badge variant="secondary" className="mt-2">
-                  Excellent
-                </Badge>
+                  <Badge variant="secondary" className="mt-2">
+                    Excellent
+                  </Badge>
 
-                <p className="mt-1 text-center text-sm text-muted-foreground">
-                  Based on payment reliability
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 border-t pt-4 text-sm">
-                <div>
-                  <p className="font-medium">Paid on time</p>
-                  <p className="text-muted-foreground">89% of invoices</p>
+                  <p className="mt-1 text-center text-sm text-muted-foreground">
+                    Based on payment reliability
+                  </p>
                 </div>
 
-                <div className="text-right">
-                  <p className="font-medium">Needs attention</p>
-                  <p className="text-muted-foreground">1 client</p>
+                <div className="grid grid-cols-2 gap-4 border-t pt-4 text-sm">
+                  <div>
+                    <p className="font-medium">Paid on time</p>
+                    <p className="text-muted-foreground">89% of invoices</p>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="font-medium">Needs attention</p>
+                    <p className="text-muted-foreground">1 client</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="col-span-12 md:col-span-12 lg:col-span-12 2xl:col-span-12">
+              </CardContent>
+            </Card>
+          </div>
+
           <AiSummaryCard />
+
+          {/* Cash flow + envelope summary */}
+          <div className="grid grid-cols-1 gap-4 sm:gap-5 xl:grid-cols-2">
+            <MonthlyCashFlow />
+            <AIEnvelopeSummary />
+          </div>
         </div>
-        <div
-          className={cn(
-            collapsed
-              ? "col-span-12 md:col-span-12 lg:col-span-6 2xl:col-span-6"
-              : "col-span-12 md:col-span-12 lg:col-span-12 2xl:col-span-12",
-          )}
-        >
-          <MonthlyCashFlow />
-        </div>
-        <div
-          className={cn(
-            collapsed
-              ? "col-span-12 md:col-span-12 lg:col-span-6 2xl:col-span-6"
-              : "col-span-12 md:col-span-12 lg:col-span-12 2xl:col-span-12",
-          )}
-        >
-          <AIEnvelopeSummary />
-        </div>
-      </div>
-      <div
-        className={
-          collapsed
-            ? "flex flex-col gap-3 md:col-span-12 lg:col-span-3 2xl:col-span-3"
-            : "flex flex-col gap-3 md:col-span-12 lg:col-span-12 2xl:col-span-12"
-        }
-      >
-        <div className="">
+
+        {/* Side rail */}
+        <div className="flex flex-col gap-4 sm:gap-5">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <CardTitle>Upcoming Billing</CardTitle>
@@ -453,12 +408,10 @@ export default function Dashboard() {
                 status="warning"
               />
             </CardContent>
-          </Card>{" "}
-        </div>
-        <div>
+          </Card>
+
           <OutstandingInvoiceCard />
-        </div>
-        <div>
+
           <Card className="h-full rounded-2xl bg-card shadow-sm">
             <CardHeader className="pb-2">
               <div className="flex items-start justify-between">
@@ -516,11 +469,10 @@ export default function Dashboard() {
               ))}
             </CardContent>
           </Card>
-        </div>
-        <div>
+
           <Card>
             <CardHeader>
-              <CardTitle>Upcoming Billing</CardTitle>
+              <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
 
             <CardContent className="flex flex-col space-y-2">
@@ -539,15 +491,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div
-        className={cn(
-          collapsed
-            ? "col-span-1 md:col-span-12 lg:col-span-9 2xl:col-span-9"
-            : "col-span-1 md:col-span-12 lg:col-span-12 2xl:col-span-12",
-        )}
-      >
-        <RecentTransactions />
-      </div>
+      <RecentTransactions />
     </div>
   );
 }

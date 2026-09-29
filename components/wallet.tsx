@@ -1,62 +1,128 @@
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
+"use client";
 
-type WalletCardProps = {
+import Link from "next/link";
+import { LucideIcon, Wallet, Building2, CirclePlus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+} from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
+
+interface WalletCardProps {
   href: string;
   name: string;
   balance: string;
+  currency: "NGN" | "USD";
   description: string;
-  color: "green" | "blue" | "purple";
+  icon: LucideIcon;
   active?: boolean;
-};
+}
 
-const colors = {
-  green: "bg-emerald-500 shadow-[0_0_12px_theme(colors.emerald.500/40%)]",
-  blue: "bg-sky-500 shadow-[0_0_12px_theme(colors.sky.500/40%)]",
-  purple: "bg-violet-500 shadow-[0_0_12px_theme(colors.violet.500/40%)]",
-};
-
-export function WalletCard({
+function WalletCard({
   href,
   name,
   balance,
+  currency,
   description,
-  color,
+  icon: Icon,
   active,
 }: WalletCardProps) {
   return (
     <Link
       href={href}
       className={cn(
-        "block rounded-xl border bg-sidebar-accent/40 p-4 transition-all",
-        "hover:bg-sidebar-accent hover:border-primary/20",
-        active && "border-primary bg-sidebar-accent",
+        "group relative block rounded-xl border border-border bg-card p-3.5 transition-colors",
+        "hover:border-primary/30 hover:bg-accent/50",
+        active && "border-primary/40 bg-accent/60",
       )}
     >
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <span className={cn("h-3 w-3 rounded-full", colors[color])} />
+      {/* ledger-style active rail */}
+      <span
+        className={cn(
+          "absolute inset-y-3 left-0 w-[3px] rounded-full bg-primary transition-opacity",
+          active ? "opacity-100" : "opacity-0",
+        )}
+      />
 
-          <div>
-            <p className="text-sm font-medium">{name}</p>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <div
+            className={cn(
+              "flex size-8 shrink-0 items-center justify-center rounded-lg",
+              "bg-primary/10 text-primary",
+            )}
+          >
+            <Icon className="size-4" />
+          </div>
 
-            <p className="text-xs text-muted-foreground">{description}</p>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium leading-none">{name}</p>
+            <p className="mt-1 truncate text-xs text-muted-foreground">
+              {description}
+            </p>
           </div>
         </div>
 
         {active && (
-          <Badge variant="secondary" className="text-[10px]">
+          <Badge
+            variant="secondary"
+            className="shrink-0 text-[10px] font-medium"
+          >
             Active
           </Badge>
         )}
       </div>
 
-      <div className="mt-4">
-        <h4 className="text-lg font-semibold tracking-tight tabular-nums">
+      <div className="mt-3.5 flex items-baseline gap-1.5">
+        <span className="text-lg font-semibold tracking-tight tabular-nums">
           {balance}
-        </h4>
+        </span>
+        <span className="text-[11px] font-medium text-muted-foreground">
+          {currency}
+        </span>
       </div>
     </Link>
+  );
+}
+
+export function WalletsSidebarGroup() {
+  return (
+    <SidebarGroup className="px-2">
+      <SidebarGroupLabel className="mb-2 px-2 text-[11px] uppercase tracking-widest">
+        Wallets
+      </SidebarGroupLabel>
+
+      <SidebarGroupContent className="space-y-2">
+        <WalletCard
+          href="/wallets/personal"
+          name="Personal Wallet"
+          balance="600,000"
+          currency="USD"
+          description="Main spending wallet"
+          icon={Wallet}
+          active
+        />
+
+        <WalletCard
+          href="/wallets/business"
+          name="Business Wallet"
+          balance="300,000"
+          currency="NGN"
+          description="Client payments"
+          icon={Building2}
+        />
+
+        <Button
+          variant="ghost"
+          className="w-full justify-start rounded-xl text-muted-foreground hover:text-foreground"
+        >
+          <CirclePlus className="mr-2 size-4" />
+          Add wallet
+        </Button>
+      </SidebarGroupContent>
+    </SidebarGroup>
   );
 }

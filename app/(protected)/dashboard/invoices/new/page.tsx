@@ -25,7 +25,7 @@ export default function NewInvoicePage() {
     // });
     console.log("Create invoice", { values, submitType });
 
-    router.push("/invoices");
+    router.push("/dashboard/invoices");
   }
 
   return <InvoiceFormPageView mode="create" onSubmit={handleCreate} />;

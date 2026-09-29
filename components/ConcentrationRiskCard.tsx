@@ -7,17 +7,20 @@ import { cn } from "@/lib/utils";
 interface ConcentrationRiskCardProps {
   clients: ClientRevenueShare[];
   currency: "NGN" | "USD";
+  className?: string;
 }
 
 function riskLevel(topShare: number): { label: string; tone: string } {
-  if (topShare >= 40) return { label: "Concentrated", tone: "text-red-600 bg-red-50" };
-  if (topShare >= 25) return { label: "Moderate", tone: "text-amber-600 bg-amber-50" };
-  return { label: "Diversified", tone: "text-emerald-600 bg-emerald-50" };
+  if (topShare >= 40)
+    return { label: "Concentrated", tone: "text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-950/40" };
+  if (topShare >= 25)
+    return { label: "Moderate", tone: "text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/40" };
+  return { label: "Diversified", tone: "text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/40" };
 }
 
-const BAR_COLORS = ["bg-emerald-600", "bg-emerald-400", "bg-amber-400", "bg-gray-300", "bg-gray-200"];
+const BAR_COLORS = ["bg-emerald-600", "bg-emerald-400", "bg-amber-400", "bg-slate-400", "bg-slate-300"];
 
-export function ConcentrationRiskCard({ clients, currency }: ConcentrationRiskCardProps) {
+export function ConcentrationRiskCard({ clients, currency, className }: ConcentrationRiskCardProps) {
   const inCurrency = clients
     .filter((c) => c.currency === currency)
     .sort((a, b) => b.shareOfTotal - a.shareOfTotal);
@@ -26,9 +29,9 @@ export function ConcentrationRiskCard({ clients, currency }: ConcentrationRiskCa
   const risk = riskLevel(topShare);
 
   return (
-    <Card className="border-gray-200 shadow-none">
+    <Card className={cn("shadow-none", className)}>
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm font-medium text-gray-700">
+        <CardTitle className="text-sm font-medium text-foreground">
           Client concentration ({currency})
         </CardTitle>
         <span className={cn("text-xs font-medium rounded-full px-2 py-0.5", risk.tone)}>
@@ -36,11 +39,11 @@ export function ConcentrationRiskCard({ clients, currency }: ConcentrationRiskCa
         </span>
       </CardHeader>
       <CardContent>
-        <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-100 mb-4">
+        <div className="flex h-3 w-full overflow-hidden rounded-full bg-muted mb-4">
           {inCurrency.map((client, i) => (
             <div
               key={client.clientId}
-              className={cn("h-full", BAR_COLORS[i] ?? "bg-gray-200")}
+              className={cn("h-full", BAR_COLORS[i] ?? "bg-slate-300")}
               style={{ width: `${client.shareOfTotal}%` }}
               title={`${client.name}: ${client.shareOfTotal}%`}
             />
@@ -49,16 +52,16 @@ export function ConcentrationRiskCard({ clients, currency }: ConcentrationRiskCa
         <div className="space-y-2">
           {inCurrency.map((client, i) => (
             <div key={client.clientId} className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-2 text-gray-700">
-                <span className={cn("h-2 w-2 rounded-full", BAR_COLORS[i] ?? "bg-gray-200")} />
+              <span className="flex items-center gap-2 text-foreground/90">
+                <span className={cn("h-2 w-2 rounded-full", BAR_COLORS[i] ?? "bg-slate-300")} />
                 {client.name}
               </span>
-              <span className="text-gray-400">{client.shareOfTotal}%</span>
+              <span className="text-muted-foreground">{client.shareOfTotal}%</span>
             </div>
           ))}
         </div>
         {topShare >= 40 && (
-          <p className="text-xs text-red-600 mt-3 pt-3 border-t border-gray-100">
+          <p className="text-xs text-red-600 dark:text-red-400 mt-3 pt-3 border-t border-border">
             {inCurrency[0].name} alone makes up {topShare}% of {currency} revenue — losing this
             client would materially affect cash flow.
           </p>
