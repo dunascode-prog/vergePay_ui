@@ -9,7 +9,15 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
+import {
+  AuthHeader,
+  AuthNotice,
+  PasswordInput,
+  authInputClass,
+  authLinkClass,
+  authSubmitClass,
+} from "@/components/auth/fields";
 
 import z from "zod";
 import { useState } from "react";
@@ -43,27 +51,6 @@ function messageFor(err: unknown): string {
   return "Something went wrong. Please try again.";
 }
 
-// Shared look for the auth inputs and main button: taller than the app's
-// default controls, as on most fintech sign-in screens.
-const inputClass = "h-11 rounded-lg px-3 text-base md:text-sm";
-const submitClass = "h-11 w-full rounded-lg bg-emerald-700 text-sm font-medium text-white hover:bg-emerald-800";
-
-function Notice({ tone, children }: { tone: "info" | "error"; children: React.ReactNode }) {
-  return (
-    <div
-      role={tone === "error" ? "alert" : "status"}
-      className={cn(
-        "rounded-lg border px-3 py-2.5 text-sm",
-        tone === "error"
-          ? "border-destructive/20 bg-destructive/5 text-destructive"
-          : "border-emerald-200 bg-emerald-50 text-emerald-800",
-      )}
-    >
-      {children}
-    </div>
-  );
-}
-
 export function LoginForm({
   className,
   next,
@@ -73,7 +60,6 @@ export function LoginForm({
 }: SigninFormProps) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(initialStep);
-  const [showPassword, setShowPassword] = useState(false);
   const [notice, setNotice] = useState<string | null>(
     justRegistered ? "Account created. Sign in to continue." : null,
   );
@@ -123,15 +109,12 @@ export function LoginForm({
 
   return (
     <div className={cn("w-full", className)} {...props}>
-      <header className="mb-8 space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Sign in to VergePay</h1>
-        <p className="text-sm text-muted-foreground">Welcome back. Enter your details to continue.</p>
-      </header>
+      <AuthHeader title="Sign in to VergePay" subtitle="Welcome back. Enter your details to continue." />
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <FieldGroup className="gap-5">
-          {notice && <Notice tone="info">{notice}</Notice>}
-          {errors.root && <Notice tone="error">{errors.root.message}</Notice>}
+          {notice && <AuthNotice tone="info">{notice}</AuthNotice>}
+          {errors.root && <AuthNotice tone="error">{errors.root.message}</AuthNotice>}
 
           <Field data-invalid={Boolean(errors.email)}>
             <FieldLabel htmlFor="email">Email address</FieldLabel>
@@ -140,7 +123,7 @@ export function LoginForm({
               type="email"
               autoComplete="email"
               placeholder="you@business.com"
-              className={inputClass}
+              className={authInputClass}
               aria-invalid={Boolean(errors.email)}
               {...register("email")}
             />
@@ -149,29 +132,17 @@ export function LoginForm({
 
           <Field data-invalid={Boolean(errors.password)}>
             <FieldLabel htmlFor="password">Password</FieldLabel>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                autoComplete="current-password"
-                placeholder="Enter your password"
-                className={cn(inputClass, "pr-11")}
-                aria-invalid={Boolean(errors.password)}
-                {...register("password")}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((shown) => !shown)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-muted-foreground hover:text-foreground"
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
+            <PasswordInput
+              id="password"
+              autoComplete="current-password"
+              placeholder="Enter your password"
+              aria-invalid={Boolean(errors.password)}
+              {...register("password")}
+            />
             <FieldError errors={[errors.password]} />
           </Field>
 
-          <Button type="submit" disabled={isSubmitting} className={cn(submitClass, "mt-1")}>
+          <Button type="submit" disabled={isSubmitting} className={authSubmitClass}>
             {isSubmitting ? "Signing in…" : "Sign in"}
           </Button>
         </FieldGroup>
@@ -179,7 +150,7 @@ export function LoginForm({
 
       <p className="mt-8 text-sm text-muted-foreground">
         New to VergePay?{" "}
-        <Link href="/signup" className="font-medium text-emerald-700 hover:underline">
+        <Link href="/signup" className={authLinkClass}>
           Create an account
         </Link>
       </p>
@@ -230,15 +201,11 @@ function TwoFactorStep({
 
   return (
     <>
-      <header className="mb-8 space-y-3">
-        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
-          <ShieldCheck className="h-5 w-5" />
-        </span>
-        <h1 className="text-2xl font-semibold tracking-tight">Two-factor authentication</h1>
-        <p className="text-sm text-muted-foreground">
-          Enter the 6-digit code from your authenticator app.
-        </p>
-      </header>
+      <AuthHeader
+        icon={<ShieldCheck className="h-5 w-5" />}
+        title="Two-factor authentication"
+        subtitle="Enter the 6-digit code from your authenticator app."
+      />
 
       <form onSubmit={submit} noValidate>
         <FieldGroup className="gap-5">
@@ -252,7 +219,7 @@ function TwoFactorStep({
               autoFocus
               maxLength={6}
               placeholder="000000"
-              className={cn(inputClass, "text-center text-lg tracking-[0.5em] tabular-nums md:text-lg")}
+              className={cn(authInputClass, "text-center text-lg tracking-[0.5em] tabular-nums md:text-lg")}
               value={code}
               aria-invalid={Boolean(error)}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
@@ -260,7 +227,7 @@ function TwoFactorStep({
             {error && <FieldError>{error}</FieldError>}
           </Field>
 
-          <Button type="submit" disabled={submitting} className={cn(submitClass, "mt-1")}>
+          <Button type="submit" disabled={submitting} className={authSubmitClass}>
             {submitting ? "Verifying…" : "Verify and continue"}
           </Button>
         </FieldGroup>
@@ -271,7 +238,7 @@ function TwoFactorStep({
         <button
           type="button"
           onClick={switchAccount}
-          className="font-medium text-emerald-700 hover:underline"
+          className={authLinkClass}
         >
           Use a different account
         </button>

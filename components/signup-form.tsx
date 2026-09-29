@@ -2,29 +2,39 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Field,
-  FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+  AuthHeader,
+  AuthNotice,
+  PasswordChecklist,
+  PasswordInput,
+  PasswordRule,
+  authInputClass,
+  authLinkClass,
+  authSubmitClass,
+} from "@/components/auth/fields";
 import { SignupRequest } from "@/types/auth";
 import { signup } from "@/services/auth";
 import { ApiError } from "@/lib/api";
 import Link from "next/link";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
+
+// The API's password rules (vergePay_api signUp), shown live as a checklist.
+const PASSWORD_RULES: PasswordRule[] = [
+  { label: "At least 12 characters", test: (v) => v.length >= 12 },
+  { label: "Upper and lowercase letters", test: (v) => /[A-Z]/.test(v) && /[a-z]/.test(v) },
+  { label: "A number", test: (v) => /[0-9]/.test(v) },
+  { label: "A special character", test: (v) => /[!@#$%^&*(),.?":{}|<>_\-+=/\\[\]';`~]/.test(v) },
+];
+
 const signupSchema = z
   .object({
     username: z
@@ -36,56 +46,39 @@ const signupSchema = z
         /^[a-zA-Z0-9_]+$/,
         "Username may only contain letters, numbers and underscores.",
       ),
-
-    email: z.string().trim().toLowerCase().email("Invalid email address."),
+    email: z.string().trim().toLowerCase().email("Enter a valid email address."),
     password: z
       .string()
-      .min(12, "Password must be at least 12 characters.")
-      .max(128)
-      .regex(/[A-Z]/, "Password must contain an uppercase letter.")
-      .regex(/[a-z]/, "Password must contain a lowercase letter.")
-      .regex(/[0-9]/, "Password must contain a number.")
-      .regex(
-        /[!@#$%^&*(),.?":{}|<>_\-+=/\\[\]';`~]/,
-        "Password must contain a special character.",
-      ),
-    confirmPassword: z.string(),
+      .max(128, "Password cannot exceed 128 characters.")
+      .refine((v) => PASSWORD_RULES.every((rule) => rule.test(v)), "Your password doesn't meet all the requirements yet."),
+    confirmPassword: z.string().min(1, "Confirm your password."),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: "Passwords do not match.",
     path: ["confirmPassword"],
   });
 
-interface SignupFormProps extends React.HTMLAttributes<HTMLDivElement> {
-  loading: boolean;
-  setLoader: React.Dispatch<React.SetStateAction<boolean>>;
-}
-export function SignupForm({
-  className,
-  loading,
-  setLoader,
-  ...props
-}: SignupFormProps) {
+export function SignupForm({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   const router = useRouter();
   const {
     register,
     handleSubmit,
     setError,
-    formState: { errors },
+    control,
+    formState: { errors, isSubmitting, isSubmitted },
   } = useForm<SignupRequest>({
     resolver: zodResolver(signupSchema),
+    defaultValues: { username: "", email: "", password: "", confirmPassword: "" },
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordc, setShowPasswordc] = useState(false);
+  const password = useWatch({ control, name: "password" });
 
   const onSubmit = async (values: SignupRequest) => {
-    setLoader(true);
     try {
       await signup(values);
       router.push("/signin?registered=1");
     } catch (err) {
       // CONFLICT names one field ("email already exists"); VALIDATION_ERROR
-      // lists messages per field. Anything else goes above the button.
+      // lists messages per field. Anything else goes in the banner.
       const fields = err instanceof ApiError ? err.fieldErrors() : {};
       const known = Object.entries(fields).filter(([field]) => field in values);
       for (const [field, message] of known) {
@@ -97,129 +90,90 @@ export function SignupForm({
           message: err instanceof ApiError ? err.message : "Something went wrong. Please try again.",
         });
       }
-    } finally {
-      setLoader(false);
     }
   };
 
+  // The checklist already explains an unmet rule; only other password
+  // errors (too long, or from the server) need a message of their own.
+  const passwordRuleError = errors.password?.type === "custom";
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Create your account</CardTitle>
-          <CardDescription>
-            Enter your email below to create your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="username">Username</FieldLabel>
-                <Input
-                  id="username"
-                  type="text"
-                  autoComplete="username"
-                  placeholder="Choose a username"
-                  {...register("username")}
-                />
-                {errors.username && (
-                  <FieldDescription>{errors.username.message}</FieldDescription>
-                )}
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  {...register("email")}
-                />
-                {errors.email && (
-                  <FieldDescription>{errors.email.message}</FieldDescription>
-                )}
-              </Field>
-              <Field>
-                <Field className="grid grid-cols-2 gap-4">
-                  <Field>
-                    <FieldLabel htmlFor="password">Password</FieldLabel>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        type={`${showPassword ? "text" : "password"}`}
-                        className="pr-10"
-                        {...register("password")}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((prev) => !prev)}
-                        className="absolute inset-y-0 right-0 flex items-center pr-3"
-                      >
-                        {showPassword ? (
-                          <Eye className="h-4 w-4 text-muted-foreground" />
-                        ) : (
-                          <EyeOff className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </button>
-                    </div>
-                    {errors.password && (
-                      <FieldDescription>
-                        {errors.password.message}
-                      </FieldDescription>
-                    )}
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="confirmPassword">
-                      Confirm Password
-                    </FieldLabel>
-                    <div className="relative">
-                      <Input
-                        id="confirmPassword"
-                        type={`${showPasswordc ? "text" : "password"}`}
-                        className="pr-10"
-                        {...register("confirmPassword", {
-                          required: "confirm password is required",
-                        })}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPasswordc((prev) => !prev)}
-                        className="absolute inset-y-0 right-0 flex items-center pr-3"
-                      >
-                        {showPasswordc ? (
-                          <Eye className="h-4 w-4 text-muted-foreground" />
-                        ) : (
-                          <EyeOff className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </button>
-                    </div>
-                    {errors.confirmPassword && (
-                      <FieldDescription>
-                        {errors.confirmPassword.message}
-                      </FieldDescription>
-                    )}
-                  </Field>
-                </Field>
-              </Field>
-              <Field>
-                {errors.root && (
-                  <FieldDescription role="alert" className="text-center text-destructive">
-                    {errors.root.message}
-                  </FieldDescription>
-                )}
-                <Button type="submit" disabled={loading}>Create Account</Button>
-                <FieldDescription className="text-center">
-                  Already have an account? <Link href="/signin">Sign in</Link>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
-      <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
-      </FieldDescription>
+    <div className={cn("w-full", className)} {...props}>
+      <AuthHeader
+        title="Create your account"
+        subtitle="Manage your personal and business money in one place."
+      />
+
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <FieldGroup className="gap-5">
+          {errors.root && <AuthNotice tone="error">{errors.root.message}</AuthNotice>}
+
+          <Field data-invalid={Boolean(errors.username)}>
+            <FieldLabel htmlFor="username">Username</FieldLabel>
+            <Input
+              id="username"
+              type="text"
+              autoComplete="username"
+              placeholder="e.g. ada_designs"
+              className={authInputClass}
+              aria-invalid={Boolean(errors.username)}
+              {...register("username")}
+            />
+            <FieldError errors={[errors.username]} />
+          </Field>
+
+          <Field data-invalid={Boolean(errors.email)}>
+            <FieldLabel htmlFor="email">Email address</FieldLabel>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@business.com"
+              className={authInputClass}
+              aria-invalid={Boolean(errors.email)}
+              {...register("email")}
+            />
+            <FieldError errors={[errors.email]} />
+          </Field>
+
+          <Field data-invalid={Boolean(errors.password)}>
+            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <PasswordInput
+              id="password"
+              autoComplete="new-password"
+              placeholder="Create a password"
+              aria-invalid={Boolean(errors.password)}
+              aria-describedby="password-rules"
+              {...register("password")}
+            />
+            <PasswordChecklist rules={PASSWORD_RULES} value={password} showErrors={isSubmitted} />
+            {!passwordRuleError && <FieldError errors={[errors.password]} />}
+          </Field>
+
+          <Field data-invalid={Boolean(errors.confirmPassword)}>
+            <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
+            <PasswordInput
+              id="confirmPassword"
+              autoComplete="new-password"
+              placeholder="Enter the password again"
+              aria-invalid={Boolean(errors.confirmPassword)}
+              {...register("confirmPassword")}
+            />
+            <FieldError errors={[errors.confirmPassword]} />
+          </Field>
+
+          <Button type="submit" disabled={isSubmitting} className={authSubmitClass}>
+            {isSubmitting ? "Creating account…" : "Create account"}
+          </Button>
+        </FieldGroup>
+      </form>
+
+      <p className="mt-8 text-sm text-muted-foreground">
+        Already have an account?{" "}
+        <Link href="/signin" className={authLinkClass}>
+          Sign in
+        </Link>
+      </p>
     </div>
   );
 }

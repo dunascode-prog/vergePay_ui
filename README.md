@@ -49,7 +49,7 @@ The sidebar groups the app the way a small-business owner thinks about their mon
 | Screen | Route | What it shows |
 |---|---|---|
 | **Sign in** | `/signin` | A split layout in the style of fintech sign-in pages: a focused form on the left, and a brand panel on the right that disappears on phones. Email and password with a show/hide toggle; a **two-factor code step** for accounts with 2FA on; clear inline errors; and a return to the page you were trying to open |
-| **Sign up** | `/signup` | Username, email and password, checked against the same rules as the API, with server errors shown on the field they belong to |
+| **Sign up** | `/signup` | The same split layout. Username, email and password, with a **live password checklist** (12+ characters, upper and lowercase, a number, a special character) that ticks off as you type. Server errors such as "username already exists" show on the field they belong to |
 
 ### Main
 | Screen | Route | What it shows |
