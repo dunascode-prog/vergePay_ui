@@ -17,6 +17,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { SignupRequest } from "@/types/auth";
 import { signup } from "@/services/auth";
+import { ApiError } from "@/lib/api";
+import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
@@ -80,20 +82,21 @@ export function SignupForm({
     setLoader(true);
     try {
       await signup(values);
-      router.push("/signin");
+      router.push("/signin?registered=1");
     } catch (err) {
-      const error = (err as { error: any })?.error;
-
-      if (error?.field) {
-        setError(error.field as keyof SignupRequest, {
-          type: "server",
-          message: error.message,
-        });
-
-        return;
+      // CONFLICT names one field ("email already exists"); VALIDATION_ERROR
+      // lists messages per field. Anything else goes above the button.
+      const fields = err instanceof ApiError ? err.fieldErrors() : {};
+      const known = Object.entries(fields).filter(([field]) => field in values);
+      for (const [field, message] of known) {
+        setError(field as keyof SignupRequest, { type: "server", message });
       }
-
-      console.log(err);
+      if (known.length === 0) {
+        setError("root", {
+          type: "server",
+          message: err instanceof ApiError ? err.message : "Something went wrong. Please try again.",
+        });
+      }
     } finally {
       setLoader(false);
     }
@@ -114,8 +117,9 @@ export function SignupForm({
               <Field>
                 <FieldLabel htmlFor="username">Username</FieldLabel>
                 <Input
-                  id="name"
+                  id="username"
                   type="text"
+                  autoComplete="username"
                   placeholder="Choose a username"
                   {...register("username")}
                 />
@@ -165,7 +169,7 @@ export function SignupForm({
                     )}
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="confirm-password">
+                    <FieldLabel htmlFor="confirmPassword">
                       Confirm Password
                     </FieldLabel>
                     <div className="relative">
@@ -198,9 +202,14 @@ export function SignupForm({
                 </Field>
               </Field>
               <Field>
-                <Button type="submit">Create Account</Button>
+                {errors.root && (
+                  <FieldDescription role="alert" className="text-center text-destructive">
+                    {errors.root.message}
+                  </FieldDescription>
+                )}
+                <Button type="submit" disabled={loading}>Create Account</Button>
                 <FieldDescription className="text-center">
-                  Already have an account? <a href="/signin">Sign in</a>
+                  Already have an account? <Link href="/signin">Sign in</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

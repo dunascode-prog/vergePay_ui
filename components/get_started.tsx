@@ -29,7 +29,7 @@ export function SignupForm({
             >
               <div className="flex h-10 w-40 items-center justify-start rounded-md overflow-hidden">
                 <Image
-                  src="/vergePay_logo.svg"
+                  src="/final_vergepay_logo.svg"
                   alt="VergePay Logo"
                   width={160}
                   height={40}
@@ -41,7 +41,7 @@ export function SignupForm({
             </Link>
             <h1 className="text-xl font-bold">Welcome to VergePay</h1>
             <FieldDescription>
-              Already have an account? <a href="#">Sign in</a>
+              Already have an account? <Link href="/signin">Sign in</Link>
             </FieldDescription>
           </div>
           <Link href="/signup">
