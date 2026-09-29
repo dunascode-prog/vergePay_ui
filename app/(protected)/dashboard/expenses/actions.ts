@@ -6,11 +6,11 @@ import { Expense } from "@/types/expense";
 
 export async function createExpenseAction(input: CreateExpenseInput): Promise<Expense> {
   const expense = await createExpense(input);
-  revalidatePath("/expenses");
+  revalidatePath("/dashboard/expenses");
   return expense;
 }
 
 export async function deleteExpenseAction(id: string): Promise<void> {
   await deleteExpense(id);
-  revalidatePath("/expenses");
+  revalidatePath("/dashboard/expenses");
 }

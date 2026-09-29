@@ -139,7 +139,7 @@ export function RecurringPlansTable({
                   >
                     <TableCell className="font-medium text-gray-800">
                       <Link
-                        href={`/recurring/${plan.id}`}
+                        href={`/dashboard/recurring/${plan.id}`}
                         className="hover:underline"
                       >
                         {plan.client.name}

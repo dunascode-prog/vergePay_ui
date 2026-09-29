@@ -50,7 +50,7 @@ export function SpendingHabitsCard() {
               <LabelList
                 dataKey="amount"
                 position="top"
-                formatter={(v: number) => `₦${v.toLocaleString()}`}
+                formatter={(v) => `₦${Number(v).toLocaleString()}`}
               />
             </Bar>
           </BarChart>

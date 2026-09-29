@@ -240,6 +240,7 @@ Open [http://localhost:3000](http://localhost:3000), create an account at `/sign
 - [x] Personal / Business / Combined views
 - [x] All 10 sections designed and built: invoices, recurring billing, clients, business overview, expenses, payroll, goals, envelopes, analytics
 - [x] Sign-up and sign-in against the real API
+- [x] Clean production build (`next build` with strict TypeScript, zero errors) and every in-app link resolving to a real route
 - [ ] Route guard, 2FA sign-in step and sign-out
 - [ ] Wallets, balances and transaction history from the ledger
 - [ ] Transfers, and Add Money by card and bank transfer (Flutterwave)

@@ -64,11 +64,9 @@ export function NewInvoiceDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-emerald-700 hover:bg-emerald-800">
-          <LuPlus className="h-4 w-4 mr-1.5" />
-          New invoice
-        </Button>
+      <DialogTrigger render={<Button className="bg-emerald-700 hover:bg-emerald-800" />}>
+        <LuPlus className="h-4 w-4 mr-1.5" />
+        New invoice
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>

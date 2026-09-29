@@ -6,6 +6,6 @@ import { ClientProfile } from "@/types/client";
 
 export async function createClientAction(input: CreateClientInput): Promise<ClientProfile> {
   const client = await createClient(input);
-  revalidatePath("/clients");
+  revalidatePath("/dashboard/clients");
   return client;
 }

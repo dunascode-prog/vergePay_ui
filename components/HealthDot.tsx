@@ -21,13 +21,11 @@ export function HealthDot({
 }) {
   const tier = healthTier(score);
   return (
-    <TooltipProvider delayDuration={150}>
+    <TooltipProvider delay={150}>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 cursor-default">
-            <span className={cn("h-1.5 w-1.5 rounded-full", tier.color)} />
-            {score}/100
-          </span>
+        <TooltipTrigger render={<span className="inline-flex items-center gap-1.5 text-xs text-gray-500 cursor-default" />}>
+          <span className={cn("h-1.5 w-1.5 rounded-full", tier.color)} />
+          {score}/100
         </TooltipTrigger>
         <TooltipContent side="top" className="text-xs">
           <p className="font-medium">{tier.label} client</p>

@@ -10,7 +10,7 @@ import { Goal, GoalContribution } from "@/types/goal";
 
 export async function createGoalAction(input: CreateGoalInput): Promise<Goal> {
   const goal = await createGoal(input);
-  revalidatePath("/goals");
+  revalidatePath("/dashboard/goals");
   return goal;
 }
 
@@ -19,6 +19,6 @@ export async function addContributionAction(
   amount: number
 ): Promise<{ goal: Goal; contribution: GoalContribution }> {
   const result = await addContribution(goalId, amount);
-  revalidatePath("/goals");
+  revalidatePath("/dashboard/goals");
   return result;
 }

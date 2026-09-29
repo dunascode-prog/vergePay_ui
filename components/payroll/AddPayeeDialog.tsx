@@ -71,11 +71,9 @@ export function AddPayeeDialog({ onCreate, onCreated }: AddPayeeDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-emerald-700 hover:bg-emerald-800">
-          <LuPlus className="h-4 w-4 mr-1.5" />
-          Add to payroll
-        </Button>
+      <DialogTrigger render={<Button className="bg-emerald-700 hover:bg-emerald-800" />}>
+        <LuPlus className="h-4 w-4 mr-1.5" />
+        Add to payroll
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

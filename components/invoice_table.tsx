@@ -59,11 +59,11 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
               </TableCell>
 
               <TableCell>
-                <StatusBadge status={invoice.status} />
+                <Badge variant="outline">{invoice.status}</Badge>
               </TableCell>
 
               <TableCell className="text-right">
-                <InvoiceActions status={invoice.status} />
+                <Button variant="ghost" size="sm">View</Button>
               </TableCell>
             </TableRow>
           ))}

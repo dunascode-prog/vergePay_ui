@@ -11,13 +11,13 @@ import { Envelope, EnvelopeTransaction } from "@/types/envelope";
 
 export async function createEnvelopeAction(input: CreateEnvelopeInput): Promise<Envelope> {
   const envelope = await createEnvelope(input);
-  revalidatePath("/envelopes");
+  revalidatePath("/dashboard/envelopes");
   return envelope;
 }
 
 export async function addFundsAction(envelopeId: string, amount: number): Promise<Envelope> {
   const envelope = await adjustEnvelopeAllocation(envelopeId, amount);
-  revalidatePath("/envelopes");
+  revalidatePath("/dashboard/envelopes");
   return envelope;
 }
 
@@ -27,6 +27,6 @@ export async function withdrawAction(
   note: string
 ): Promise<EnvelopeTransaction> {
   const transaction = await recordWithdrawal(envelopeId, amount, note);
-  revalidatePath("/envelopes");
+  revalidatePath("/dashboard/envelopes");
   return transaction;
 }

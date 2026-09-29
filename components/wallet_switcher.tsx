@@ -1,5 +1,5 @@
 "use client";
-import { CirclePlus } from "lucide-react";
+import { Briefcase, CirclePlus, Wallet } from "lucide-react";
 
 import {
   SidebarGroup,
@@ -23,7 +23,8 @@ export function WalletSwitcher() {
           name="Personal Wallet"
           balance="$600k"
           description="Main spending wallet"
-          color="green"
+          currency="NGN"
+          icon={Wallet}
           active
         />
 
@@ -32,7 +33,8 @@ export function WalletSwitcher() {
           name="Business Wallet"
           balance="$300k"
           description="Client payments"
-          color="blue"
+          currency="NGN"
+          icon={Briefcase}
         />
 
         <Button variant="ghost" className="w-full justify-start rounded-xl">
