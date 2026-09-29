@@ -28,7 +28,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { WalletSwitcher } from "./wallet_switcher";
 import { UserNav } from "./user_nav";
 import { cn } from "@/lib/utils";
@@ -126,7 +125,7 @@ export function AppSidebar() {
                   className="relative flex items-center justify-center gap-3"
                 >
                   <Image
-                    src="/final_vergePay_logoc.svg"
+                    src="/final_vergepay_logoc.svg"
                     alt="VergePay"
                     width={34}
                     height={34}
@@ -139,7 +138,7 @@ export function AppSidebar() {
                     )}
                   />
                   <Image
-                    src="/final_vergePay_logo.svg"
+                    src="/final_vergepay_logo.svg"
                     alt="VergePay"
                     width={154}
                     height={154}
@@ -200,11 +199,7 @@ export function AppSidebar() {
 
       {collapsed ? (
         <SidebarFooter className="flex items-center pb-2">
-          <Avatar className="h-9 w-9">
-            <AvatarImage src="https://i.pravatar.cc/300" />
-            <AvatarFallback>SA</AvatarFallback>
-            <AvatarBadge className="bg-emerald-500" />
-          </Avatar>
+          <UserNav compact />
         </SidebarFooter>
       ) : (
         <SidebarFooter className="border-t px-2 py-3">

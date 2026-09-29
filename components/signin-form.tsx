@@ -11,66 +11,104 @@ import {
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
 import z from "zod";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { SigninRequest } from "@/types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signin } from "@/services/auth";
+import { signin, signout, verifyTwoFactor } from "@/services/auth";
+import { ApiError } from "@/lib/api";
 
 const signinSchema = z.object({
-  email: z.string().trim().toLowerCase().email("Invalid email or password"),
+  email: z.string().trim().toLowerCase().email("Enter a valid email address."),
   password: z.string().min(1, "Password is required."),
 });
+
+type Step = "credentials" | "code";
+
 interface SigninFormProps extends React.HTMLAttributes<HTMLDivElement> {
-  loading: boolean;
-  setLoader: React.Dispatch<React.SetStateAction<boolean>>;
+  /** Where to go once signed in (already checked to be a same-site path). */
+  next: string;
+  /** "code" when arriving with a password-only session (proxy.ts sends 2FA users here). */
+  initialStep: Step;
+  justRegistered?: boolean;
 }
+
+function messageFor(err: unknown): string {
+  if (err instanceof ApiError) {
+    if (err.status === 401) return "Invalid email or password.";
+    return err.message;
+  }
+  return "Something went wrong. Please try again.";
+}
+
 export function LoginForm({
   className,
-  loading,
-  setLoader,
+  next,
+  initialStep,
+  justRegistered = false,
   ...props
 }: SigninFormProps) {
   const router = useRouter();
+  const [step, setStep] = useState<Step>(initialStep);
+  const [notice, setNotice] = useState<string | null>(
+    justRegistered ? "Account created. Sign in to continue." : null,
+  );
+
   const {
     register,
     handleSubmit,
     setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<SigninRequest>({ resolver: zodResolver(signinSchema) });
+
   const onSubmit = async (values: SigninRequest) => {
-    setLoader(true);
+    setNotice(null);
     try {
-      await signin(values);
-
-      router.push("/dashboard");
-    } catch (err) {
-      const error = (err as { error: any })?.error;
-
-      if (error?.field) {
-        setError(error.field as keyof SigninRequest, {
-          type: "server",
-          message: error.message,
-        });
-
+      const result = await signin(values);
+      if (result.two_factor_required) {
+        setStep("code");
         return;
       }
-      console.log(err);
-      setLoader(false);
+      router.replace(next);
+    } catch (err) {
+      const fields = err instanceof ApiError ? err.fieldErrors() : {};
+      for (const [field, message] of Object.entries(fields)) {
+        if (field === "email" || field === "password") {
+          setError(field, { type: "server", message });
+        }
+      }
+      if (Object.keys(fields).length === 0) {
+        setError("root", { type: "server", message: messageFor(err) });
+      }
     }
-    // } finally {
-    //   setLoader(false);
-    // }
   };
+
+  if (step === "code") {
+    return (
+      <div className={cn("flex w-full flex-col gap-6", className)} {...props}>
+        <TwoFactorStep
+          onVerified={() => router.replace(next)}
+          onRestart={(message) => {
+            setNotice(message);
+            setStep("credentials");
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn("flex w-full flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
@@ -79,7 +117,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
             <FieldGroup>
               <Field>
                 <Button variant="outline" type="button">
@@ -102,22 +140,27 @@ export function LoginForm({
                 </Button>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                {errors ? (
-                  <FieldDescription>Invalid email or password</FieldDescription>
-                ) : (
-                  "Or continue with"
-                )}
+                Or continue with
               </FieldSeparator>
-              <Field>
+              {notice && (
+                <FieldDescription role="status" className="text-center">
+                  {notice}
+                </FieldDescription>
+              )}
+              {errors.root && <FieldError className="text-center">{errors.root.message}</FieldError>}
+              <Field data-invalid={Boolean(errors.email)}>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
                   type="email"
+                  autoComplete="email"
                   placeholder="m@example.com"
+                  aria-invalid={Boolean(errors.email)}
                   {...register("email")}
                 />
+                <FieldError errors={[errors.email]} />
               </Field>
-              <Field>
+              <Field data-invalid={Boolean(errors.password)}>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                   <a
@@ -130,16 +173,18 @@ export function LoginForm({
                 <Input
                   id="password"
                   type="password"
+                  autoComplete="current-password"
+                  aria-invalid={Boolean(errors.password)}
                   {...register("password")}
                 />
-                {errors.password && (
-                  <FieldDescription>{errors.password.message}</FieldDescription>
-                )}
+                <FieldError errors={[errors.password]} />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Signing in…" : "Login"}
+                </Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="/signup">Sign up</a>
+                  Don&apos;t have an account? <Link href="/signup">Sign up</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
@@ -151,5 +196,89 @@ export function LoginForm({
         and <a href="#">Privacy Policy</a>.
       </FieldDescription>
     </div>
+  );
+}
+
+// The second step for accounts with 2FA on. The password step left a
+// limited session; a valid code upgrades it to a full one.
+function TwoFactorStep({
+  onVerified,
+  onRestart,
+}: {
+  onVerified: () => void;
+  onRestart: (message: string | null) => void;
+}) {
+  const [code, setCode] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!/^\d{6}$/.test(code)) {
+      setError("Enter the 6-digit code from your authenticator app.");
+      return;
+    }
+    setSubmitting(true);
+    setError(null);
+    try {
+      await verifyTwoFactor(code);
+      onVerified();
+    } catch (err) {
+      setSubmitting(false);
+      setCode("");
+      // The limited session is gone (expired, or signed out elsewhere).
+      if (err instanceof ApiError && err.status === 401) {
+        onRestart("Your sign-in timed out. Enter your password again.");
+        return;
+      }
+      setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
+    }
+  };
+
+  const switchAccount = async () => {
+    await signout().catch(() => {});
+    onRestart(null);
+  };
+
+  return (
+    <Card>
+      <CardHeader className="text-center">
+        <CardTitle className="text-xl">Two-factor authentication</CardTitle>
+        <CardDescription>
+          Enter the 6-digit code from your authenticator app.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={submit} noValidate>
+          <FieldGroup>
+            <Field data-invalid={Boolean(error)}>
+              <FieldLabel htmlFor="code">Authentication code</FieldLabel>
+              <Input
+                id="code"
+                name="code"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                autoFocus
+                maxLength={6}
+                placeholder="123456"
+                className="text-center text-lg tracking-[0.5em] tabular-nums"
+                value={code}
+                aria-invalid={Boolean(error)}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              />
+              {error && <FieldError>{error}</FieldError>}
+            </Field>
+            <Field>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? "Verifying…" : "Verify"}
+              </Button>
+              <Button type="button" variant="ghost" onClick={switchAccount}>
+                Use a different account
+              </Button>
+            </Field>
+          </FieldGroup>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
