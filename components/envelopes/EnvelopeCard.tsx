@@ -92,7 +92,7 @@ export function EnvelopeCard({ envelope, onAddFunds, onWithdraw }: EnvelopeCardP
 
         {envelope.linkedCategory && (
           <Link
-            href="/expenses"
+            href="/dashboard/expenses"
             className="inline-flex items-center gap-1 text-xs text-emerald-700 hover:underline mb-3"
           >
             View {envelope.linkedCategory} expenses

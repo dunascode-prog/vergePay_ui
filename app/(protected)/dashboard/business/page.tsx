@@ -78,7 +78,7 @@ export default async function BusinessOverviewPage() {
             ? ` · ${c.overdueInvoicesCount} overdue invoice(s)`
             : ""
         }`,
-        href: "/clients",
+        href: "/dashboard/clients",
         linkLabel: "View client",
       })),
     ...clients
@@ -88,7 +88,7 @@ export default async function BusinessOverviewPage() {
         severity: "medium" as const,
         title: `${c.name} has an overdue invoice`,
         detail: `${c.overdueInvoicesCount} invoice(s) past due`,
-        href: "/invoices",
+        href: "/dashboard/invoices",
         linkLabel: "View invoices",
       })),
     ...pausedPlans.map((p) => ({
@@ -96,7 +96,7 @@ export default async function BusinessOverviewPage() {
       severity: "medium" as const,
       title: `${p.client.name}'s recurring plan is paused`,
       detail: p.description,
-      href: `/recurring/${p.id}`,
+      href: `/dashboard/recurring/${p.id}`,
       linkLabel: "View plan",
     })),
   ];

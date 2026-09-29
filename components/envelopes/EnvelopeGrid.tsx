@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { EnvelopeCard } from "./EnvelopeCard";
 import { AddEnvelopeDialog } from "./AddEnvelopeDialog";
 import { Envelope, EnvelopeView } from "@/types/envelope";
-import { addFundsAction, withdrawAction, createEnvelopeAction } from "@/app/envelopes/actions";
+import { addFundsAction, withdrawAction, createEnvelopeAction } from "@/app/(protected)/dashboard/envelopes/actions";
 
 interface EnvelopeGridProps {
   envelopes: EnvelopeView[];

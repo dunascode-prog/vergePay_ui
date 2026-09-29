@@ -62,7 +62,7 @@ export function NewInvoicePageView() {
     // Goes through the idempotency-key protocol on the mutating call so a
     // retry can't create a duplicate invoice.
     await new Promise((r) => setTimeout(r, 900));
-    router.push("/invoices");
+    router.push("/dashboard/invoices");
   }
 
   return (

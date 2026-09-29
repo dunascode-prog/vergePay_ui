@@ -170,7 +170,7 @@ export function DaySelector({
   ...props
 }: MonthSelectorProps) {
   return (
-    <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+    <Select value={selectedMonth} onValueChange={(v) => setSelectedMonth(v ?? "")}>
       <SelectTrigger
         className={cn(
           "h-10 w-30 rounded-xl border-0 bg-muted px-4 shadow-sm hover:bg-muted/80 transition-colors",

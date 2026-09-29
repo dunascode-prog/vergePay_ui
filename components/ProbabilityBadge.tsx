@@ -16,18 +16,20 @@ export function ProbabilityBadge({ probability }: { probability: number }) {
       : "text-red-700 bg-red-50";
 
   return (
-    <TooltipProvider delayDuration={150}>
+    <TooltipProvider delay={150}>
       <Tooltip>
-        <TooltipTrigger asChild>
-          <span
-            className={cn(
-              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium cursor-default",
-              tone
-            )}
-          >
-            <LuSparkles className="h-3 w-3" />
-            {probability}%
-          </span>
+        <TooltipTrigger
+          render={
+            <span
+              className={cn(
+                "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium cursor-default",
+                tone
+              )}
+            />
+          }
+        >
+          <LuSparkles className="h-3 w-3" />
+          {probability}%
         </TooltipTrigger>
         <TooltipContent side="top" className="text-xs max-w-56">
           AI-predicted probability of on-time payment, based on this client's history.

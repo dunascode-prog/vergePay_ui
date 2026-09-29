@@ -48,7 +48,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
           title={invoice.number}
         >
           {invoice.status === "draft" && (
-            <Link href={`/invoices/${invoice.id}/edit`}>
+            <Link href={`/dashboard/invoices/${invoice.id}/edit`}>
               <Button variant="outline" size="sm">
                 <LuPencil className="h-3.5 w-3.5 mr-1.5" />
                 Edit
@@ -56,7 +56,7 @@ export function InvoiceDetailView({ invoice }: InvoiceDetailViewProps) {
             </Link>
           )}
           {canRemind && (
-            <Link href={`/invoices/${invoice.id}/remind`}>
+            <Link href={`/dashboard/invoices/${invoice.id}/remind`}>
               <Button size="sm" className="bg-emerald-700 hover:bg-emerald-800">
                 <LuBellRing className="h-3.5 w-3.5 mr-1.5" />
                 Send reminder

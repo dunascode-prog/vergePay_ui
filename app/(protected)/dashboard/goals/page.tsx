@@ -14,7 +14,7 @@ export default async function GoalsPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto">
         <PageHeader
-          backHref="/dashboard/business-overview"
+          backHref="/dashboard/business"
           backLabel="Back to business overview"
           title=""
         />

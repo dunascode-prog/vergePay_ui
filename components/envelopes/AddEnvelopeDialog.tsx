@@ -95,11 +95,9 @@ export function AddEnvelopeDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-emerald-700 hover:bg-emerald-800">
-          <LuPlus className="h-4 w-4 mr-1.5" />
-          New envelope
-        </Button>
+      <DialogTrigger render={<Button className="bg-emerald-700 hover:bg-emerald-800" />}>
+        <LuPlus className="h-4 w-4 mr-1.5" />
+        New envelope
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -137,7 +135,7 @@ export function AddEnvelopeDialog({
           ) : (
             <div className="space-y-1.5">
               <Label htmlFor="category">Category</Label>
-              <Select value={linkedCategory} onValueChange={setLinkedCategory}>
+              <Select value={linkedCategory} onValueChange={(v) => setLinkedCategory(v ?? "")}>
                 <SelectTrigger id="category">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>

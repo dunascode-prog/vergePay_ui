@@ -132,7 +132,7 @@ export function PayeeCard({ payee, payments, onRunPayroll }: PayeeCardProps) {
                   </div>
                   {payment.linkedExpenseId && (
                     <Link
-                      href="/expenses"
+                      href="/dashboard/expenses"
                       className="inline-flex items-center gap-1 text-xs text-emerald-700 hover:underline mt-1.5"
                     >
                       View in Expenses

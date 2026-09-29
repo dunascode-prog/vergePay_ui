@@ -33,7 +33,10 @@ import {
 export function UserNav() {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger
+        // the button renders as a <div>, so it isn't a native <button>
+        nativeButton={false}
+        render={
         <SidebarMenuButton
           className="h-auto rounded-xl p-3 transition-colors hover:bg-sidebar-accent"
           render={
@@ -67,7 +70,8 @@ export function UserNav() {
             </div>
           }
         />
-      </DropdownMenuTrigger>
+        }
+      />
 
       <DropdownMenuContent align="end" side="right" className="w-64">
         <DropdownMenuLabel>

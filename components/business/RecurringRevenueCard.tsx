@@ -25,7 +25,7 @@ export function RecurringRevenueCard({
           <LuRepeat className="h-4 w-4 text-emerald-600" />
           Recurring revenue
         </CardTitle>
-        <Link href="/recurring">
+        <Link href="/dashboard/recurring">
           <Button variant="ghost" size="sm" className="h-7 text-gray-500">
             View all
             <LuArrowRight className="h-3.5 w-3.5 ml-1" />

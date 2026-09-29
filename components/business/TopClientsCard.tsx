@@ -15,7 +15,7 @@ export function TopClientsCard({ clients }: TopClientsCardProps) {
     <Card className="border-gray-200 shadow-none">
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
         <CardTitle className="text-sm font-medium text-gray-700">Top clients</CardTitle>
-        <Link href="/clients">
+        <Link href="/dashboard/clients">
           <Button variant="ghost" size="sm" className="h-7 text-gray-500">
             View all
             <LuArrowRight className="h-3.5 w-3.5 ml-1" />

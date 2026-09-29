@@ -21,7 +21,7 @@ interface WalletCardProps {
   active?: boolean;
 }
 
-function WalletCard({
+export function WalletCard({
   href,
   name,
   balance,

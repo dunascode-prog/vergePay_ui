@@ -12,7 +12,7 @@ import { Payee, PayrollPayment } from "@/types/payroll";
 
 export async function createPayeeAction(input: CreatePayeeInput): Promise<Payee> {
   const payee = await createPayee(input);
-  revalidatePath("/payroll");
+  revalidatePath("/dashboard/payroll");
   return payee;
 }
 
@@ -44,8 +44,8 @@ export async function runPayrollAction(
   await attachLinkedExpense(payment.id, expense.id);
   payment.linkedExpenseId = expense.id;
 
-  revalidatePath("/payroll");
-  revalidatePath("/expenses");
+  revalidatePath("/dashboard/payroll");
+  revalidatePath("/dashboard/expenses");
 
   return { payment, updatedPayee: payee };
 }

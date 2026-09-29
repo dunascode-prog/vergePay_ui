@@ -59,7 +59,7 @@ export function RecurringPlanForm({ clientOptions }: RecurringPlanFormProps) {
         frequency,
         startDate,
       });
-      router.push(`/recurring/${plan.id}`);
+      router.push(`/dashboard/recurring/${plan.id}`);
     } finally {
       setSubmitting(false);
     }
@@ -70,7 +70,7 @@ export function RecurringPlanForm({ clientOptions }: RecurringPlanFormProps) {
       <CardContent className="p-6 space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="client">Client</Label>
-          <Select value={clientId} onValueChange={setClientId}>
+          <Select value={clientId} onValueChange={(v) => setClientId(v ?? "")}>
             <SelectTrigger id="client">
               <SelectValue placeholder="Select a client" />
             </SelectTrigger>

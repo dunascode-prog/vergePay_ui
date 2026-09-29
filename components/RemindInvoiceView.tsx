@@ -103,7 +103,7 @@ export function RemindInvoiceView({ invoice }: RemindInvoiceViewProps) {
     await new Promise((r) => setTimeout(r, 900));
     setSending(false);
     setSent(true);
-    setTimeout(() => router.push(`/invoices/${safeInvoice.id}`), 1200);
+    setTimeout(() => router.push(`/dashboard/invoices/${safeInvoice.id}`), 1200);
   }
 
   const noChannelSelected = !emailChecked && !whatsappChecked;

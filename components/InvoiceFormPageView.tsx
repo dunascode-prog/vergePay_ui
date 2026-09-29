@@ -196,7 +196,7 @@ export function InvoiceFormPageView({
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="client">Client</Label>
-                  <Select value={clientId} onValueChange={setClientId}>
+                  <Select value={clientId} onValueChange={(v) => setClientId(v ?? "")}>
                     <SelectTrigger id="client">
                       <SelectValue placeholder="Select a client" />
                     </SelectTrigger>

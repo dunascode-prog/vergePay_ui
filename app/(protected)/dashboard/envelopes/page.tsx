@@ -19,7 +19,7 @@ export default async function EnvelopesPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-6xl px-6 py-8">
         <PageHeader
-          backHref="/business-overview"
+          backHref="/dashboard/business"
           backLabel="Back to business overview"
           title="Envelopes"
         />

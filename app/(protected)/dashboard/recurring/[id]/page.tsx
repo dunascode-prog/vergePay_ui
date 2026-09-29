@@ -30,7 +30,7 @@ export default async function RecurringPlanDetailPage({ params }: RecurringPlanD
   return (
     <div className="max-w-2xl">
       <PageHeader
-        backHref="/recurring"
+        backHref="/dashboard/recurring"
         backLabel="Back to recurring billing"
         title={plan.description}
       >
