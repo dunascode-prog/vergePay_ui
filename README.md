@@ -56,6 +56,7 @@ The sidebar groups the app the way a small-business owner thinks about their mon
 | Screen | Route | What it shows |
 |---|---|---|
 | **Overview** | `/dashboard` | **Live from the ledger.** Every customer has up to two wallets, a **Personal** and a **Business** one, and the **Personal / Business / Combined** toggle shows one, the other, or both. A performance card (income, spent and net this month, and the balance, each compared with last month, with six-month sparklines), the wallet cards (balance, currency, copyable account number, or "Add a business wallet" if it's missing), a six-month income-vs-spending chart and the latest transactions (*Personal wallet → Business wallet*). An **Investments** card links Alpaca and then shows synced holdings. A reminder to link comes back every 3 days until they do. Widgets whose features aren't connected yet (AI insight, client health, upcoming billing, outstanding invoices, goals, budgets) follow the toggle and are tagged **Sample data** |
+| **Move money** | wallet card actions | **Add money** by bank transfer (a permanent account number for the wallet) or debit card (linked once through Flutterwave's hosted checkout, then one-tap top-ups, with 3-D Secure handled). **Send** to any VergePay wallet after a name check ("Ada Obi"), with a review screen and receipt. **Transfer** between your own personal and business wallets. The first time money moves, a one-time **identity check** (BVN, legal name, date of birth) runs inside the same dialog, and 2FA is turned on when linking a card needs it |
 | **Analytics** | `/dashboard/analytics` | Revenue trend, client revenue share and concentration risk, cash-flow forecast, collection metrics, late-payment ageing, how effective reminders are, and a feed of AI insights. Filter by this month, the last 3 months or this year |
 
 ### Payments
@@ -116,6 +117,14 @@ The overview has no summary endpoint to trust: it's worked out in the browser fr
 - **Balances over time, worked backwards.** Each month's closing balance comes from today's balance, subtracting each month's movements.
 - **One currency at a time.** Naira and dollars are never summed. With both, a currency switch appears.
 - **Charts built to be read.** Income and spending are a colour pair checked for colour-blind separation and 3:1 contrast in light and dark mode, the chart has a legend and a screen-reader table, and a sparkline only appears once there are two months of data to draw.
+
+### Moving money safely
+Every money action is built so that a retry or a double-tap can't pay twice, and so that you see exactly what will happen before it does.
+- **Idempotency keys on every attempt.** Each Send, Transfer, top-up and card link carries its own `Idempotency-Key`, so a flaky connection that retries replays the same result instead of moving money again.
+- **Name enquiry before paying.** The recipient's name comes from the API before you confirm. Your own wallets are caught ("use Transfer"), and so are currency mismatches.
+- **Review, then receipt.** Amount, fee (free), note and destination are shown before sending, then a receipt with a short reference.
+- **Cards never touch VergePay.** Card details are typed on Flutterwave's page. After checkout or 3-D Secure, the return page asks the API, which verifies with Flutterwave itself, rather than trusting the redirect.
+- **Identity and 2FA in the flow, not a detour.** The one-time BVN check waits for the (asynchronous) verdict and carries straight on. Adding a card turns 2FA on if needed, using the same step as brokerage linking.
 
 ### Money shown honestly
 Totals in different currencies are **never added together**. A client paying ₦620,000 and $1,400 is shown as `₦620,000 + $1,400`, not as a single naira figure based on a guessed exchange rate (`lib/format.ts`). Amounts use locale formatting (`en-NG`, `en-US`). The API stores all money as integer minor units (kobo and cents), so no floating-point error ever reaches the screen.
@@ -184,7 +193,7 @@ The screens were designed first, using sample data shaped like the real domain. 
 | Sign-up and sign-in | `/signup`, `/signin` | `POST /v1/auth/signup`, `/signin` | ✅ Connected |
 | Session, 2FA, sign-out | `proxy.ts`, sign-in, user menu | `/v1/auth/refresh`, `/2fa/verify`, `/logout`, `/v1/users/me` | ✅ Connected |
 | Wallets and overview | `/onboarding`, `/dashboard`, sidebar wallets, greeting | `GET`/`POST /v1/accounts` (one personal and one business wallet), `/:id/transactions` | ✅ Connected |
-| Transfers and Add Money | overview actions | `POST /v1/transactions`, `/v1/cards/:id/charges`, `/v1/accounts/:id/virtual-account` | ⏳ Planned |
+| Add money, Send, Transfer, identity | wallet-card actions, `/dashboard/payments/complete` | `POST /v1/kyc/submissions`, `/v1/accounts/lookup`, `POST /v1/transactions`, `/v1/cards` (link, charges), `/v1/accounts/:id/virtual-account`, `/v1/transactions/:id/sync` | ✅ Connected |
 | Invoices | `/dashboard/invoices/*` | `/v1/invoices`, `/:id/pay`, `/:id/cancel` | ⏳ Planned |
 | Investments | dashboard Investments card, link reminder, `/dashboard/investments/linked` | `POST`/`GET /v1/brokerage-links` (opens the investment wallet), `/v1/holdings`, `/v1/auth/2fa/enable` + `/verify` | ✅ Connected |
 | Loans | new screen | `/v1/loans`, `/:id/schedule`, `/:id/repayments` | ⏳ Planned |
@@ -272,7 +281,7 @@ Open [http://localhost:3000](http://localhost:3000), create an account at `/sign
 - [x] Route guard, 2FA sign-in step, silent session refresh and sign-out
 - [ ] Security settings: turn 2FA on or off from the app
 - [x] Wallets, balances, cash flow and transaction history from the ledger, per Personal / Business / Combined
-- [ ] Transfers, and Add Money by card and bank transfer (Flutterwave)
+- [x] Add money (bank-transfer account number, or a linked card via Flutterwave), Send with a name check, Transfer between your wallets, and one-time identity verification (BVN)
 - [ ] Invoices on the real API: create, pay, cancel
 - [x] Investments: link Alpaca (with 2FA set up on the way), synced holdings, a reminder until linked
 - [ ] Loans: apply, view the repayment schedule, repay
