@@ -50,11 +50,12 @@ The sidebar groups the app the way a small-business owner thinks about their mon
 |---|---|---|
 | **Sign in** | `/signin` | A split layout in the style of fintech sign-in pages: a focused form on the left, and a brand panel on the right that disappears on phones. Email and password with a show/hide toggle; a **two-factor code step** for accounts with 2FA on; clear inline errors; and a return to the page you were trying to open |
 | **Sign up** | `/signup` | The same split layout. Username, email and password, with a **live password checklist** (12+ characters, upper and lowercase, a number, a special character) that ticks off as you type. Server errors such as "username already exists" show on the field they belong to |
+| **Create your wallet** | `/onboarding` | Right after sign-up: choose a Personal or a Business wallet, and NGN or USD. The dashboard stays locked until the first wallet exists, and the other can be added later |
 
 ### Main
 | Screen | Route | What it shows |
 |---|---|---|
-| **Overview** | `/dashboard` | **Live from the ledger.** A performance card (income, spent and net this month, the balance, each compared with last month, plus six-month sparklines) that switches between **Personal / Business / Combined**. A card per account shows its balance and a copyable account number, with **Open an account** (personal or business; current, savings or an investment wallet; NGN or USD). A six-month income-vs-spending chart and the latest transactions, each shown as *from → to*. New users get a one-click "Open your first account" |
+| **Overview** | `/dashboard` | **Live from the ledger.** Every customer has up to two wallets, a **Personal** and a **Business** one, and the **Personal / Business / Combined** toggle shows one, the other, or both. A performance card (income, spent and net this month, and the balance, each compared with last month, with six-month sparklines), the wallet cards (balance, currency, copyable account number, or "Add a business wallet" if it's missing), a six-month income-vs-spending chart and the latest transactions (*Personal wallet → Business wallet*). An **Investments** card links Alpaca and then shows synced holdings. A reminder to link comes back every 3 days until they do. Widgets whose features aren't connected yet (AI insight, client health, upcoming billing, outstanding invoices, goals, budgets) follow the toggle and are tagged **Sample data** |
 | **Analytics** | `/dashboard/analytics` | Revenue trend, client revenue share and concentration risk, cash-flow forecast, collection metrics, late-payment ageing, how effective reminders are, and a feed of AI insights. Filter by this month, the last 3 months or this year |
 
 ### Payments
@@ -104,6 +105,9 @@ The API issues the session as **HttpOnly, `SameSite=Strict` cookies**, so no scr
   It reads the token's claims **without verifying them**, because the UI deliberately doesn't hold the API's signing key. That's safe because the proxy only decides where to send someone. Every piece of data is still authorised by the API itself.
 - **No open redirects.** `?next=` only accepts same-site paths, so `?next=//evil.example` goes to `/dashboard`.
 - **Two-factor sign-in.** For accounts with TOTP 2FA on, the password alone gives a limited session that the API refuses for any data. The sign-in form moves to a 6-digit code step (with `autocomplete="one-time-code"`), and a valid code upgrades the session. "Use a different account" revokes the limited session.
+
+### Two wallets, one view
+A customer has **at most one personal and one business wallet**; the API refuses a third. Sign-up leads straight to creating the first one. The Personal / Business / Combined toggle maps exactly onto them, so personal spending and business money never blur together. Investments sit in their own optional card: the investment wallet behind them is opened by the API when the customer links Alpaca, and it never shows up as a wallet.
 
 ### A dashboard computed from the ledger
 The overview has no summary endpoint to trust: it's worked out in the browser from each account's ledger lines, by small pure functions in `lib/ledger.ts`.
@@ -179,10 +183,10 @@ The screens were designed first, using sample data shaped like the real domain. 
 |---|---|---|---|
 | Sign-up and sign-in | `/signup`, `/signin` | `POST /v1/auth/signup`, `/signin` | ✅ Connected |
 | Session, 2FA, sign-out | `proxy.ts`, sign-in, user menu | `/v1/auth/refresh`, `/2fa/verify`, `/logout`, `/v1/users/me` | ✅ Connected |
-| Wallets and overview | `/dashboard`, sidebar wallets, greeting | `GET`/`POST /v1/accounts` (with `purpose`), `/:id/transactions` | ✅ Connected |
+| Wallets and overview | `/onboarding`, `/dashboard`, sidebar wallets, greeting | `GET`/`POST /v1/accounts` (one personal and one business wallet), `/:id/transactions` | ✅ Connected |
 | Transfers and Add Money | overview actions | `POST /v1/transactions`, `/v1/cards/:id/charges`, `/v1/accounts/:id/virtual-account` | ⏳ Planned |
 | Invoices | `/dashboard/invoices/*` | `/v1/invoices`, `/:id/pay`, `/:id/cancel` | ⏳ Planned |
-| Investments | new `/dashboard/investments` | `/v1/brokerage-links`, `/v1/holdings` | ⏳ Planned |
+| Investments | dashboard Investments card, link reminder, `/dashboard/investments/linked` | `POST`/`GET /v1/brokerage-links` (opens the investment wallet), `/v1/holdings`, `/v1/auth/2fa/enable` + `/verify` | ✅ Connected |
 | Loans | new screen | `/v1/loans`, `/:id/schedule`, `/:id/repayments` | ⏳ Planned |
 | Clients, recurring, expenses, payroll, goals, envelopes, analytics | their pages | none yet; the backend doesn't have these features | 🎨 Designed, sample data |
 
@@ -270,7 +274,7 @@ Open [http://localhost:3000](http://localhost:3000), create an account at `/sign
 - [x] Wallets, balances, cash flow and transaction history from the ledger, per Personal / Business / Combined
 - [ ] Transfers, and Add Money by card and bank transfer (Flutterwave)
 - [ ] Invoices on the real API: create, pay, cancel
-- [ ] Investments: connect a brokerage, view holdings
+- [x] Investments: link Alpaca (with 2FA set up on the way), synced holdings, a reminder until linked
 - [ ] Loans: apply, view the repayment schedule, repay
 - [ ] Remove leftover sample data and unused components
 - [ ] Deployment

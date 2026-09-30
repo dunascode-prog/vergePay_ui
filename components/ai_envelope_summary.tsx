@@ -1,3 +1,4 @@
+import { SampleBadge } from "@/components/dashboard/SampleWidgets";
 import {
   Card,
   CardContent,
@@ -55,13 +56,16 @@ export function AIEnvelopeSummary() {
             </CardTitle>
 
             <CardDescription className="mt-1 text-xs">
-              Great allocation. You're prioritizing essentials.
+              Great allocation. You&apos;re prioritizing essentials.
             </CardDescription>
           </div>
 
-          <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-            Healthy
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
+              Healthy
+            </Badge>
+            <SampleBadge />
+          </div>
         </div>
       </CardHeader>
 

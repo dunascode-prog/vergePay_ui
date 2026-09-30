@@ -1,24 +1,27 @@
+import Link from "next/link";
+import { SampleBadge } from "@/components/dashboard/SampleWidgets";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ArrowRight, FileText, CheckCircle2 } from "lucide-react";
 
 export default function OutstandingInvoiceCard() {
   return (
     <Card className="rounded-2xl">
       <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <CardTitle className="text-base font-semibold">
-          Outstanding Invoices
+        <CardTitle className="flex items-center gap-2 text-base font-semibold">
+          Outstanding invoices
+          <SampleBadge />
         </CardTitle>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-emerald-600 hover:text-emerald-700"
+        <Link
+          href="/dashboard/invoices"
+          className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "text-emerald-600 hover:text-emerald-700")}
         >
           View all
           <ArrowRight className="ml-1 h-4 w-4" />
-        </Button>
+        </Link>
       </CardHeader>
 
       <CardContent className="space-y-4">

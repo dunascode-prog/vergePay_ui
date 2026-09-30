@@ -12,8 +12,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAccountScope, useAppData } from "@/components/app-data";
-import { OpenAccountDialog } from "@/components/accounts/OpenAccountDialog";
-import { accountName, isWallet } from "@/lib/ledger";
+import { AddWalletDialog } from "@/components/accounts/AddWalletDialog";
+import { walletName, walletsOf } from "@/lib/ledger";
 
 interface WalletCardProps {
   href: string;
@@ -92,14 +92,11 @@ export function WalletCard({
   );
 }
 
-const MAX_LISTED = 4;
-
-/** The sidebar's wallet list: the user's real accounts, linking to the dashboard in that scope. */
+/** The sidebar's wallets: the customer's personal and business wallet, each opening that view. */
 export function WalletsSidebarGroup() {
   const { accounts, accountsState } = useAppData();
   const [scope] = useAccountScope();
-  const wallets = accounts.filter(isWallet);
-  const listed = wallets.slice(0, MAX_LISTED);
+  const wallets = walletsOf(accounts);
 
   return (
     <SidebarGroup className="px-2">
@@ -116,47 +113,47 @@ export function WalletsSidebarGroup() {
         )}
 
         {accountsState === "error" && (
-          <p className="px-2 text-xs text-muted-foreground">Couldn&apos;t load your accounts.</p>
+          <p className="px-2 text-xs text-muted-foreground">Couldn&apos;t load your wallets.</p>
         )}
 
-        {listed.map((account) => (
-          <WalletCard
-            key={account.account_id}
-            href={`/dashboard?scope=${account.purpose}`}
-            name={accountName(account)}
-            balance={(account.balance_minor / 100).toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-            currency={account.currency_code}
-            description={
-              account.account_status === "frozen"
-                ? `Frozen · ${account.account_number}`
-                : account.account_number
+        {accountsState === "ready" &&
+          (["personal", "business"] as const).map((purpose) => {
+            const wallet = wallets[purpose];
+            if (!wallet) {
+              return (
+                <AddWalletDialog
+                  key={purpose}
+                  purpose={purpose}
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start rounded-xl text-muted-foreground hover:text-foreground"
+                    >
+                      <CirclePlus className="mr-2 size-4" />
+                      Add a {walletName(purpose).toLowerCase()}
+                    </Button>
+                  }
+                />
+              );
             }
-            icon={account.purpose === "business" ? Building2 : Wallet}
-            active={scope === account.purpose}
-          />
-        ))}
-
-        {wallets.length > MAX_LISTED && (
-          <Link href="/dashboard" className="block px-2 text-xs text-muted-foreground hover:text-foreground">
-            +{wallets.length - MAX_LISTED} more on the dashboard
-          </Link>
-        )}
-
-        <OpenAccountDialog
-          defaultPurpose={scope === "business" ? "business" : "personal"}
-          trigger={
-            <Button
-              variant="ghost"
-              className="w-full justify-start rounded-xl text-muted-foreground hover:text-foreground"
-            >
-              <CirclePlus className="mr-2 size-4" />
-              Open account
-            </Button>
-          }
-        />
+            return (
+              <WalletCard
+                key={purpose}
+                href={`/dashboard?scope=${purpose}`}
+                name={walletName(purpose)}
+                balance={(wallet.balance_minor / 100).toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+                currency={wallet.currency_code}
+                description={
+                  wallet.account_status === "frozen" ? `Frozen · ${wallet.account_number}` : wallet.account_number
+                }
+                icon={purpose === "business" ? Building2 : Wallet}
+                active={scope === purpose}
+              />
+            );
+          })}
       </SidebarGroupContent>
     </SidebarGroup>
   );

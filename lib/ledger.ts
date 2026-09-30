@@ -19,18 +19,50 @@ const PURPOSE_LABEL: Record<AccountPurpose, string> = {
 export const accountTypeLabel = (type: AccountType) => TYPE_LABEL[type];
 export const purposeLabel = (purpose: AccountPurpose) => PURPOSE_LABEL[purpose];
 
-/** "Business · Current" */
+/** "Personal wallet", "Business wallet", "Investment wallet". */
 export function accountName(account: Account): string {
-  return `${PURPOSE_LABEL[account.purpose]} · ${TYPE_LABEL[account.account_type]}`;
+  if (account.account_type === "current") return walletName(account.purpose);
+  return TYPE_LABEL[account.account_type] + (account.account_type === "loan_holding" ? " account" : "");
 }
 
-/** Accounts a person sees as wallets: not the loan system's, not closed. */
+export function walletName(purpose: AccountPurpose): string {
+  return `${PURPOSE_LABEL[purpose]} wallet`;
+}
+
+/** A customer's wallets are their open current accounts. */
 export function isWallet(account: Account): boolean {
-  return account.account_type !== "loan_holding" && account.account_status !== "closed";
+  return account.account_type === "current" && account.account_status !== "closed";
 }
 
-export function inScope(account: Account, scope: AccountScope): boolean {
-  return scope === "combined" || account.purpose === scope;
+export interface Wallets {
+  personal: Account | null;
+  business: Account | null;
+  /** Opened by the API when the customer links a brokerage; not a wallet card. */
+  investment: Account | null;
+}
+
+/**
+ * A customer has at most one personal and one business wallet (the API
+ * enforces it). Users created before that rule can have more; the oldest
+ * open one of each is theirs.
+ */
+export function walletsOf(accounts: Account[]): Wallets {
+  const oldest = (match: (a: Account) => boolean) =>
+    accounts
+      .filter((a) => a.account_status !== "closed" && match(a))
+      .sort((a, b) => a.created_at.localeCompare(b.created_at))[0] ?? null;
+  return {
+    personal: oldest((a) => a.account_type === "current" && a.purpose === "personal"),
+    business: oldest((a) => a.account_type === "current" && a.purpose === "business"),
+    investment: oldest((a) => a.account_type === "investment_wallet"),
+  };
+}
+
+/** The wallets a scope shows: Personal → the personal wallet, Business → the business one, Combined → both. */
+export function scopedWallets(wallets: Wallets, scope: AccountScope): Account[] {
+  const list: (Account | null)[] =
+    scope === "personal" ? [wallets.personal] : scope === "business" ? [wallets.business] : [wallets.personal, wallets.business];
+  return list.filter((a): a is Account => a !== null);
 }
 
 const LOCALE: Record<string, string> = { NGN: "en-NG", USD: "en-US", GBP: "en-GB", EUR: "en-IE" };

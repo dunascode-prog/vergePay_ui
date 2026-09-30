@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 // it can't be fooled into granting data: the API verifies every request
 // itself. Its job is sending people to the right screen.
 //
-//   no session                  /dashboard → /signin?next=…
+//   no session                  /dashboard, /onboarding → /signin?next=…
 //   password ok, 2FA code due   /dashboard → /signin?step=2fa
 //   full session                /signin, /signup → /dashboard
 
@@ -35,7 +35,7 @@ export function proxy(request: NextRequest) {
   // outlives it. The first API call then refreshes the session (lib/api.ts).
   const mayHaveSession = fullSession || (!accessToken && hasRefreshToken);
 
-  if (pathname.startsWith("/dashboard")) {
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")) {
     if (pendingTwoFactor) {
       const url = new URL("/signin", request.url);
       url.searchParams.set("step", "2fa");
@@ -58,5 +58,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/signin", "/signup"],
+  matcher: ["/dashboard/:path*", "/onboarding", "/signin", "/signup"],
 };
