@@ -10,12 +10,16 @@ import {
   SidebarGroupContent,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAccountScope, useAppData } from "@/components/app-data";
+import { AddWalletDialog } from "@/components/accounts/AddWalletDialog";
+import { walletName, walletsOf } from "@/lib/ledger";
 
 interface WalletCardProps {
   href: string;
   name: string;
   balance: string;
-  currency: "NGN" | "USD";
+  currency: string;
   description: string;
   icon: LucideIcon;
   active?: boolean;
@@ -71,7 +75,7 @@ export function WalletCard({
             variant="secondary"
             className="shrink-0 text-[10px] font-medium"
           >
-            Active
+            Viewing
           </Badge>
         )}
       </div>
@@ -88,7 +92,12 @@ export function WalletCard({
   );
 }
 
+/** The sidebar's wallets: the customer's personal and business wallet, each opening that view. */
 export function WalletsSidebarGroup() {
+  const { accounts, accountsState } = useAppData();
+  const [scope] = useAccountScope();
+  const wallets = walletsOf(accounts);
+
   return (
     <SidebarGroup className="px-2">
       <SidebarGroupLabel className="mb-2 px-2 text-[11px] uppercase tracking-widest">
@@ -96,32 +105,55 @@ export function WalletsSidebarGroup() {
       </SidebarGroupLabel>
 
       <SidebarGroupContent className="space-y-2">
-        <WalletCard
-          href="/wallets/personal"
-          name="Personal Wallet"
-          balance="600,000"
-          currency="USD"
-          description="Main spending wallet"
-          icon={Wallet}
-          active
-        />
+        {accountsState === "loading" && (
+          <>
+            <Skeleton className="h-[86px] w-full rounded-xl" />
+            <Skeleton className="h-[86px] w-full rounded-xl" />
+          </>
+        )}
 
-        <WalletCard
-          href="/wallets/business"
-          name="Business Wallet"
-          balance="300,000"
-          currency="NGN"
-          description="Client payments"
-          icon={Building2}
-        />
+        {accountsState === "error" && (
+          <p className="px-2 text-xs text-muted-foreground">Couldn&apos;t load your wallets.</p>
+        )}
 
-        <Button
-          variant="ghost"
-          className="w-full justify-start rounded-xl text-muted-foreground hover:text-foreground"
-        >
-          <CirclePlus className="mr-2 size-4" />
-          Add wallet
-        </Button>
+        {accountsState === "ready" &&
+          (["personal", "business"] as const).map((purpose) => {
+            const wallet = wallets[purpose];
+            if (!wallet) {
+              return (
+                <AddWalletDialog
+                  key={purpose}
+                  purpose={purpose}
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start rounded-xl text-muted-foreground hover:text-foreground"
+                    >
+                      <CirclePlus className="mr-2 size-4" />
+                      Add a {walletName(purpose).toLowerCase()}
+                    </Button>
+                  }
+                />
+              );
+            }
+            return (
+              <WalletCard
+                key={purpose}
+                href={`/dashboard?scope=${purpose}`}
+                name={walletName(purpose)}
+                balance={(wallet.balance_minor / 100).toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+                currency={wallet.currency_code}
+                description={
+                  wallet.account_status === "frozen" ? `Frozen · ${wallet.account_number}` : wallet.account_number
+                }
+                icon={purpose === "business" ? Building2 : Wallet}
+                active={scope === purpose}
+              />
+            );
+          })}
       </SidebarGroupContent>
     </SidebarGroup>
   );

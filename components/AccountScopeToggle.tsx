@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { SegmentedToggle, SegmentedOption } from "./SegmentedToggle";
+import { useAccountScope } from "./app-data";
+import type { AccountScope } from "@/lib/ledger";
 
-export type AccountScope = "personal" | "business" | "combined";
+export type { AccountScope };
 
 const OPTIONS: SegmentedOption<AccountScope>[] = [
   { value: "personal", label: "Personal" },
@@ -11,27 +12,12 @@ const OPTIONS: SegmentedOption<AccountScope>[] = [
   { value: "combined", label: "Combined" },
 ];
 
-interface AccountScopeToggleProps {
-  value?: AccountScope;
-  onChange?: (value: AccountScope) => void;
-}
-
 /**
- * Controls which wallet/ledger scope the dashboard is showing. Uncontrolled
- * by default (manages its own state) but accepts value/onChange if the page
- * needs to read or drive the selection itself.
+ * Which accounts the dashboard shows: personal, business, or both. The choice
+ * lives in the URL (?scope=), so every part of the page agrees on it.
  */
-export function AccountScopeToggle({
-  value,
-  onChange,
-}: AccountScopeToggleProps) {
-  const [internalValue, setInternalValue] = useState<AccountScope>("personal");
-  const current = value ?? internalValue;
-
-  function handleChange(next: AccountScope) {
-    setInternalValue(next);
-    onChange?.(next);
-  }
+export function AccountScopeToggle() {
+  const [current, setScope] = useAccountScope();
 
   return (
     <>
@@ -40,7 +26,7 @@ export function AccountScopeToggle({
         <SegmentedToggle
           options={OPTIONS}
           value={current}
-          onChange={handleChange}
+          onChange={setScope}
           aria-label="Account scope"
         />
       </div>
@@ -53,7 +39,7 @@ export function AccountScopeToggle({
         <select
           id="account-scope-select"
           value={current}
-          onChange={(e) => handleChange(e.target.value as AccountScope)}
+          onChange={(e) => setScope(e.target.value as AccountScope)}
           className="rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-900"
         >
           {OPTIONS.map((option) => (

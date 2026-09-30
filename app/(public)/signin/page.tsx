@@ -14,7 +14,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/signin">) 
   return (
     <AuthShell>
       <LoginForm
-        next={safeNext(params.next)}
+        // just signed up: straight on to creating their first wallet
+        next={params.registered === "1" ? "/onboarding" : safeNext(params.next)}
         initialStep={params.step === "2fa" ? "code" : "credentials"}
         justRegistered={params.registered === "1"}
       />

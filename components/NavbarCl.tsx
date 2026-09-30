@@ -38,6 +38,7 @@ import { CalendarDays } from "lucide-react";
 import { Button } from "./ui/button";
 import { LuDownload } from "react-icons/lu";
 import { AccountScopeToggle } from "./AccountScopeToggle";
+import { useAppData } from "./app-data";
 import Link from "next/link";
 
 type PageTitle = {
@@ -72,18 +73,17 @@ const SECTION_CONFIG: Record<Section, SectionConfig> = {
   dashboard: {
     basePath: "/dashboard",
     title: "Dashboard",
-    description: "Good Morning, Seun",
+    // replaced by <Greeting /> (time of day + the user's name) when rendered
+    description: "Welcome back",
     showAccountScope: true,
-    // TODO: this button has nowhere to go yet (href=""). Either build the
-    // "Add Money" destination/modal, or remove the Link wrapper until it does
-    // — a Link with an empty href is a dead click right now.
-    headerAction: { label: "Add Money", href: "", icon: Plus },
+    // "Add Money" comes back with funding (Step 3); it had nowhere to go yet.
   },
   analytics: {
     basePath: "/dashboard/analytics",
     title: "Analytics",
     description: "Financial health & habits",
-    showAccountScope: true,
+    // still sample data, so the Personal/Business toggle would do nothing here
+    showAccountScope: false,
     // Same issue as above — no real destination wired up yet.
     headerAction: { label: "Export Report", href: "", icon: LuDownload },
   },
@@ -91,7 +91,8 @@ const SECTION_CONFIG: Record<Section, SectionConfig> = {
     basePath: "/dashboard/invoices",
     title: "Invoices",
     description: "Manage client invoices in one place.",
-    showAccountScope: true,
+    // still sample data, so the Personal/Business toggle would do nothing here
+    showAccountScope: false,
     headerAction: {
       label: "New Invoice",
       href: "/dashboard/invoices/new",
@@ -252,6 +253,15 @@ export function DaySelector({
   );
 }
 
+function Greeting() {
+  const { user } = useAppData();
+  const hour = new Date().getHours();
+  const part = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const name = user ? user.first_name || user.username : null;
+  // the server and the browser can be in different time zones
+  return <span suppressHydrationWarning>{name ? `${part}, ${name}` : part}</span>;
+}
+
 const Navbar = ({ className, ...props }: React.ComponentProps<"div">) => {
   const { setTheme } = useTheme();
   const pathname = usePathname();
@@ -275,7 +285,9 @@ const Navbar = ({ className, ...props }: React.ComponentProps<"div">) => {
       <div className="flex flex-row items-center gap-1">
         <SidebarTrigger />
         <div>
-          <p className="hidden lg:flex 2xl:flex -mb-1">{config.description}</p>
+          <p className="hidden lg:flex 2xl:flex -mb-1">
+            {section === "dashboard" ? <Greeting /> : config.description}
+          </p>
           <h6>{config.title}</h6>
         </div>
       </div>

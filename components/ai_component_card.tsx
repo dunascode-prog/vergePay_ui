@@ -1,3 +1,4 @@
+import { SampleBadge } from "@/components/dashboard/SampleWidgets";
 import {
   Card,
   CardContent,
@@ -24,9 +25,7 @@ export default function AiSummaryCard() {
             </CardDescription>
           </div>
 
-          <span className="rounded-full border bg-background px-3 py-1 text-xs text-muted-foreground">
-            Just now
-          </span>
+          <SampleBadge />
         </div>
       </CardHeader>
 

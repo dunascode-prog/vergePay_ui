@@ -10,11 +10,13 @@ import {
 } from "@/components/ui/chart";
 
 type SparklineProps = {
-  data: { value: number }[];
+  data: { value: number; label?: string }[];
   color: string;
+  /** Formats the hovered value (e.g. as money); defaults to the raw number. */
+  formatValue?: (value: number) => string;
 };
 
-export function Sparkline({ data, color }: SparklineProps) {
+export function Sparkline({ data, color, formatValue }: SparklineProps) {
   const config = {
     value: {
       label: "Value",
@@ -36,7 +38,21 @@ export function Sparkline({ data, color }: SparklineProps) {
       >
         <ChartTooltip
           cursor={false}
-          content={<ChartTooltipContent hideLabel />}
+          content={
+            <ChartTooltipContent
+              hideIndicator
+              labelKey="label"
+              nameKey="label"
+              formatter={(value, _name, item) => (
+                <span className="flex w-full justify-between gap-3">
+                  <span className="text-muted-foreground">{item.payload.label}</span>
+                  <span className="font-medium tabular-nums text-foreground">
+                    {formatValue ? formatValue(Number(value)) : String(value)}
+                  </span>
+                </span>
+              )}
+            />
+          }
         />
 
         <Area
@@ -45,7 +61,7 @@ export function Sparkline({ data, color }: SparklineProps) {
           stroke={color}
           fill={color}
           fillOpacity={0.15}
-          strokeWidth={2.5}
+          strokeWidth={2}
         />
       </AreaChart>
     </ChartContainer>
