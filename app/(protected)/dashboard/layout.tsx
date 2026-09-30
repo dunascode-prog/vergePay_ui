@@ -1,3 +1,4 @@
+import { AppDataProvider } from "@/components/app-data";
 import Navbar from "@/components/NavbarCl";
 import { AppSidebar } from "@/components/sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -19,15 +20,17 @@ export default async function DashboardLayout({
         enableSystem
         disableTransitionOnChange
       >
-        <SidebarProvider defaultOpen={defaultOpen}>
-          <AppSidebar />
-          <div className="w-full">
-            <Navbar className="sticky top-0 z-40 border-b bg-background" />
-            <main className="overflow-y-auto px-1 py-2 d:px-2 md:py-4 lg:px-4 lg:py-4">
-              {children}
-            </main>
-          </div>
-        </SidebarProvider>
+        <AppDataProvider>
+          <SidebarProvider defaultOpen={defaultOpen}>
+            <AppSidebar />
+            <div className="w-full">
+              <Navbar className="sticky top-0 z-40 border-b bg-background" />
+              <main className="overflow-y-auto px-3 py-3 sm:px-4 md:py-4 lg:px-4 lg:py-4">
+                {children}
+              </main>
+            </div>
+          </SidebarProvider>
+        </AppDataProvider>
       </ThemeProvider>
     </div>
   );

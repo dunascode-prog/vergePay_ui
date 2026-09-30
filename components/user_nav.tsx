@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   Avatar,
@@ -31,7 +31,8 @@ import {
   User,
 } from "lucide-react";
 
-import { getMe, signout } from "@/services/auth";
+import { signout } from "@/services/auth";
+import { useAppData } from "@/components/app-data";
 import { UserProfile } from "@/types/auth";
 
 function displayName(user: UserProfile): string {
@@ -46,13 +47,8 @@ function initials(user: UserProfile): string {
 
 /** `compact`: avatar only, for the collapsed (icon) sidebar. */
 export function UserNav({ compact = false }: { compact?: boolean }) {
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const { user } = useAppData();
   const [signingOut, setSigningOut] = useState(false);
-
-  useEffect(() => {
-    // A 401 here is handled by api(): it refreshes the session or goes to /signin.
-    getMe().then(setUser).catch(() => {});
-  }, []);
 
   const handleSignOut = async () => {
     setSigningOut(true);

@@ -10,12 +10,16 @@ import {
   SidebarGroupContent,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAccountScope, useAppData } from "@/components/app-data";
+import { OpenAccountDialog } from "@/components/accounts/OpenAccountDialog";
+import { accountName, isWallet } from "@/lib/ledger";
 
 interface WalletCardProps {
   href: string;
   name: string;
   balance: string;
-  currency: "NGN" | "USD";
+  currency: string;
   description: string;
   icon: LucideIcon;
   active?: boolean;
@@ -71,7 +75,7 @@ export function WalletCard({
             variant="secondary"
             className="shrink-0 text-[10px] font-medium"
           >
-            Active
+            Viewing
           </Badge>
         )}
       </div>
@@ -88,7 +92,15 @@ export function WalletCard({
   );
 }
 
+const MAX_LISTED = 4;
+
+/** The sidebar's wallet list: the user's real accounts, linking to the dashboard in that scope. */
 export function WalletsSidebarGroup() {
+  const { accounts, accountsState } = useAppData();
+  const [scope] = useAccountScope();
+  const wallets = accounts.filter(isWallet);
+  const listed = wallets.slice(0, MAX_LISTED);
+
   return (
     <SidebarGroup className="px-2">
       <SidebarGroupLabel className="mb-2 px-2 text-[11px] uppercase tracking-widest">
@@ -96,32 +108,55 @@ export function WalletsSidebarGroup() {
       </SidebarGroupLabel>
 
       <SidebarGroupContent className="space-y-2">
-        <WalletCard
-          href="/wallets/personal"
-          name="Personal Wallet"
-          balance="600,000"
-          currency="USD"
-          description="Main spending wallet"
-          icon={Wallet}
-          active
-        />
+        {accountsState === "loading" && (
+          <>
+            <Skeleton className="h-[86px] w-full rounded-xl" />
+            <Skeleton className="h-[86px] w-full rounded-xl" />
+          </>
+        )}
 
-        <WalletCard
-          href="/wallets/business"
-          name="Business Wallet"
-          balance="300,000"
-          currency="NGN"
-          description="Client payments"
-          icon={Building2}
-        />
+        {accountsState === "error" && (
+          <p className="px-2 text-xs text-muted-foreground">Couldn&apos;t load your accounts.</p>
+        )}
 
-        <Button
-          variant="ghost"
-          className="w-full justify-start rounded-xl text-muted-foreground hover:text-foreground"
-        >
-          <CirclePlus className="mr-2 size-4" />
-          Add wallet
-        </Button>
+        {listed.map((account) => (
+          <WalletCard
+            key={account.account_id}
+            href={`/dashboard?scope=${account.purpose}`}
+            name={accountName(account)}
+            balance={(account.balance_minor / 100).toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+            currency={account.currency_code}
+            description={
+              account.account_status === "frozen"
+                ? `Frozen · ${account.account_number}`
+                : account.account_number
+            }
+            icon={account.purpose === "business" ? Building2 : Wallet}
+            active={scope === account.purpose}
+          />
+        ))}
+
+        {wallets.length > MAX_LISTED && (
+          <Link href="/dashboard" className="block px-2 text-xs text-muted-foreground hover:text-foreground">
+            +{wallets.length - MAX_LISTED} more on the dashboard
+          </Link>
+        )}
+
+        <OpenAccountDialog
+          defaultPurpose={scope === "business" ? "business" : "personal"}
+          trigger={
+            <Button
+              variant="ghost"
+              className="w-full justify-start rounded-xl text-muted-foreground hover:text-foreground"
+            >
+              <CirclePlus className="mr-2 size-4" />
+              Open account
+            </Button>
+          }
+        />
       </SidebarGroupContent>
     </SidebarGroup>
   );
