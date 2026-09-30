@@ -35,7 +35,11 @@ export function VerifyIdentityStep({ onVerified }: { onVerified: () => void }) {
   const [stillPending, setStillPending] = useState(false);
   const [key] = useState(() => crypto.randomUUID());
   const cancelled = useRef(false);
-  useEffect(() => () => void (cancelled.current = true), []);
+  // reset on mount too: StrictMode (dev) mounts, unmounts and mounts again
+  useEffect(() => {
+    cancelled.current = false;
+    return () => void (cancelled.current = true);
+  }, []);
 
   const set = (name: keyof Fields) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setFields((f) => ({ ...f, [name]: name === "bvn" ? e.target.value.replace(/\D/g, "").slice(0, 11) : e.target.value }));
