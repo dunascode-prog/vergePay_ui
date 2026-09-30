@@ -1,10 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Briefcase, Check, Copy, Plus, Wallet } from "lucide-react";
+import { ArrowLeftRight, Briefcase, Check, Copy, Plus, Send, Wallet } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AddWalletDialog } from "@/components/accounts/AddWalletDialog";
+import { Button } from "@/components/ui/button";
+import { AddMoneyDialog } from "@/components/money/AddMoneyDialog";
+import { SendMoneyDialog } from "@/components/money/SendMoneyDialog";
+import { TransferDialog } from "@/components/money/TransferDialog";
 import { AccountScope, formatMinor, walletName, Wallets } from "@/lib/ledger";
 import { Account, AccountPurpose } from "@/types/account";
 
@@ -38,7 +42,7 @@ function CopyNumber({ number }: { number: string }) {
   );
 }
 
-function WalletCard({ wallet }: { wallet: Account }) {
+function WalletCard({ wallet, other }: { wallet: Account; other: Account | null }) {
   const Icon = ICON[wallet.purpose];
   return (
     <Card className="flex flex-col">
@@ -64,6 +68,36 @@ function WalletCard({ wallet }: { wallet: Account }) {
         </div>
 
         <CopyNumber number={wallet.account_number} />
+
+        <div className={other ? "grid grid-cols-3 gap-2" : "grid grid-cols-2 gap-2"}>
+          <AddMoneyDialog
+            wallet={wallet}
+            trigger={
+              <Button className="h-10 gap-1.5 rounded-lg bg-emerald-700 text-white hover:bg-emerald-800" aria-label={`Add money to your ${walletName(wallet.purpose).toLowerCase()}`}>
+                <Plus className="size-4" aria-hidden /> Add
+              </Button>
+            }
+          />
+          <SendMoneyDialog
+            wallet={wallet}
+            trigger={
+              <Button variant="outline" className="h-10 gap-1.5 rounded-lg" aria-label={`Send money from your ${walletName(wallet.purpose).toLowerCase()}`}>
+                <Send className="size-4" aria-hidden /> Send
+              </Button>
+            }
+          />
+          {other && (
+            <TransferDialog
+              from={wallet}
+              to={other}
+              trigger={
+                <Button variant="outline" className="h-10 gap-1.5 rounded-lg" aria-label={`Transfer from your ${walletName(wallet.purpose).toLowerCase()} to your ${walletName(other.purpose).toLowerCase()}`}>
+                  <ArrowLeftRight className="size-4" aria-hidden /> Transfer
+                </Button>
+              }
+            />
+          )}
+        </div>
       </CardContent>
     </Card>
   );
@@ -103,7 +137,11 @@ export function WalletCards({ wallets, scope }: { wallets: Wallets; scope: Accou
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {slots.map((purpose) =>
         wallets[purpose] ? (
-          <WalletCard key={purpose} wallet={wallets[purpose]!} />
+          <WalletCard
+            key={purpose}
+            wallet={wallets[purpose]!}
+            other={wallets[purpose === "personal" ? "business" : "personal"]}
+          />
         ) : (
           <AddWalletCard key={purpose} purpose={purpose} />
         ),

@@ -43,19 +43,23 @@ const RECENT = 8;
 type LoadState = "loading" | "ready" | "error";
 
 // Ledger lines for these accounts over the last six months. Keyed on the
-// account ids, so it refetches when a wallet is added, not on every render.
-function useLedgerLines(accountIds: string[]) {
+// account ids and on `version` (it goes up after money moves), so it
+// refetches when something changed, not on every render. A refetch keeps the
+// old lines on screen until the new ones arrive.
+function useLedgerLines(accountIds: string[], version: number) {
   const key = accountIds.join(",");
   const [lines, setLines] = useState<ScopedTransaction[]>([]);
   const [state, setState] = useState<LoadState>("loading");
   const [attempt, setAttempt] = useState(0);
+  const [loadedKey, setLoadedKey] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     const ids = key ? key.split(",") : [];
     const from = monthsAgoStart(MONTHS);
+    // only a different set of accounts shows the skeleton again
     // eslint-disable-next-line react-hooks/set-state-in-effect -- start of a fetch
-    setState("loading");
+    if (loadedKey !== key) setState("loading");
     Promise.all(
       ids.map(async (id) =>
         (await listAccountTransactionsSince(id, from)).map((line) => ({ ...line, account_id: id })),
@@ -65,12 +69,15 @@ function useLedgerLines(accountIds: string[]) {
         if (cancelled) return;
         setLines(perAccount.flat());
         setState("ready");
+        setLoadedKey(key);
       })
       .catch(() => !cancelled && setState("error"));
     return () => {
       cancelled = true;
     };
-  }, [key, attempt]);
+    // loadedKey is read to decide on the skeleton, not a reason to refetch
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, attempt, version]);
 
   return { lines, state, retry: () => setAttempt((n) => n + 1) };
 }
@@ -123,14 +130,14 @@ function BrokerageResult() {
 }
 
 export default function Dashboard() {
-  const { accounts, accountsState, reloadAccounts } = useAppData();
+  const { accounts, accountsState, reloadAccounts, dataVersion } = useAppData();
   const [scope] = useAccountScope();
   const brokerage = useBrokerage();
 
   const wallets = useMemo(() => walletsOf(accounts), [accounts]);
   const scoped = useMemo(() => scopedWallets(wallets, scope), [wallets, scope]);
   const scopedIds = useMemo(() => scoped.map((a) => a.account_id), [scoped]);
-  const ledger = useLedgerLines(scopedIds);
+  const ledger = useLedgerLines(scopedIds, dataVersion);
 
   const currencies = useMemo(() => currenciesOf(scoped), [scoped]);
   const [pickedCurrency, setPickedCurrency] = useState<string | null>(null);

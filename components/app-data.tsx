@@ -14,8 +14,12 @@ interface AppData {
   user: UserProfile | null;
   accounts: Account[];
   accountsState: LoadState;
-  /** Re-fetch accounts, e.g. after opening one. */
+  /** Re-fetch accounts, e.g. after opening one or moving money. */
   reloadAccounts: () => Promise<void>;
+  /** Re-fetch the profile, e.g. after identity verification or turning 2FA on. */
+  reloadUser: () => Promise<void>;
+  /** Goes up every time accounts are reloaded, so views of transactions know to refetch. */
+  dataVersion: number;
 }
 
 const AppDataContext = createContext<AppData | null>(null);
@@ -27,25 +31,35 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [accountsState, setAccountsState] = useState<LoadState>("loading");
+  const [dataVersion, setDataVersion] = useState(0);
 
   const reloadAccounts = useCallback(async () => {
     try {
       setAccounts(await listAccounts());
       setAccountsState("ready");
+      setDataVersion((v) => v + 1);
     } catch {
       setAccountsState("error");
     }
   }, []);
 
+  const reloadUser = useCallback(async () => {
+    try {
+      setUser(await getMe());
+    } catch {
+      // keep the last known profile; a 401 is handled inside api()
+    }
+  }, []);
+
   useEffect(() => {
-    getMe().then(setUser).catch(() => {});
     // eslint-disable-next-line react-hooks/set-state-in-effect -- loading data on mount
+    void reloadUser();
     void reloadAccounts();
-  }, [reloadAccounts]);
+  }, [reloadAccounts, reloadUser]);
 
   const value = useMemo(
-    () => ({ user, accounts, accountsState, reloadAccounts }),
-    [user, accounts, accountsState, reloadAccounts],
+    () => ({ user, accounts, accountsState, reloadAccounts, reloadUser, dataVersion }),
+    [user, accounts, accountsState, reloadAccounts, reloadUser, dataVersion],
   );
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
 }
