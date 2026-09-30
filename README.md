@@ -135,7 +135,7 @@ Calculations live in small, pure modules in `lib/` rather than inside JSX:
 
 ### Accessible components, dark mode
 The UI is built on **shadcn/ui over Base UI** primitives, so dialogs, dropdowns, sheets, tabs and tooltips handle focus, keyboard navigation and ARIA roles properly. The theme is made of CSS variables in Tailwind 4, with light and dark modes via `next-themes`. The chrome stays out of the way:
-- **Sidebar:** opens on the first visit, highlights the page you're on (`aria-current="page"`), and collapses to icons with a tooltip on each. It remembers your choice in a cookie. On phones it becomes a sheet that closes as soon as you pick a page.
+- **Sidebar:** a floating, rounded panel. It has a collapse button on its edge, a **⌘K / Ctrl+K page search**, and groups (Get paid, Business, Wealth) that open to show their pages on a curved tree line. It highlights the page you're on (`aria-current="page"`). Collapsed to icons, each group opens a flyout of its pages on hover, and every icon has a tooltip and an accessible name. It remembers your choice in a cookie. On phones it becomes a sheet that closes as soon as you pick a page.
 - **Top bar:** only the page title (with a time-of-day greeting on the dashboard), the Personal / Business / Combined toggle where the page uses it, and the page's main action (*New invoice*, *New plan*).
 - **Account menu:** light, dark or system appearance, and sign out.
 

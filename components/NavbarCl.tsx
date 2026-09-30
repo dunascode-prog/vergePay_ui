@@ -64,7 +64,8 @@ export default function Navbar({ className }: { className?: string }) {
       )}
     >
       <div className="flex min-w-0 items-center gap-2">
-        <SidebarTrigger className="-ml-1 shrink-0" />
+        {/* phones only: on larger screens the sidebar has its own collapse button */}
+        <SidebarTrigger className="-ml-1 shrink-0 md:hidden" />
         <div className="min-w-0 leading-tight">
           {isHome && (
             <p className="hidden truncate text-xs text-muted-foreground sm:block">

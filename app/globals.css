@@ -106,11 +106,11 @@
   --chart-income: #047857;
   --chart-spending: #eb6834;
   --radius: 0.625rem;
-  --sidebar: oklch(0.975 0.004 145);
+  --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.15 0.01 145);
   --sidebar-primary: oklch(0.717 0.15 145.771);
   --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.93 0.015 145);
+  --sidebar-accent: oklch(0.96 0.004 145);
   --sidebar-accent-foreground: oklch(0.15 0.03 145);
   --sidebar-border: oklch(0.89 0.01 145);
   --sidebar-border2: oklch(0.93 0.004 145);

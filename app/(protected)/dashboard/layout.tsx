@@ -24,7 +24,10 @@ export default async function DashboardLayout({
         disableTransitionOnChange
       >
         <AppDataProvider>
-          <SidebarProvider defaultOpen={defaultOpen}>
+          <SidebarProvider
+            defaultOpen={defaultOpen}
+            style={{ "--sidebar-width": "17rem", "--sidebar-width-icon": "3.5rem" } as React.CSSProperties}
+          >
             <AppSidebar />
             <div className="w-full">
               <Navbar className="sticky top-0 z-40 border-b" />
