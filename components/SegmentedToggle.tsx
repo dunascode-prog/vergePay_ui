@@ -44,7 +44,7 @@ export function SegmentedToggle<T extends string>({
   }
 
   return (
-    <div className={cn("inline-flex rounded-lg bg-gray-100 p-1", className)}>
+    <div className={cn("inline-flex rounded-lg bg-muted p-1", className)}>
       <div
         role="radiogroup"
         aria-label={aria["aria-label"]}
@@ -53,7 +53,7 @@ export function SegmentedToggle<T extends string>({
       >
         <span
           aria-hidden
-          className="absolute left-0 top-0 h-full rounded-md bg-white shadow-sm transition-transform duration-200 ease-out"
+          className="absolute left-0 top-0 h-full rounded-md bg-background shadow-sm transition-transform duration-200 ease-out"
           style={{
             width: `${100 / options.length}%`,
             transform: `translateX(${activeIndex * 100}%)`,
@@ -74,7 +74,7 @@ export function SegmentedToggle<T extends string>({
               onClick={() => onChange(option.value)}
               className={cn(
                 "relative z-10 flex-1 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-                isActive ? "text-gray-900" : "text-gray-500 hover:text-gray-700"
+                isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               )}
             >
               {option.label}

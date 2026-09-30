@@ -12,7 +12,9 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const cookieStore = await cookies();
-  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
+  // Open on a first visit; after that, whatever the user last chose.
+  const saved = cookieStore.get("sidebar_state")?.value;
+  const defaultOpen = saved === undefined ? true : saved === "true";
   return (
     <div suppressHydrationWarning className="min-h-screen flex flex-row">
       <ThemeProvider
@@ -22,10 +24,13 @@ export default async function DashboardLayout({
         disableTransitionOnChange
       >
         <AppDataProvider>
-          <SidebarProvider defaultOpen={defaultOpen}>
+          <SidebarProvider
+            defaultOpen={defaultOpen}
+            style={{ "--sidebar-width": "17rem", "--sidebar-width-icon": "3.5rem" } as React.CSSProperties}
+          >
             <AppSidebar />
             <div className="w-full">
-              <Navbar className="sticky top-0 z-40 border-b bg-background" />
+              <Navbar className="sticky top-0 z-40 border-b" />
               <main className="overflow-y-auto px-3 py-3 sm:px-4 md:py-4 lg:px-4 lg:py-4">
                 <RequireWallet>{children}</RequireWallet>
               </main>

@@ -21,8 +21,8 @@ export function AccountScopeToggle() {
 
   return (
     <>
-      {/* Desktop: segmented control */}
-      <div className="hidden lg:block">
+      {/* Tablet and up: segmented control */}
+      <div className="hidden sm:block">
         <SegmentedToggle
           options={OPTIONS}
           value={current}
@@ -31,8 +31,8 @@ export function AccountScopeToggle() {
         />
       </div>
 
-      {/* Mobile/tablet: same choice, no control lost below the lg breakpoint */}
-      <div className="lg:hidden">
+      {/* Phones: the same choice as a compact select */}
+      <div className="sm:hidden">
         <label className="sr-only" htmlFor="account-scope-select">
           Account scope
         </label>
@@ -40,7 +40,7 @@ export function AccountScopeToggle() {
           id="account-scope-select"
           value={current}
           onChange={(e) => setScope(e.target.value as AccountScope)}
-          className="rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-900"
+          className="h-9 rounded-lg border border-input bg-background px-2.5 text-sm font-medium text-foreground"
         >
           {OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
