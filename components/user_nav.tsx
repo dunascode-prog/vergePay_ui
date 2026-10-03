@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 
 import {
@@ -22,14 +21,7 @@ import {
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import {
-  Bell,
-  CreditCard,
-  LogOut,
-  MoreHorizontal,
-  Settings,
-  User,
-} from "lucide-react";
+import { LogOut, MoreHorizontal } from "lucide-react";
 
 import { signout } from "@/services/auth";
 import { useAppData } from "@/components/app-data";
@@ -91,10 +83,6 @@ export function UserNav({ compact = false }: { compact?: boolean }) {
                     <p className="truncate text-sm font-semibold">{displayName(user)}</p>
 
                     <p className="truncate text-xs text-muted-foreground">
-                      @{user.username}
-                    </p>
-
-                    <p className="truncate text-xs text-muted-foreground">
                       {user.email}
                     </p>
                   </div>
@@ -126,46 +114,7 @@ export function UserNav({ compact = false }: { compact?: boolean }) {
           </DropdownMenuLabel>
         </DropdownMenuGroup>
 
-        <DropdownMenuSeparator />
-
-        <DropdownMenuGroup>
-          <DropdownMenuItem
-            render={
-              <Link href="/profile">
-                <User className="mr-2 size-4" />
-                Profile
-              </Link>
-            }
-          />
-
-          <DropdownMenuItem
-            render={
-              <Link href="/settings">
-                <Settings className="mr-2 size-4" />
-                Settings
-              </Link>
-            }
-          />
-
-          <DropdownMenuItem
-            render={
-              <Link href="/billing">
-                <CreditCard className="mr-2 size-4" />
-                Billing
-              </Link>
-            }
-          />
-
-          <DropdownMenuItem
-            render={
-              <Link href="/notifications">
-                <Bell className="mr-2 size-4" />
-                Notifications
-              </Link>
-            }
-          />
-        </DropdownMenuGroup>
-
+        {/* Profile and settings pages come later; only what exists is linked. */}
         <DropdownMenuSeparator />
 
         <DropdownMenuItem

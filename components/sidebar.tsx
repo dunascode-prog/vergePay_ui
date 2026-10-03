@@ -28,7 +28,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { WalletSwitcher } from "./wallet_switcher";
 import { UserNav } from "./user_nav";
 import { cn } from "@/lib/utils";
 import { WalletsSidebarGroup } from "./wallet";
@@ -121,7 +120,7 @@ export function AppSidebar() {
               size="lg"
               render={
                 <Link
-                  href="/"
+                  href="/dashboard"
                   className="relative flex items-center justify-center gap-3"
                 >
                   <Image
@@ -185,7 +184,7 @@ export function AppSidebar() {
             <SidebarMenu className="flex items-center">
               <SidebarMenuButton
                 render={
-                  <Link href="/">
+                  <Link href="/dashboard" aria-label="Wallets">
                     <CreditCard className="size-4" />
                   </Link>
                 }

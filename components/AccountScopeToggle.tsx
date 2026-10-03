@@ -40,7 +40,7 @@ export function AccountScopeToggle() {
           id="account-scope-select"
           value={current}
           onChange={(e) => setScope(e.target.value as AccountScope)}
-          className="rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-900"
+          className="rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium text-foreground"
         >
           {OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
