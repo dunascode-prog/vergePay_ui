@@ -39,6 +39,10 @@ export function ConcentrationRiskCard({ clients, currency, className }: Concentr
         </span>
       </CardHeader>
       <CardContent>
+        {inCurrency.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No {currency} invoices were paid in this period yet.</p>
+        ) : (
+        <>
         <div className="flex h-3 w-full overflow-hidden rounded-full bg-muted mb-4">
           {inCurrency.map((client, i) => (
             <div
@@ -65,6 +69,8 @@ export function ConcentrationRiskCard({ clients, currency, className }: Concentr
             {inCurrency[0].name} alone makes up {topShare}% of {currency} revenue — losing this
             client would materially affect cash flow.
           </p>
+        )}
+        </>
         )}
       </CardContent>
     </Card>
