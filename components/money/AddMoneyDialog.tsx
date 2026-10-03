@@ -103,7 +103,10 @@ function BankTransfer({ wallet }: { wallet: Account }) {
     setBusy(true);
     setError(null);
     try {
-      setDetails(await createVirtualAccount(wallet.account_id, bvn));
+      const va = await createVirtualAccount(wallet.account_id, bvn);
+      // an empty reply is a server fault, not an account number
+      if (!va?.account_number) throw new Error("no account number");
+      setDetails(va);
       setState("ready");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Couldn't create the account number. Please try again.");
@@ -114,7 +117,7 @@ function BankTransfer({ wallet }: { wallet: Account }) {
 
   if (state === "loading") return <Skeleton className="h-40 w-full rounded-xl" />;
 
-  if (state === "none") {
+  if (state === "none" || !details) {
     return (
       <form onSubmit={create} className="space-y-5" noValidate>
         <StepHeader
@@ -139,8 +142,8 @@ function BankTransfer({ wallet }: { wallet: Account }) {
     <div className="space-y-5">
       <StepHeader title="Transfer to this account" subtitle="From any Nigerian bank app. The money lands in this wallet within minutes." />
       <Summary>
-        <SummaryRow label="Bank" value={details!.bank_name} />
-        <SummaryRow label="Account number" value={<CopyValue value={details!.account_number} label="account number" />} />
+        <SummaryRow label="Bank" value={details.bank_name} />
+        <SummaryRow label="Account number" value={<CopyValue value={details.account_number} label="account number" />} />
         {name && <SummaryRow label="Account name" value={name} />}
       </Summary>
       <p className="text-xs text-muted-foreground">This number is yours to keep. Share it with clients to get paid straight into your wallet.</p>
