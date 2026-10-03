@@ -34,6 +34,10 @@ export function LinkAlpacaDialog({ trigger, onLinked }: { trigger: React.ReactEl
     if (next) {
       setStep("intro");
       setError(null);
+    } else if (step === "done") {
+      // Refresh the card only now: linked, it swaps this dialog's trigger for
+      // the holdings, which would close the dialog before "Linked" is seen.
+      onLinked?.();
     }
   };
 
@@ -44,7 +48,6 @@ export function LinkAlpacaDialog({ trigger, onLinked }: { trigger: React.ReactEl
       return;
     }
     setStep("done");
-    onLinked?.();
   };
 
   const begin = async () => {
@@ -101,7 +104,7 @@ export function LinkAlpacaDialog({ trigger, onLinked }: { trigger: React.ReactEl
               <DialogTitle>Linked</DialogTitle>
               <DialogDescription>Your Alpaca account is linked. Your holdings are syncing now.</DialogDescription>
             </DialogHeader>
-            <Button onClick={() => setOpen(false)} className={primaryButton}>
+            <Button onClick={() => reset(false)} className={primaryButton}>
               Done
             </Button>
           </div>
