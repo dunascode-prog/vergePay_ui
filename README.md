@@ -48,7 +48,7 @@ The sidebar groups the app the way a small-business owner thinks about their mon
 ### Home
 | Screen | Route | What it shows |
 |---|---|---|
-| **Landing page** | `/` | The public home page (vergepay.com), in the style of Mono and Flutterwave. A hero with a live-looking product preview; what VergePay is built on (Flutterwave payments, BVN verification, 2FA, a double-entry ledger); every feature in one grid; deep dives on invoicing, the two wallets and insights; security; who it's for; a "Why VergePay" section for investors and partners; how to get started; FAQ. Responsive with a phone menu, and signed-in visitors get "Go to dashboard" instead of sign-up. The contact address is `CONTACT_EMAIL` in `components/landing/Landing.tsx` |
+| **Landing page** | `/` | The public home page (vergepay.com), in the style of Mono and Flutterwave. A hero ("Built for Nigeria's freelancers and small businesses", with Create free account → `/signup` and Sign in → `/signin`) and a live-looking product preview; what VergePay is built on (Flutterwave payments, BVN verification, 2FA, a double-entry ledger); every feature in one grid; deep dives on invoicing, the two wallets and insights; security; who it's for; a "Why VergePay" section for investors and partners; how to get started; FAQ. Responsive with a phone menu, and signed-in visitors get "Go to dashboard" instead of sign-up. The contact address is `CONTACT_EMAIL` in `components/landing/Landing.tsx` |
 
 ### Account
 | Screen | Route | What it shows |

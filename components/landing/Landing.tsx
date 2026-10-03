@@ -94,25 +94,32 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
           <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_80%_10%,rgba(99,209,107,0.18),transparent),radial-gradient(50%_40%_at_0%_0%,rgba(15,100,82,0.08),transparent)]" />
           <div className={cn(container, "relative grid grid-cols-1 items-center gap-16 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-10")}>
             <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-700">
-              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-900/10 bg-white/70 px-3 py-1 text-xs font-medium text-emerald-900 backdrop-blur">
-                <span className="size-1.5 rounded-full bg-[#63D16B]" />
-                Built for Nigeria&apos;s freelancers and small businesses
-              </span>
-              <h1 className="mt-6 text-[2.6rem] leading-[1.02] font-extrabold tracking-[-0.045em] text-zinc-950 sm:text-6xl lg:text-[3.6rem] xl:text-[4rem]">
-                Get paid, spend and grow,
-                <span className="block text-emerald-800">all from one account.</span>
+              <h1 className="text-[2.4rem] leading-[1.08] font-semibold tracking-[-0.035em] text-zinc-950 sm:text-[3.25rem] lg:text-[3.4rem] xl:text-[3.75rem]">
+                Built for Nigeria&apos;s <span className="text-emerald-800">freelancers and small businesses.</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-zinc-600">
                 VergePay gives you a personal and a business wallet, invoices your clients can pay in one tap, and a live picture of where every naira goes. No more juggling five bank apps.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <PrimaryCta signedIn={signedIn} />
-                <a
-                  href="#product"
-                  className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-white px-6 py-3.5 text-base font-semibold text-zinc-900 transition-colors hover:bg-zinc-50"
-                >
-                  See what&apos;s inside
-                </a>
+                {signedIn ? (
+                  <PrimaryCta signedIn />
+                ) : (
+                  <>
+                    <Link
+                      href="/signup"
+                      className="group inline-flex items-center justify-center gap-2 rounded-full bg-emerald-900 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-emerald-800"
+                    >
+                      Create free account
+                      <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                    </Link>
+                    <Link
+                      href="/signin"
+                      className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-white px-6 py-3.5 text-base font-semibold text-zinc-900 transition-colors hover:bg-zinc-50"
+                    >
+                      Sign in
+                    </Link>
+                  </>
+                )}
               </div>
               <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-600">
                 {["Free to open", "Two account numbers", "Bank-level security"].map((t) => (
