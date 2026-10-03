@@ -1,6 +1,5 @@
 "use client";
 import {
-  Bell,
   Check,
   ChevronDown,
   Command,
@@ -40,6 +39,7 @@ import { LuDownload } from "react-icons/lu";
 import { AccountScopeToggle } from "./AccountScopeToggle";
 import { useAppData } from "./app-data";
 import Link from "next/link";
+import { NotificationBell } from "./notifications/NotificationBell";
 
 type PageTitle = {
   title: string;
@@ -294,6 +294,9 @@ const Navbar = ({ className, ...props }: React.ComponentProps<"div">) => {
       <div className="flex flex-row justify-between gap-2 items-center">
         {config.showAccountScope && <AccountScopeToggle />}
 
+        {/* live alerts; always visible, on every screen size */}
+        <NotificationBell />
+
         <div
           className={cn(
             !collapsed ? "hidden" : "hidden lg:flex lg:flex-row lg:gap-1",
@@ -302,12 +305,6 @@ const Navbar = ({ className, ...props }: React.ComponentProps<"div">) => {
           <Button variant="secondary" size="icon" className="rounded-full">
             <Search className="size-3" />
           </Button>
-          <div className="relative">
-            <Button variant="secondary" size="icon" className="rounded-full">
-              <Bell className="size-3" />
-            </Button>
-            <span className="absolute top-2 right-2 size-2 rounded-full bg-red-500" />
-          </div>
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
@@ -347,11 +344,6 @@ const Navbar = ({ className, ...props }: React.ComponentProps<"div">) => {
                 <DropdownMenuItem>
                   <Search className="mr-2 h-4 w-4" />
                   Search
-                </DropdownMenuItem>
-
-                <DropdownMenuItem>
-                  <Bell className="mr-2 h-4 w-4" />
-                  Notifications
                 </DropdownMenuItem>
               </DropdownMenuGroup>
 

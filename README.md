@@ -126,6 +126,13 @@ Every money action is built so that a retry or a double-tap can't pay twice, and
 - **Cards never touch VergePay.** Card details are typed on Flutterwave's page. After checkout or 3-D Secure, the return page asks the API, which verifies with Flutterwave itself, rather than trusting the redirect.
 - **Identity and 2FA in the flow, not a detour.** The one-time BVN check waits for the (asynchronous) verdict and carries straight on. Adding a card turns 2FA on if needed, using the same step as brokerage linking.
 
+### A dashboard that updates itself
+When someone sends you money, your balance, charts and history update, a toast says who sent what, and the bell counts it, all without a reload ([`components/realtime/LiveUpdates.tsx`](components/realtime/LiveUpdates.tsx), [`components/notifications/NotificationBell.tsx`](components/notifications/NotificationBell.tsx)).
+- **One WebSocket, same session.** It connects to `/v1/ws` on the app's own origin, and the `/v1` rewrite forwards the upgrade to the API. The HttpOnly session cookie goes with it, so JavaScript still never touches a token.
+- **Expiry handled quietly.** The API closes the socket (`4401`) when the short-lived access token expires. The client refreshes the session through the same shared `refreshSession()` as HTTP and reconnects.
+- **Nothing lost offline.** It reconnects with backoff, straight away when the network or the tab comes back, and then re-reads balances and alerts. The API's notification list is the durable copy; the socket only makes it instant.
+- **Toasts only for what you didn't do yourself:** money in and identity decisions. Your own sends just appear in the bell. Reading an alert in one tab clears the badge in the others.
+
 ### Money shown honestly
 Totals in different currencies are **never added together**. A client paying ₦620,000 and $1,400 is shown as `₦620,000 + $1,400`, not as a single naira figure based on a guessed exchange rate (`lib/format.ts`). Amounts use locale formatting (`en-NG`, `en-US`). The API stores all money as integer minor units (kobo and cents), so no floating-point error ever reaches the screen.
 
@@ -194,6 +201,7 @@ The screens were designed first, using sample data shaped like the real domain. 
 | Session, 2FA, sign-out | `proxy.ts`, sign-in, user menu | `/v1/auth/refresh`, `/2fa/verify`, `/logout`, `/v1/users/me` | ✅ Connected |
 | Wallets and overview | `/onboarding`, `/dashboard`, sidebar wallets, greeting | `GET`/`POST /v1/accounts` (one personal and one business wallet), `/:id/transactions` | ✅ Connected |
 | Add money, Send, Transfer, identity | wallet-card actions, `/dashboard/payments/complete` | `POST /v1/kyc/submissions`, `/v1/accounts/lookup`, `POST /v1/transactions`, `/v1/cards` (link, charges), `/v1/accounts/:id/virtual-account`, `/v1/transactions/:id/sync` | ✅ Connected |
+| Notifications and live updates | top-bar bell, toasts, the whole dashboard | `GET /v1/notifications`, `/:id/read`, `/read-all`, WebSocket `/v1/ws` | ✅ Connected |
 | Invoices | `/dashboard/invoices/*` | `/v1/invoices`, `/:id/pay`, `/:id/cancel` | ⏳ Planned |
 | Investments | dashboard Investments card, link reminder, `/dashboard/investments/linked` | `POST`/`GET /v1/brokerage-links` (opens the investment wallet), `/v1/holdings`, `/v1/auth/2fa/enable` + `/verify` | ✅ Connected |
 | Loans | new screen | `/v1/loans`, `/:id/schedule`, `/:id/repayments` | ⏳ Planned |
@@ -282,6 +290,7 @@ Open [http://localhost:3000](http://localhost:3000), create an account at `/sign
 - [ ] Security settings: turn 2FA on or off from the app
 - [x] Wallets, balances, cash flow and transaction history from the ledger, per Personal / Business / Combined
 - [x] Add money (bank-transfer account number, or a linked card via Flutterwave), Send with a name check, Transfer between your wallets, and one-time identity verification (BVN)
+- [x] Live dashboard: balances update the moment money moves, a notification bell, and toasts for money in
 - [ ] Invoices on the real API: create, pay, cancel
 - [x] Investments: link Alpaca (with 2FA set up on the way), synced holdings, a reminder until linked
 - [ ] Loans: apply, view the repayment schedule, repay
