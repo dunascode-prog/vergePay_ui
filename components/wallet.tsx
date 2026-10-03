@@ -25,14 +25,14 @@ export function WalletsSidebarGroup() {
   const wallets = walletsOf(accounts);
 
   return (
-    <SidebarGroup className="px-2">
-      <SidebarGroupLabel className="px-2 text-[11px] tracking-widest uppercase">Wallets</SidebarGroupLabel>
+    <SidebarGroup className="py-1">
+      <SidebarGroupLabel>Wallets</SidebarGroupLabel>
 
       <SidebarGroupContent>
         {accountsState === "loading" && (
-          <div className="space-y-1 px-2">
-            <Skeleton className="h-9 w-full rounded-lg" />
-            <Skeleton className="h-9 w-full rounded-lg" />
+          <div className="space-y-1">
+            <Skeleton className="h-8 w-full rounded-md" />
+            <Skeleton className="h-8 w-full rounded-md" />
           </div>
         )}
 
@@ -51,7 +51,7 @@ export function WalletsSidebarGroup() {
                       trigger={
                         <button
                           type="button"
-                          className="flex h-9 w-full items-center gap-2.5 rounded-lg px-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
+                          className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
                         >
                           <CirclePlus className="size-4 shrink-0" />
                           Add a {walletName(purpose).toLowerCase()}
@@ -70,7 +70,7 @@ export function WalletsSidebarGroup() {
                     aria-current={active ? "page" : undefined}
                     title={`${walletName(purpose)} · ${wallet.account_number}${frozen ? " · frozen" : ""}`}
                     className={cn(
-                      "flex h-9 items-center gap-2.5 rounded-lg px-2 text-sm transition-colors hover:bg-sidebar-accent",
+                      "flex h-8 items-center gap-2 rounded-md px-2 text-sm transition-colors hover:bg-sidebar-accent",
                       active && "bg-sidebar-accent font-medium",
                     )}
                   >

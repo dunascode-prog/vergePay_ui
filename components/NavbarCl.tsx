@@ -1,6 +1,6 @@
 "use client";
 import { Monitor, Moon, Plus, Search, Sun } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 import { useTheme } from "next-themes";
@@ -133,84 +133,107 @@ function Greeting() {
   return <span suppressHydrationWarning>{name ? `${part}, ${name}` : part}</span>;
 }
 
-const Navbar = ({ className }: React.ComponentProps<"div">) => {
+// "⌘K" on a Mac, "Ctrl K" elsewhere; decided after mount, so the server
+// render and the first browser render agree.
+function useShortcutLabel() {
+  const [label, setLabel] = useState("Ctrl K");
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- a browser-only fact, read once
+    if (/Mac|iPhone|iPad/.test(navigator.platform)) setLabel("⌘K");
+  }, []);
+  return label;
+}
+
+/**
+ * The top bar: the sidebar button and the page's title on the left; search,
+ * alerts, theme, the Personal/Business/Combined switch and the page's main
+ * action on the right. One fixed height, the same as the sidebar's header.
+ */
+const Navbar = ({ className }: React.ComponentProps<"header">) => {
   const { setTheme } = useTheme();
   const pathname = usePathname();
   const [searchOpen, setSearchOpen] = useState(false);
   const openSearch = useCallback(() => setSearchOpen(true), []);
   useCommandShortcut(openSearch);
+  const shortcut = useShortcutLabel();
 
   const section = resolveSection(pathname);
   const config = SECTION_CONFIG[section];
   const isSectionRoot = pathname === config.basePath;
 
   return (
-    <div className={cn("flex flex-row items-center justify-between gap-2 px-3 py-3", className)}>
-      <div className="flex min-w-0 flex-row items-center gap-1">
-        <SidebarTrigger />
-        <div className="min-w-0">
-          <p className="-mb-1 hidden lg:flex">{section === "dashboard" ? <Greeting /> : config.description}</p>
-          <h6 className="truncate">{config.title}</h6>
-        </div>
-      </div>
+    <header className={cn("flex h-14 shrink-0 items-center gap-2 px-3 sm:px-4", className)}>
+      <SidebarTrigger className="-ml-1" />
+      <span aria-hidden className="mx-1 hidden h-5 w-px bg-border sm:block" />
+      <p className="min-w-0 truncate text-sm font-semibold sm:text-base">
+        {section === "dashboard" ? <Greeting /> : config.title}
+      </p>
 
-      <div className="flex flex-row items-center gap-2">
-        {/* tools first: search, alerts, theme; always shown, whatever the sidebar's state */}
-        <div className="flex items-center gap-1.5">
-          <Button
-            variant="secondary"
-            size="icon"
-            className="rounded-full"
-            onClick={openSearch}
-            aria-label="Search pages (Ctrl+K)"
-            title="Search pages (Ctrl+K)"
-          >
-            <Search className="size-4" />
-          </Button>
-          <NotificationBell />
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button variant="secondary" size="icon" className="relative rounded-full" aria-label="Theme">
-                  <Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                  <Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-                </Button>
-              }
-            />
-            <DropdownMenuContent align="end" sideOffset={10}>
-              <DropdownMenuItem onClick={() => setTheme("light")}>
-                <Sun className="mr-2 size-4" /> Light
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")}>
-                <Moon className="mr-2 size-4" /> Dark
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")}>
-                <Monitor className="mr-2 size-4" /> System
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+      <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+        {/* search: a field on larger screens, an icon on phones */}
+        <button
+          type="button"
+          onClick={openSearch}
+          aria-label={`Search pages (${shortcut})`}
+          className="hidden h-9 w-56 items-center gap-2 rounded-lg border border-input bg-background px-3 text-sm text-muted-foreground shadow-xs transition-colors hover:bg-muted/60 md:flex"
+        >
+          <Search className="size-4" />
+          <span className="flex-1 text-left">Search…</span>
+          <kbd className="rounded border bg-muted px-1.5 py-0.5 font-sans text-[10px] font-medium text-muted-foreground">{shortcut}</kbd>
+        </button>
+        <Button variant="ghost" size="icon" className="rounded-full md:hidden" onClick={openSearch} aria-label="Search pages">
+          <Search className="size-4" />
+        </Button>
 
-        {config.showAccountScope && <AccountScopeToggle />}
+        <NotificationBell />
+
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="ghost" size="icon" className="relative rounded-full" aria-label="Theme">
+                <Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+                <Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+              </Button>
+            }
+          />
+          <DropdownMenuContent align="end" sideOffset={8}>
+            <DropdownMenuItem onClick={() => setTheme("light")}>
+              <Sun className="size-4" /> Light
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")}>
+              <Moon className="size-4" /> Dark
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("system")}>
+              <Monitor className="size-4" /> System
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {config.showAccountScope && (
+          <>
+            <span aria-hidden className="mx-0.5 hidden h-5 w-px bg-border sm:block" />
+            <AccountScopeToggle />
+          </>
+        )}
 
         {/*
-          Only rendered on the section's own root route (e.g. /dashboard/invoices),
-          not on its sub-routes (e.g. /dashboard/invoices/[id]/edit): "New Invoice"
-          floating in the navbar while you're editing an existing invoice would be
-          misleading.
+          Only on the section's own root route (e.g. /dashboard/invoices), not
+          its sub-routes: "New Invoice" in the bar while editing an existing
+          invoice would be misleading.
         */}
         {isSectionRoot && config.headerAction && (
-          <Link href={config.headerAction.href}>
-            <Button className="bg-emerald-700 hover:bg-emerald-800">
-              <config.headerAction.icon className="h-4 w-4" />
-              <span className="hidden sm:inline">{config.headerAction.label}</span>
-            </Button>
+          <Link
+            href={config.headerAction.href}
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-emerald-700 px-3 text-sm font-medium text-white transition-colors hover:bg-emerald-800"
+          >
+            <config.headerAction.icon className="size-4" />
+            <span className="hidden sm:inline">{config.headerAction.label}</span>
           </Link>
         )}
       </div>
 
       <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
-    </div>
+    </header>
   );
 };
 
