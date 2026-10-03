@@ -57,11 +57,6 @@ export function LandingNav({ signedIn }: { signedIn: boolean }) {
         </ul>
 
         <div className="hidden items-center gap-2 lg:flex">
-          {signedIn && (
-            <Link href="/dashboard" className="rounded-full px-4 py-2.5 text-sm font-semibold text-emerald-800 transition-colors hover:bg-emerald-50">
-              Dashboard
-            </Link>
-          )}
           <Link href="/signin" className="rounded-full px-4 py-2.5 text-sm font-semibold text-zinc-800 transition-colors hover:bg-zinc-100">
             Sign in
           </Link>
