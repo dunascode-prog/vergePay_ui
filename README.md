@@ -20,7 +20,7 @@ Built by **[Seyitan Omodara](https://github.com/dunascode-prog)** · Backend: [v
 | | |
 |---|---|
 | **What it is** | A dashboard for freelancers and small businesses to run personal and business money in one place |
-| **Screens** | 16 routes in 10 sections: overview, analytics, invoices (list, new, detail, edit, reminder), recurring billing, clients, business overview, expenses, payroll, goals, envelopes |
+| **Screens** | 16 routes in 10 sections: overview, analytics, invoices (list, new, detail, edit, and the public pay page), recurring billing, clients, business overview, expenses, payroll, goals, envelopes |
 | **Stack** | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui on Base UI, Recharts, React Hook Form + Zod |
 | **Rendering** | Server Components by default. Client Components only where there's interaction. Server Actions for forms |
 | **Money** | Naira and US dollars kept separate and never blended at an invented exchange rate. Formatted per locale with `Intl.NumberFormat` |
@@ -62,10 +62,10 @@ The sidebar groups the app the way a small-business owner thinks about their mon
 ### Payments
 | Screen | Route | What it shows |
 |---|---|---|
-| **Invoices** | `/dashboard/invoices` | Filterable table of draft, sent, partial, paid and overdue invoices. Each has a **predicted chance of on-time payment** and the client's health score |
-| **New / edit invoice** | `/dashboard/invoices/new`, `/[id]/edit` | Invoice form with client, description, amount, currency, and issue and due dates |
-| **Invoice detail** | `/dashboard/invoices/[id]` | Status, amount paid so far, payment history and the ledger entries behind the invoice |
-| **Send reminder** | `/dashboard/invoices/[id]/remind` | Compose a payment reminder for an unpaid invoice |
+| **Invoices** | `/dashboard/invoices` | **Live from the API.** Outstanding, overdue, paid in the last 30 days and drafts at a glance; **Sent** and **To pay** tabs; filter by status; a table on desktop, cards on a phone. Updates by itself when a client pays |
+| **New / edit invoice** | `/dashboard/invoices/new`, `/[id]/edit` | Bill a client (add one without leaving the form), choose the wallet it's paid into, line items with live totals, due-date shortcuts and a note. **Send** (with or without emailing it) or **save a draft** |
+| **Invoice detail** | `/dashboard/invoices/[id]` | The invoice as the client sees it, the **pay link** (copy, WhatsApp, email reminder), and an activity trail: sent, emailed (with delivery status), paid by card or wallet, receipt emailed. Send, edit or delete a draft; cancel an unpaid one; refund a wallet payment; pay an invoice you've received |
+| **Pay an invoice** | `/pay/[token]` | **Public, no account needed.** The client's hosted invoice page: who, what, how much, by when. Pays through Flutterwave checkout (card, bank transfer, USSD), or from a VergePay wallet when signed in, then confirms the payment with the API |
 | **Recurring billing** | `/dashboard/recurring`, `/new`, `/[id]` | Retainers and subscriptions: pause, resume or cancel, next billing date, invoices generated, and the monthly equivalent of weekly, quarterly and yearly plans |
 | **Clients** | `/dashboard/clients` | Client cards with health score, average days to pay, on-time rate, total revenue, and VIP and new tags. A detail sheet and an AI note on each client |
 
@@ -202,7 +202,8 @@ The screens were designed first, using sample data shaped like the real domain. 
 | Wallets and overview | `/onboarding`, `/dashboard`, sidebar wallets, greeting | `GET`/`POST /v1/accounts` (one personal and one business wallet), `/:id/transactions` | ✅ Connected |
 | Add money, Send, Transfer, identity | wallet-card actions, `/dashboard/payments/complete` | `POST /v1/kyc/submissions`, `/v1/accounts/lookup`, `POST /v1/transactions`, `/v1/cards` (link, charges), `/v1/accounts/:id/virtual-account`, `/v1/transactions/:id/sync` | ✅ Connected |
 | Notifications and live updates | top-bar bell, toasts, the whole dashboard | `GET /v1/notifications`, `/:id/read`, `/read-all`, WebSocket `/v1/ws` | ✅ Connected |
-| Invoices | `/dashboard/invoices/*` | `/v1/invoices`, `/:id/pay`, `/:id/cancel` | ⏳ Planned |
+| Invoices and clients | `/dashboard/invoices/*` | `/v1/invoices` (create, edit and delete drafts, `/send`, `/remind`, `/pay`, `/cancel`, `/refund`), `/v1/clients` | ✅ Connected |
+| Pay links | `/pay/[token]` (public) | `/v1/pay/:token`, `/checkout`, `/sync`, `/wallet` | ✅ Connected |
 | Investments | dashboard Investments card, link reminder, `/dashboard/investments/linked` | `POST`/`GET /v1/brokerage-links` (opens the investment wallet), `/v1/holdings`, `/v1/auth/2fa/enable` + `/verify` | ✅ Connected |
 | Loans | new screen | `/v1/loans`, `/:id/schedule`, `/:id/repayments` | ⏳ Planned |
 | Clients, recurring, expenses, payroll, goals, envelopes, analytics | their pages | none yet; the backend doesn't have these features | 🎨 Designed, sample data |
@@ -219,7 +220,7 @@ vergepay/
 │   ├── (public)/signin, signup/    # auth pages
 │   └── (protected)/dashboard/      # the app: one folder per screen
 │       ├── layout.tsx              # sidebar + top bar + theme
-│       ├── invoices/[id]/edit, remind/
+│       ├── invoices/[id]/edit, new/
 │       ├── recurring/[id], new/
 │       └── clients, business, expenses, payroll, goals, envelopes, analytics/
 │           └── actions.ts          # Server Actions for that screen
@@ -291,7 +292,7 @@ Open [http://localhost:3000](http://localhost:3000), create an account at `/sign
 - [x] Wallets, balances, cash flow and transaction history from the ledger, per Personal / Business / Combined
 - [x] Add money (bank-transfer account number, or a linked card via Flutterwave), Send with a name check, Transfer between your wallets, and one-time identity verification (BVN)
 - [x] Live dashboard: balances update the moment money moves, a notification bell, and toasts for money in
-- [ ] Invoices on the real API: create, pay, cancel
+- [x] Invoices on the real API: clients, drafts with line items, send and email, pay links clients pay by card or bank transfer, reminders, cancel and refund
 - [x] Investments: link Alpaca (with 2FA set up on the way), synced holdings, a reminder until linked
 - [ ] Loans: apply, view the repayment schedule, repay
 - [ ] Remove leftover sample data and unused components
