@@ -59,21 +59,6 @@ function SectionTitle({ eyebrow, title, body, dark = false, center = false }: { 
   );
 }
 
-function PrimaryCta({ signedIn, className }: { signedIn: boolean; className?: string }) {
-  return (
-    <Link
-      href={signedIn ? "/dashboard" : "/signup"}
-      className={cn(
-        "group inline-flex items-center justify-center gap-2 rounded-full bg-emerald-900 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-emerald-800",
-        className,
-      )}
-    >
-      {signedIn ? "Go to your dashboard" : "Open a free account"}
-      <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-    </Link>
-  );
-}
-
 const Tick = ({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) => (
   <li className="flex gap-3">
     <span className={cn("mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full", dark ? "bg-[#63D16B]/15 text-[#63D16B]" : "bg-emerald-100 text-emerald-800")}>
@@ -101,26 +86,25 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
                 VergePay gives you a personal and a business wallet, invoices your clients can pay in one tap, and a live picture of where every naira goes. No more juggling five bank apps.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                {signedIn ? (
-                  <PrimaryCta signedIn />
-                ) : (
-                  <>
-                    <Link
-                      href="/signup"
-                      className="group inline-flex items-center justify-center gap-2 rounded-full bg-emerald-900 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-emerald-800"
-                    >
-                      Create free account
-                      <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-                    </Link>
-                    <Link
-                      href="/signin"
-                      className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-white px-6 py-3.5 text-base font-semibold text-zinc-900 transition-colors hover:bg-zinc-50"
-                    >
-                      Sign in
-                    </Link>
-                  </>
-                )}
+                <Link
+                  href="/signup"
+                  className="group inline-flex items-center justify-center gap-2 rounded-full bg-emerald-900 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-emerald-800"
+                >
+                  Get started for free
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+                <Link
+                  href="/signin"
+                  className="inline-flex items-center justify-center rounded-full border border-zinc-200 bg-white px-6 py-3.5 text-base font-semibold text-zinc-900 transition-colors hover:bg-zinc-50"
+                >
+                  Sign in
+                </Link>
               </div>
+              {signedIn && (
+                <Link href="/dashboard" className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-800 hover:underline">
+                  You&apos;re signed in: go to your dashboard <ArrowRight className="size-3.5" />
+                </Link>
+              )}
               <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-600">
                 {["Free to open", "Two account numbers", "Bank-level security"].map((t) => (
                   <li key={t} className="flex items-center gap-1.5">
@@ -402,13 +386,19 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
               <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_50%_0%,rgba(99,209,107,0.25),transparent)]" />
               <h2 className="relative mx-auto max-w-2xl text-3xl leading-tight font-bold tracking-[-0.03em] text-white sm:text-5xl">Your money, finally organised.</h2>
               <p className="relative mx-auto mt-4 max-w-lg text-emerald-100/85 sm:text-lg">Open your free account in minutes and send your first invoice today.</p>
-              <div className="relative mt-8 flex justify-center">
+              <div className="relative mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                 <Link
-                  href={signedIn ? "/dashboard" : "/signup"}
-                  className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 font-semibold text-emerald-950 transition-colors hover:bg-emerald-50"
+                  href="/signup"
+                  className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 font-semibold text-emerald-950 transition-colors hover:bg-emerald-50"
                 >
-                  {signedIn ? "Go to your dashboard" : "Open a free account"}
+                  Get started for free
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+                <Link
+                  href={signedIn ? "/dashboard" : "/signin"}
+                  className="inline-flex items-center justify-center rounded-full border border-white/25 px-7 py-3.5 font-semibold text-white transition-colors hover:bg-white/10"
+                >
+                  {signedIn ? "Go to your dashboard" : "Sign in"}
                 </Link>
               </div>
             </div>

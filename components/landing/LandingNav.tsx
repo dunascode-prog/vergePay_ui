@@ -57,20 +57,17 @@ export function LandingNav({ signedIn }: { signedIn: boolean }) {
         </ul>
 
         <div className="hidden items-center gap-2 lg:flex">
-          {signedIn ? (
-            <Link href="/dashboard" className="rounded-full bg-emerald-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-800">
-              Go to dashboard
+          {signedIn && (
+            <Link href="/dashboard" className="rounded-full px-4 py-2.5 text-sm font-semibold text-emerald-800 transition-colors hover:bg-emerald-50">
+              Dashboard
             </Link>
-          ) : (
-            <>
-              <Link href="/signin" className="rounded-full px-4 py-2.5 text-sm font-semibold text-zinc-800 transition-colors hover:bg-zinc-100">
-                Sign in
-              </Link>
-              <Link href="/signup" className="rounded-full bg-emerald-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-800">
-                Open free account
-              </Link>
-            </>
           )}
+          <Link href="/signin" className="rounded-full px-4 py-2.5 text-sm font-semibold text-zinc-800 transition-colors hover:bg-zinc-100">
+            Sign in
+          </Link>
+          <Link href="/signup" className="rounded-full bg-emerald-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-800">
+            Get started
+          </Link>
         </div>
 
         <button
@@ -97,19 +94,16 @@ export function LandingNav({ signedIn }: { signedIn: boolean }) {
             ))}
           </ul>
           <div className="mt-6 grid gap-3">
-            {signedIn ? (
-              <Link href="/dashboard" className="rounded-full bg-emerald-900 py-3.5 text-center font-semibold text-white">
-                Go to dashboard
+            <Link href="/signup" className="rounded-full bg-emerald-900 py-3.5 text-center font-semibold text-white">
+              Get started
+            </Link>
+            <Link href="/signin" className="rounded-full border border-zinc-200 py-3.5 text-center font-semibold text-zinc-900">
+              Sign in
+            </Link>
+            {signedIn && (
+              <Link href="/dashboard" className="py-2 text-center font-semibold text-emerald-800">
+                Go to your dashboard
               </Link>
-            ) : (
-              <>
-                <Link href="/signup" className="rounded-full bg-emerald-900 py-3.5 text-center font-semibold text-white">
-                  Open free account
-                </Link>
-                <Link href="/signin" className="rounded-full border border-zinc-200 py-3.5 text-center font-semibold text-zinc-900">
-                  Sign in
-                </Link>
-              </>
             )}
           </div>
         </div>
