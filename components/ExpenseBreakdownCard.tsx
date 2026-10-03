@@ -18,10 +18,14 @@ export function ExpenseBreakdownCard({ categories }: ExpenseBreakdownCardProps) 
   return (
     <Card className="shadow-none">
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm font-medium text-foreground">Expenses by category</CardTitle>
+        <CardTitle className="text-sm font-medium text-foreground">Where money went</CardTitle>
         <span className="text-sm font-semibold text-foreground">{formatMoney(total, currency)}</span>
       </CardHeader>
       <CardContent>
+        {categories.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No money went out in this period.</p>
+        ) : (
+        <>
         <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-muted mb-4">
           {categories.map((c) => (
             <div
@@ -46,6 +50,8 @@ export function ExpenseBreakdownCard({ categories }: ExpenseBreakdownCardProps) 
               </div>
             ))}
         </div>
+        </>
+        )}
       </CardContent>
     </Card>
   );

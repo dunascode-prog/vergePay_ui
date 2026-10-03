@@ -29,7 +29,8 @@ export function AIInsightsFeed({ insights }: AIInsightsFeedProps) {
     <div className="rounded-lg border border-border bg-card p-4">
       <div className="flex items-center gap-1.5 mb-3">
         <LuSparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-        <p className="text-sm font-medium text-foreground">AI monthly report</p>
+        <p className="text-sm font-medium text-foreground">Insights</p>
+        <p className="text-xs text-muted-foreground">· from your invoices and transactions</p>
       </div>
       <div className="space-y-3">
         {insights.map((insight) => {
