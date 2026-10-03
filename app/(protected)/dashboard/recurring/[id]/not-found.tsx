@@ -12,7 +12,7 @@ export default function RecurringPlanNotFound() {
       <p className="text-sm text-gray-500 mb-6 max-w-sm">
         This plan may have been deleted, or the link you followed might be out of date.
       </p>
-      <Link href="/recurring">
+      <Link href="/dashboard/recurring">
         <Button variant="outline">
           <LuArrowLeft className="h-3.5 w-3.5 mr-1.5" />
           Back to recurring billing
