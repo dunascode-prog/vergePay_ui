@@ -1,13 +1,8 @@
 "use client";
 
+import { ChevronsUpDown, LogOut } from "lucide-react";
 import { useState } from "react";
-
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarBadge,
-} from "@/components/ui/avatar";
-
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,14 +12,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import { SidebarMenuButton } from "@/components/ui/sidebar";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
-
-import { LogOut, MoreHorizontal } from "lucide-react";
-
-import { signout } from "@/services/auth";
 import { useAppData } from "@/components/app-data";
+import { signout } from "@/services/auth";
 import { UserProfile } from "@/types/auth";
 
 function displayName(user: UserProfile): string {
@@ -37,9 +28,13 @@ function initials(user: UserProfile): string {
   return (parts.length > 1 ? parts[0][0] + parts[1][0] : parts[0].slice(0, 2)).toUpperCase();
 }
 
-/** `compact`: avatar only, for the collapsed (icon) sidebar. */
-export function UserNav({ compact = false }: { compact?: boolean }) {
+/**
+ * The account, at the foot of the sidebar: avatar, name and email, opening
+ * a menu. In the collapsed sidebar only the avatar shows.
+ */
+export function UserNav() {
   const { user } = useAppData();
+  const { isMobile } = useSidebar();
   const [signingOut, setSigningOut] = useState(false);
 
   const handleSignOut = async () => {
@@ -49,83 +44,55 @@ export function UserNav({ compact = false }: { compact?: boolean }) {
     window.location.assign("/signin");
   };
 
-  const avatar = (
-    <Avatar className={compact ? "h-9 w-9" : "h-10 w-10"}>
-      <AvatarFallback>{user ? initials(user) : ""}</AvatarFallback>
-
-      <AvatarBadge className="bg-emerald-500" />
-    </Avatar>
-  );
-
   return (
-    <DropdownMenu>
-      {compact ? (
-        <DropdownMenuTrigger
-          aria-label={user ? `Account menu for ${displayName(user)}` : "Account menu"}
-          className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
-        >
-          {avatar}
-        </DropdownMenuTrigger>
-      ) : (
-      <DropdownMenuTrigger
-        // the button renders as a <div>, so it isn't a native <button>
-        nativeButton={false}
-        render={
-        <SidebarMenuButton
-          className="h-auto rounded-xl p-3 transition-colors hover:bg-sidebar-accent"
-          render={
-            <div className="flex w-full items-center justify-between">
-              <div className="flex min-w-0 items-center gap-3">
-                {avatar}
-
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <SidebarMenuButton
+                size="lg"
+                tooltip={user ? displayName(user) : "Account"}
+                aria-label={user ? `Account menu for ${displayName(user)}` : "Account menu"}
+                className="data-popup-open:bg-sidebar-accent"
+              >
+                <Avatar className="size-8 rounded-lg">
+                  <AvatarFallback className="rounded-lg bg-emerald-100 text-xs font-semibold text-emerald-900 dark:bg-emerald-900 dark:text-emerald-100">
+                    {user ? initials(user) : ""}
+                  </AvatarFallback>
+                </Avatar>
                 {user ? (
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold">{displayName(user)}</p>
-
-                    <p className="truncate text-xs text-muted-foreground">
-                      {user.email}
-                    </p>
-                  </div>
+                  <span className="grid min-w-0 flex-1 text-left leading-tight">
+                    <span className="truncate text-sm font-medium">{displayName(user)}</span>
+                    <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+                  </span>
                 ) : (
-                  <div className="space-y-1.5">
+                  <span className="grid flex-1 gap-1.5">
                     <Skeleton className="h-3.5 w-24" />
                     <Skeleton className="h-3 w-32" />
-                  </div>
+                  </span>
                 )}
-              </div>
-
-              <MoreHorizontal className="size-4 shrink-0 text-muted-foreground" />
-            </div>
-          }
-        />
-        }
-      />
-      )}
-
-      <DropdownMenuContent align="end" side="right" className="w-64">
-        {/* Base UI's menu label must sit inside a group, or opening the menu throws */}
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>
-            <div className="space-y-1">
-              <p className="font-medium">{user ? displayName(user) : "…"}</p>
-
-              <p className="text-xs text-muted-foreground">{user?.email}</p>
-            </div>
-          </DropdownMenuLabel>
-        </DropdownMenuGroup>
-
-        {/* Profile and settings pages come later; only what exists is linked. */}
-        <DropdownMenuSeparator />
-
-        <DropdownMenuItem
-          className="text-destructive focus:text-destructive"
-          disabled={signingOut}
-          onClick={handleSignOut}
-        >
-          <LogOut className="mr-2 size-4" />
-          {signingOut ? "Signing out…" : "Sign out"}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+                <ChevronsUpDown className="ml-auto size-4 text-muted-foreground" />
+              </SidebarMenuButton>
+            }
+          />
+          <DropdownMenuContent side={isMobile ? "top" : "right"} align="end" sideOffset={8} className="w-60">
+            {/* Base UI's menu label must sit inside a group, or opening the menu throws */}
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>
+                <span className="block truncate font-medium text-foreground">{user ? displayName(user) : "…"}</span>
+                <span className="block truncate text-xs font-normal text-muted-foreground">{user?.email}</span>
+              </DropdownMenuLabel>
+            </DropdownMenuGroup>
+            {/* Profile and settings pages come later; only what exists is linked. */}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive" disabled={signingOut} onClick={handleSignOut}>
+              <LogOut className="size-4" />
+              {signingOut ? "Signing out…" : "Sign out"}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
   );
 }

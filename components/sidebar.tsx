@@ -1,4 +1,8 @@
 "use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -9,202 +13,78 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
-
-import { useSidebar } from "@/components/ui/sidebar";
-
-import {
-  Home,
-  ChartColumn,
-  FileText,
-  Repeat,
-  Users,
-  Briefcase,
-  Wallet,
-  Banknote,
-  Target,
-  Mail,
-  CreditCard,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { NAV, isActivePath, isGroup, type NavLink } from "@/lib/navigation";
 import { UserNav } from "./user_nav";
-import { cn } from "@/lib/utils";
 import { WalletsSidebarGroup } from "./wallet";
 
-const sidebarMenu = {
-  main: {
-    title: "Main",
-    items: [
-      {
-        title: "Home",
-        url: "/dashboard",
-        icon: Home,
-      },
-      {
-        title: "Analytics",
-        url: "/dashboard/analytics",
-        icon: ChartColumn,
-      },
-    ],
-  },
-
-  payments: {
-    title: "Payments",
-    items: [
-      {
-        title: "Invoices",
-        url: "/dashboard/invoices",
-        icon: FileText,
-        badge: 4,
-      },
-      {
-        title: "Recurring billing",
-        url: "/dashboard/recurring",
-        icon: Repeat,
-      },
-      {
-        title: "Clients",
-        url: "/dashboard/clients",
-        icon: Users,
-      },
-    ],
-  },
-
-  business: {
-    title: "Business",
-    items: [
-      {
-        title: "Business overview",
-        url: "/dashboard/business",
-        icon: Briefcase,
-      },
-      {
-        title: "Expenses",
-        url: "/dashboard/expenses",
-        icon: Wallet,
-      },
-      {
-        title: "Payroll",
-        url: "/dashboard/payroll",
-        icon: Banknote,
-      },
-    ],
-  },
-
-  wealth: {
-    title: "Wealth",
-    items: [
-      {
-        title: "Goals",
-        url: "/dashboard/goals",
-        icon: Target,
-      },
-      {
-        title: "Envelopes",
-        url: "/dashboard/envelopes",
-        icon: Mail,
-      },
-    ],
-  },
-};
+/**
+ * The app's sidebar: the logo, the pages (from lib/navigation.ts, the same
+ * list the ⌘K search uses), the wallets and the account. Collapses to icons
+ * with tooltips; on phones it opens as a sheet from the top bar's button.
+ */
 export function AppSidebar() {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
+  const pathname = usePathname();
+  const { state, isMobile, setOpenMobile } = useSidebar();
+  const collapsed = state === "collapsed" && !isMobile;
+
+  const item = (link: NavLink) => (
+    <SidebarMenuItem key={link.url}>
+      <SidebarMenuButton
+        isActive={isActivePath(pathname, link.url)}
+        tooltip={link.title}
+        render={
+          <Link href={link.url} onClick={() => isMobile && setOpenMobile(false)}>
+            <link.icon />
+            <span>{link.title}</span>
+          </Link>
+        }
+      />
+    </SidebarMenuItem>
+  );
+
+  const top = NAV.filter((entry): entry is NavLink => !isGroup(entry));
+  const groups = NAV.filter(isGroup);
+
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b px-2 py-3">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              render={
-                <Link
-                  href="/dashboard"
-                  className="relative flex items-center justify-center gap-3"
-                >
-                  <Image
-                    src="/final_vergepay_logoc.svg"
-                    alt="VergePay"
-                    width={34}
-                    height={34}
-                    priority
-                    className={cn(
-                      "rounded-lg transition-opacity duration-150",
-                      collapsed
-                        ? "opacity-100"
-                        : "absolute opacity-0 pointer-events-none",
-                    )}
-                  />
-                  <Image
-                    src="/final_vergepay_logo.svg"
-                    alt="VergePay"
-                    width={154}
-                    height={154}
-                    priority
-                    className={cn(
-                      "rounded-lg transition-opacity duration-150",
-                      collapsed
-                        ? "absolute opacity-0 pointer-events-none"
-                        : "opacity-100",
-                    )}
-                  />
-                </Link>
-              }
-            />
-          </SidebarMenuItem>
-        </SidebarMenu>
+      {/* same height as the top bar, so their bottom borders line up */}
+      <SidebarHeader className="h-14 justify-center border-b px-3 py-0 group-data-[collapsible=icon]:px-2">
+        <Link href="/dashboard" aria-label="VergePay home" className="flex items-center">
+          {collapsed ? (
+            <Image src="/final_vergepay_logoc.svg" alt="" width={32} height={32} priority className="mx-auto size-8 scale-125" />
+          ) : (
+            // the logo file at the sign-in page's size (components/auth/AuthShell.tsx)
+            <span className="-ml-[22px] flex h-10 w-36 items-center overflow-hidden">
+              <Image src="/final_vergepay_logo.svg" alt="" width={144} height={40} priority className="object-contain dark:brightness-[2.2] dark:saturate-[0.85]" />
+            </span>
+          )}
+        </Link>
       </SidebarHeader>
 
-      <SidebarContent className={collapsed ? "" : "px-2 py-4"}>
-        {Object.values(sidebarMenu).map((section) => (
-          <SidebarGroup key={section.title} className="mb-5">
-            <SidebarGroupLabel className="px-2 text-[11px] uppercase tracking-widest text-muted-foreground">
-              {section.title}
-            </SidebarGroupLabel>
+      <SidebarContent className="gap-0 py-2">
+        <SidebarGroup className="py-1">
+          <SidebarMenu>{top.map(item)}</SidebarMenu>
+        </SidebarGroup>
 
-            <SidebarMenu>
-              {section.items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    render={
-                      <Link href={item.url} className="flex items-center gap-3">
-                        <item.icon className="size-4" />
-                        <span>{item.title}</span>
-                      </Link>
-                    }
-                  />
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+        {groups.map((group) => (
+          <SidebarGroup key={group.title} className="py-1">
+            <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+            <SidebarMenu>{group.children.map(item)}</SidebarMenu>
           </SidebarGroup>
         ))}
-        {collapsed ? (
-          <SidebarGroup>
-            <SidebarMenu className="flex items-center">
-              <SidebarMenuButton
-                render={
-                  <Link href="/dashboard" aria-label="Wallets">
-                    <CreditCard className="size-4" />
-                  </Link>
-                }
-              />
-            </SidebarMenu>
-          </SidebarGroup>
-        ) : (
-          <WalletsSidebarGroup />
-        )}
+
+        {!collapsed && <WalletsSidebarGroup />}
       </SidebarContent>
 
-      {collapsed ? (
-        <SidebarFooter className="flex items-center pb-2">
-          <UserNav compact />
-        </SidebarFooter>
-      ) : (
-        <SidebarFooter className="border-t px-2 py-3">
-          <UserNav />
-        </SidebarFooter>
-      )}
+      <SidebarFooter className="border-t p-2">
+        <UserNav />
+      </SidebarFooter>
+
+      {/* click the edge to collapse or expand */}
+      <SidebarRail />
     </Sidebar>
   );
 }

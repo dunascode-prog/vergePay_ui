@@ -6,6 +6,7 @@ import Navbar from "@/components/NavbarCl";
 import { AppSidebar } from "@/components/sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { cookies } from "next/headers";
 
 export default async function DashboardLayout({
@@ -14,9 +15,10 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const cookieStore = await cookies();
-  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
+  // expanded unless the customer collapsed it last time
+  const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
   return (
-    <div suppressHydrationWarning className="min-h-screen flex flex-row">
+    <div suppressHydrationWarning className="flex min-h-screen flex-row">
       <ThemeProvider
         attribute="class"
         defaultTheme="system"
@@ -25,17 +27,19 @@ export default async function DashboardLayout({
       >
         <AppDataProvider>
           <LiveUpdatesProvider>
-          {/* bottom, so a toast never covers the bell or the scope toggle */}
-          <Toaster position="bottom-right" />
-          <SidebarProvider defaultOpen={defaultOpen}>
-            <AppSidebar />
-            <div className="w-full">
-              <Navbar className="sticky top-0 z-40 border-b bg-background" />
-              <main className="overflow-y-auto px-3 py-3 sm:px-4 md:py-4 lg:px-4 lg:py-4">
-                <RequireWallet>{children}</RequireWallet>
-              </main>
-            </div>
-          </SidebarProvider>
+            {/* bottom, so a toast never covers the bell or the scope toggle */}
+            <Toaster position="bottom-right" />
+            <TooltipProvider delay={300}>
+              <SidebarProvider defaultOpen={defaultOpen}>
+                <AppSidebar />
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <Navbar className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70" />
+                  <main className="flex-1 px-3 py-4 sm:px-4 lg:px-6">
+                    <RequireWallet>{children}</RequireWallet>
+                  </main>
+                </div>
+              </SidebarProvider>
+            </TooltipProvider>
           </LiveUpdatesProvider>
         </AppDataProvider>
       </ThemeProvider>
