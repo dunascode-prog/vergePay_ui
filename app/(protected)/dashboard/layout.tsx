@@ -25,7 +25,8 @@ export default async function DashboardLayout({
       >
         <AppDataProvider>
           <LiveUpdatesProvider>
-          <Toaster position="top-right" />
+          {/* bottom, so a toast never covers the bell or the scope toggle */}
+          <Toaster position="bottom-right" />
           <SidebarProvider defaultOpen={defaultOpen}>
             <AppSidebar />
             <div className="w-full">
