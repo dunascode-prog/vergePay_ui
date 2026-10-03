@@ -1,14 +1,11 @@
-import { InvoiceDetailView } from "@/components/InvoiceDetailView";
-import { getInvoiceById } from "@/data/mock-invoices";
+import { Suspense } from "react";
+import { InvoiceDetail } from "@/components/invoices/InvoiceDetail";
 
-interface InvoiceDetailPageProps {
-  params: { id: string };
-}
-
-export default async function InvoiceDetailPage({
-  params,
-}: InvoiceDetailPageProps) {
+export default async function InvoiceDetailPage({ params }: PageProps<"/dashboard/invoices/[id]">) {
   const { id } = await params;
-  const invoice = getInvoiceById(id);
-  return <InvoiceDetailView invoice={invoice} />;
+  return (
+    <Suspense>
+      <InvoiceDetail invoiceId={id} />
+    </Suspense>
+  );
 }

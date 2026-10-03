@@ -1,20 +1,6 @@
-import { notFound } from "next/navigation";
-import { getInvoiceById } from "@/data/mock-invoices";
-import { EditInvoiceClient } from "./EditInvoiceClient";
+import { InvoiceForm } from "@/components/invoices/InvoiceForm";
 
-interface EditInvoicePageProps {
-  params: { id: string };
-}
-
-export default async function EditInvoicePage({
-  params,
-}: EditInvoicePageProps) {
+export default async function EditInvoicePage({ params }: PageProps<"/dashboard/invoices/[id]/edit">) {
   const { id } = await params;
-  const invoice = getInvoiceById(id);
-
-  if (!invoice) {
-    notFound();
-  }
-
-  return <EditInvoiceClient invoice={invoice} />;
+  return <InvoiceForm invoiceId={id} />;
 }
