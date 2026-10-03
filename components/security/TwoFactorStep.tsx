@@ -37,6 +37,8 @@ export function TwoFactorStep({
   const [ready, setReady] = useState(Boolean(user?.two_factor_enabled));
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
+  // the code was accepted; what's left is the action it unlocks
+  const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -56,6 +58,9 @@ export function TwoFactorStep({
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
+    // The code was accepted but the action itself failed: the confirmation
+    // still counts for a few minutes, so just try the action again.
+    if (confirmed) return finish();
     if (!/^\d{6}$/.test(code)) {
       setError("Enter the 6-digit code from your authenticator app.");
       return;
@@ -64,10 +69,30 @@ export function TwoFactorStep({
     setError(null);
     try {
       await verifyTwoFactor(code);
-      void reloadUser();
-      await onConfirmed();
     } catch (err) {
       setCode("");
+      setError(
+        err instanceof ApiError && err.code === "INVALID_TWO_FACTOR_CODE"
+          ? "That code didn't work. Each code can be used once, so if you just used it to sign in, wait for the next one in your app."
+          : err instanceof ApiError
+            ? err.message
+            : "Something went wrong. Please try again.",
+      );
+      setBusy(false);
+      return;
+    }
+    setConfirmed(true);
+    void reloadUser();
+    await finish();
+  };
+
+  // runs the action the code unlocked (linking a card or a brokerage)
+  const finish = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await onConfirmed();
+    } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
       setBusy(false);
     }
@@ -127,24 +152,38 @@ export function TwoFactorStep({
         </div>
       )}
 
-      <div className="space-y-2">
-        <Label htmlFor="two-factor-code">Authentication code</Label>
-        <Input
-          id="two-factor-code"
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          maxLength={6}
-          placeholder="000000"
-          className="h-11 rounded-lg text-center text-lg tracking-[0.5em] tabular-nums"
-          value={code}
-          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-          aria-invalid={Boolean(error)}
-        />
-        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-      </div>
+      {confirmed ? (
+        <p role="status" className="flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2.5 text-sm font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">
+          <Check className="size-4" /> Code confirmed
+        </p>
+      ) : (
+        <div className="space-y-2">
+          <Label htmlFor="two-factor-code">Authentication code</Label>
+          <Input
+            id="two-factor-code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={6}
+            placeholder="000000"
+            className="h-11 rounded-lg text-center text-lg tracking-[0.5em] tabular-nums"
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+            aria-invalid={Boolean(error)}
+          />
+        </div>
+      )}
+      {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
 
       <Button type="submit" disabled={busy} className={primaryButton}>
-        {busy ? "Confirming…" : setup ? "Turn on and continue" : "Confirm and continue"}
+        {confirmed
+          ? busy
+            ? "Code confirmed. Finishing up…"
+            : "Try again"
+          : busy
+            ? "Checking code…"
+            : setup
+              ? "Turn on and continue"
+              : "Confirm and continue"}
       </Button>
     </form>
   );
