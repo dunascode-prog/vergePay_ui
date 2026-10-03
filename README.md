@@ -45,6 +45,11 @@ VergePay answers those on one screen. This repository is that screen. The backen
 
 The sidebar groups the app the way a small-business owner thinks about their money.
 
+### Home
+| Screen | Route | What it shows |
+|---|---|---|
+| **Landing page** | `/` | The public home page (vergepay.com), in the style of Mono and Flutterwave. A hero with a live-looking product preview; what VergePay is built on (Flutterwave payments, BVN verification, 2FA, a double-entry ledger); every feature in one grid; deep dives on invoicing, the two wallets and insights; security; who it's for; a "Why VergePay" section for investors and partners; how to get started; FAQ. Responsive with a phone menu, and signed-in visitors get "Go to dashboard" instead of sign-up. The contact address is `CONTACT_EMAIL` in `components/landing/Landing.tsx` |
+
 ### Account
 | Screen | Route | What it shows |
 |---|---|---|
@@ -267,7 +272,7 @@ API_URL=http://localhost:8000
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000), create an account at `/signup`, and sign in.
+Open [http://localhost:3000](http://localhost:3000) for the landing page, create an account at `/signup`, and sign in.
 
 ### Scripts
 

@@ -210,3 +210,23 @@
     @apply font-sans;
   }
 }
+
+/* Landing page: in-page links land below the fixed top bar, and glide there
+   unless the visitor prefers reduced motion. */
+html {
+  scroll-padding-top: 5rem;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+@keyframes vp-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
