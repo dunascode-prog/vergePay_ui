@@ -54,6 +54,9 @@ export interface ApiInvoice {
   /** Reminders emailed to the client, and when the last one went. */
   reminders_sent?: number;
   last_reminder_at?: string | null;
+  /** Sent by a recurring plan, and which billing cycle. */
+  recurring_plan_id?: string | null;
+  recurring_cycle?: number | null;
   created_at: string;
   pay_url: string | null;
   /** Issuer only, on GET /v1/invoices/:id. */

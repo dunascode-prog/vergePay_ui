@@ -82,3 +82,11 @@ export function sumBy(invoices: ApiInvoice[], pick: (i: ApiInvoice) => boolean):
 }
 
 export const isUnpaid = (i: ApiInvoice) => i.invoice_status === "open" || i.invoice_status === "overdue";
+
+// "150000" -> "150,000"; keeps up to two decimals as typed
+export function groupDigits(text: string) {
+  const clean = text.replace(/[^\d.]/g, "");
+  const [whole, ...rest] = clean.split(".");
+  const decimals = rest.length ? "." + rest.join("").slice(0, 2) : "";
+  return whole.replace(/^0+(?=\d)/, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",") + decimals;
+}
