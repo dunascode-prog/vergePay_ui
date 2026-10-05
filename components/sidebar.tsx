@@ -25,6 +25,7 @@ import {
   Target,
   Mail,
   CreditCard,
+  Landmark,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -104,6 +105,11 @@ const sidebarMenu = {
         title: "Envelopes",
         url: "/dashboard/envelopes",
         icon: Mail,
+      },
+      {
+        title: "Loans",
+        url: "/dashboard/loans",
+        icon: Landmark,
       },
     ],
   },

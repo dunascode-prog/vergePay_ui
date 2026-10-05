@@ -11,7 +11,7 @@
 
 Built by **[Seyitan Omodara](https://github.com/dunascode-prog)** · Backend: [vergePay_api](https://github.com/dunascode-prog/vergePay_api)
 
-> **Project status.** All 10 sections of the app (16 routes) are designed and built. Sign-up and sign-in call the real API. The other screens still show realistic sample data while they're connected to the backend one feature at a time; see [Connecting to the API](#connecting-to-the-api). The backend is finished and tested: 56 endpoints and 664 passing Postman assertions.
+> **Project status.** All 11 sections of the app (19 routes) are designed and built. Sign-up and sign-in call the real API. The other screens still show realistic sample data while they're connected to the backend one feature at a time; see [Connecting to the API](#connecting-to-the-api). The backend is finished and tested: 56 endpoints and 664 passing Postman assertions.
 
 ---
 
@@ -20,7 +20,7 @@ Built by **[Seyitan Omodara](https://github.com/dunascode-prog)** · Backend: [v
 | | |
 |---|---|
 | **What it is** | A dashboard for freelancers and small businesses to run personal and business money in one place |
-| **Screens** | 16 routes in 10 sections: overview, analytics, invoices (list, new, detail, edit, and the public pay page), recurring billing, clients, business overview, expenses, payroll, goals, envelopes |
+| **Screens** | 19 routes in 11 sections: overview, analytics, invoices (list, new, detail, edit, and the public pay page), recurring billing, clients, business overview, expenses, payroll, goals, envelopes, loans |
 | **Stack** | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui on Base UI, Recharts, React Hook Form + Zod |
 | **Rendering** | Server Components by default. Client Components only where there's interaction. Server Actions for forms |
 | **Money** | Naira and US dollars kept separate and never blended at an invented exchange rate. Formatted per locale with `Intl.NumberFormat` |
@@ -86,6 +86,7 @@ The sidebar groups the app the way a small-business owner thinks about their mon
 |---|---|---|
 | **Goals** | `/dashboard/goals` | Savings goals with progress, contributions, and a **pace check** that says whether you'll hit the deadline at your current rate |
 | **Envelopes** | `/dashboard/envelopes` | Budget envelopes that you fund from and withdraw back into your wallets, with spent and remaining amounts for each |
+| **Loans** | `/dashboard/loans`, `/apply`, `/[id]` | **Live.** Apply for a personal loan, cash advance, asset finance or mortgage: amount, term, the wallet it's paid into and what it's for, with the one-time identity check in the same flow. An application in review shows its details until it's decided, and a turned-down one shows the reason. Active loans show what's still owed (interest included), progress through the installments and the next payment, with overdue ones flagged. Each loan has its full schedule (principal and interest per month, and paid, due soon, overdue or upcoming) and a one-tap **Pay** for the next installment from either wallet. In development builds an under-review application has Approve and Reject buttons, using the API's `/v1/dev` helpers |
 
 Every feature page follows the same layout: a header with actions, summary cards, the main grid or table, an "add" dialog, and an AI insight banner. Once you've used one page, you know how to use them all.
 
@@ -211,7 +212,7 @@ The screens were designed first, using sample data shaped like the real domain. 
 | Invoices and clients | `/dashboard/invoices/*` | `/v1/invoices` (create, edit and delete drafts, `/send`, `/remind`, `/pay`, `/cancel`, `/refund`), `/v1/clients` | ✅ Connected |
 | Pay links | `/pay/[token]` (public) | `/v1/pay/:token`, `/checkout`, `/sync`, `/wallet` | ✅ Connected |
 | Investments | dashboard Investments card, link reminder, `/dashboard/investments/linked` | `POST`/`GET /v1/brokerage-links` (opens the investment wallet), `/v1/holdings`, `/v1/auth/2fa/enable` + `/verify` | ✅ Connected |
-| Loans | new screen | `/v1/loans`, `/:id/schedule`, `/:id/repayments` | ⏳ Planned |
+| Loans | `/dashboard/loans`, `/apply`, `/[id]` | `/v1/loans/applications` (apply, list), `/v1/loans`, `/:id`, `/:id/schedule`, `/:id/repayments` | ✅ Connected |
 | Analytics | `/dashboard/analytics` | `/v1/invoices` (with `reminders_sent`, `last_reminder_at`), `/v1/accounts/:id/transactions` | ✅ Connected (health score and goals still sample) |
 | Recurring billing | `/dashboard/recurring/*` | `/v1/recurring-plans` (create, list, get, edit, `/pause`, `/resume`, `/cancel`), `/v1/clients` | ✅ Connected |
 | Clients | `/dashboard/clients` | `/v1/clients` (list with stats and health, get with invoices, create, edit, archive, `/restore`) | ✅ Connected |

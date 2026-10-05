@@ -26,7 +26,8 @@ type Section =
   | "invoices"
   | "recurring"
   | "clients"
-  | "business";
+  | "business"
+  | "loans";
 
 interface HeaderAction {
   label: string;
@@ -90,6 +91,14 @@ const SECTION_CONFIG: Record<Section, SectionConfig> = {
     showAccountScope: false,
     // headerAction: { label: "New Plan", href: "/dashboard/recurring/new", icon: Plus },
   },
+  loans: {
+    basePath: "/dashboard/loans",
+    title: "Loans",
+    description: "Borrow and repay",
+    // each loan is in one wallet's currency and shown on its own
+    showAccountScope: false,
+    // "Apply for a loan" sits on the page, where it can hide while an application is in review
+  },
   clients: {
     basePath: "/dashboard/clients",
     title: "Clients",
@@ -120,6 +129,7 @@ function resolveSection(pathname: string): Section {
   if (pathname.startsWith("/dashboard/recurring")) return "recurring";
   if (pathname.startsWith("/dashboard/clients")) return "clients";
   if (pathname.startsWith("/dashboard/business")) return "business";
+  if (pathname.startsWith("/dashboard/loans")) return "loans";
 
   return "dashboard";
 }

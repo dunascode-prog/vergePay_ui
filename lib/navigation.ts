@@ -6,6 +6,7 @@ import {
   ChartColumn,
   FileText,
   Home,
+  Landmark,
   Mail,
   Receipt,
   Repeat,
@@ -53,6 +54,7 @@ export const NAV: NavEntry[] = [
     children: [
       { title: "Goals", url: "/dashboard/goals", icon: Target, keywords: "savings" },
       { title: "Envelopes", url: "/dashboard/envelopes", icon: Mail, keywords: "budget budgets" },
+      { title: "Loans", url: "/dashboard/loans", icon: Landmark, keywords: "borrow credit repay installment" },
     ],
   },
 ];
