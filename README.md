@@ -72,7 +72,7 @@ The sidebar groups the app the way a small-business owner thinks about their mon
 | **Invoice detail** | `/dashboard/invoices/[id]` | The invoice as the client sees it, the **pay link** (copy, WhatsApp, email reminder), and an activity trail: sent, emailed (with delivery status), paid by card or wallet, receipt emailed. Send, edit or delete a draft; cancel an unpaid one; refund a wallet payment; pay an invoice you've received |
 | **Pay an invoice** | `/pay/[token]` | **Public, no account needed.** The client's hosted invoice page: who, what, how much, by when. Pays through Flutterwave checkout (card, bank transfer, USSD), or from a VergePay wallet when signed in, then confirms the payment with the API |
 | **Recurring billing** | `/dashboard/recurring`, `/new`, `/[id]` | **Live.** Bill a client the same amount weekly, monthly, quarterly or yearly, with payment terms (on receipt, 7, 14 or 30 days). The form previews the first billing dates, and a plan that starts today sends its first invoice at once. Monthly recurring revenue, the next invoice, pause, resume, edit or cancel from the list or the plan, the invoices each plan has sent (each links back to its plan), and a warning when a plan couldn't send its last invoice |
-| **Clients** | `/dashboard/clients` | Client cards with health score, average days to pay, on-time rate, total revenue, and VIP and new tags. A detail sheet and an AI note on each client |
+| **Clients** | `/dashboard/clients` | **Live.** What clients have paid and owe (per currency, overdue flagged), and who needs attention. Insights from your invoices: overdue clients, one client carrying most of your revenue, reliable payers, new and quiet clients. Cards show each client's health score and why, with VIP, New, Recurring and overdue tags. Filter, search (name, contact, industry, location) and sort. A side sheet has the full record: health and its reasons, paid and owed, on-time payments, days to pay, recurring plans, latest invoices, contact and notes. Add, edit, mark VIP, archive and restore; **New invoice** and **New plan** start with the client chosen |
 
 ### Business
 | Screen | Route | What it shows |
@@ -214,7 +214,8 @@ The screens were designed first, using sample data shaped like the real domain. 
 | Loans | new screen | `/v1/loans`, `/:id/schedule`, `/:id/repayments` | ⏳ Planned |
 | Analytics | `/dashboard/analytics` | `/v1/invoices` (with `reminders_sent`, `last_reminder_at`), `/v1/accounts/:id/transactions` | ✅ Connected (health score and goals still sample) |
 | Recurring billing | `/dashboard/recurring/*` | `/v1/recurring-plans` (create, list, get, edit, `/pause`, `/resume`, `/cancel`), `/v1/clients` | ✅ Connected |
-| Clients, expenses, payroll, goals, envelopes | their pages | none yet; the backend doesn't have these features | 🎨 Designed, sample data |
+| Clients | `/dashboard/clients` | `/v1/clients` (list with stats and health, get with invoices, create, edit, archive, `/restore`) | ✅ Connected |
+| Expenses, payroll, goals, envelopes | their pages | none yet; the backend doesn't have these features | 🎨 Designed, sample data |
 
 ---
 

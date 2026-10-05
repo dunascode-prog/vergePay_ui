@@ -2,7 +2,7 @@
 
 import { ArrowLeft, Mail, Repeat } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useAppData } from "@/components/app-data";
 import { NewClientDialog } from "@/components/invoices/NewClientDialog";
@@ -45,8 +45,10 @@ export function RecurringPlanForm() {
     return [business, personal].filter((a): a is NonNullable<typeof a> => !!a && a.account_status === "active");
   }, [accounts]);
 
+  const params = useSearchParams();
   const [clients, setClients] = useState<ApiClient[] | null>(null);
-  const [clientId, setClientId] = useState("");
+  // ?client=<id>: started from the clients page
+  const [clientId, setClientId] = useState(() => params.get("client") ?? "");
   const [chosenWalletId, setWalletId] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");

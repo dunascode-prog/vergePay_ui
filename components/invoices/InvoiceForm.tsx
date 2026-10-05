@@ -2,7 +2,7 @@
 
 import { ArrowLeft, Mail, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useAppData } from "@/components/app-data";
 import { ErrorNote } from "@/components/money/parts";
@@ -44,8 +44,10 @@ export function InvoiceForm({ invoiceId }: { invoiceId?: string }) {
     return [business, personal].filter((a): a is NonNullable<typeof a> => !!a && a.account_status === "active");
   }, [accounts]);
 
+  const params = useSearchParams();
   const [clients, setClients] = useState<ApiClient[] | null>(null);
-  const [clientId, setClientId] = useState("");
+  // ?client=<id>: started from the clients page
+  const [clientId, setClientId] = useState(() => (invoiceId ? "" : params.get("client") ?? ""));
   const [chosenWalletId, setWalletId] = useState("");
   const [dueDate, setDueDate] = useState(isoDay(14));
   const [lines, setLines] = useState<Line[]>(() => [emptyLine()]);

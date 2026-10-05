@@ -1,5 +1,11 @@
+import { Suspense } from "react";
 import { InvoiceForm } from "@/components/invoices/InvoiceForm";
 
+// ?client=<id> starts with that client chosen (from the clients page)
 export default function NewInvoicePage() {
-  return <InvoiceForm />;
+  return (
+    <Suspense>
+      <InvoiceForm />
+    </Suspense>
+  );
 }

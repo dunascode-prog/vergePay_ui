@@ -1,106 +1,88 @@
-import { ClientProfile } from "@/types/client";
-import { ClientAvatar } from "./ClientAvatar";
-import { formatMoney, formatShortDate } from "@/lib/format";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { LuMail, LuPhone, LuMapPin, LuSparkles, LuRepeat } from "react-icons/lu";
+import { Mail, MapPin, Phone, Repeat } from "lucide-react";
+import { formatDay } from "@/lib/invoicing";
+import { HEALTH_LABEL, HEALTH_TONE, amounts, hasActivePlan, initials, isNewClient, lastActivity } from "@/lib/clients";
 import { cn } from "@/lib/utils";
+import { ApiClient } from "@/types/invoicing";
+import { ClientAvatar } from "./ClientAvatar";
 
-interface ClientCardProps {
-  client: ClientProfile;
-  onClick: () => void;
+function Tag({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <span className={cn("inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium", className)}>{children}</span>;
 }
 
-function healthTone(score: number) {
-  if (score >= 80) return "text-emerald-600";
-  if (score >= 55) return "text-amber-600";
-  return "text-red-600";
-}
-
-export function ClientCard({ client, onClick }: ClientCardProps) {
-  const isAtRisk = client.healthScore < 55;
-
+/** One client in the grid: who they are, how they pay, and why. */
+export function ClientCard({ client, onClick }: { client: ApiClient; onClick: () => void }) {
+  const { health } = client;
+  const subtitle = [client.industry, client.location].filter(Boolean).join(" · ");
   return (
-    <Card
-      role="button"
-      tabIndex={0}
+    <button
+      type="button"
       onClick={onClick}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") onClick();
-      }}
-      className="border-gray-200 shadow-none cursor-pointer transition-colors hover:border-emerald-300 hover:bg-emerald-50/30 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+      className={cn(
+        "flex w-full flex-col rounded-xl border bg-card p-4 text-left transition-colors hover:border-emerald-300 hover:bg-emerald-50/30 focus-visible:ring-3 focus-visible:ring-emerald-600/20 focus-visible:outline-none dark:hover:border-emerald-800 dark:hover:bg-emerald-950/20",
+        client.archived_at && "opacity-70",
+      )}
     >
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <ClientAvatar name={client.name} initials={client.initials} size="md" />
-            <div className="min-w-0">
-              <p className="font-medium text-gray-900 truncate">{client.name}</p>
-              <p className="text-xs text-gray-400 truncate">{client.industry}</p>
-            </div>
+      <div className="mb-3 flex w-full items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <ClientAvatar name={client.name} initials={initials(client.name)} size="md" />
+          <div className="min-w-0">
+            <p className="truncate font-medium">{client.name}</p>
+            <p className="truncate text-xs text-muted-foreground">{subtitle || client.contact_name || `Client since ${formatDay(client.created_at, false)}`}</p>
           </div>
-          <span className={cn("text-sm font-semibold shrink-0", healthTone(client.healthScore))}>
-            {client.healthScore}
+        </div>
+        {health.score !== null && (
+          <span
+            className={cn("shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums", HEALTH_TONE[health.label])}
+            title={`Health score: ${HEALTH_LABEL[health.label]}`}
+          >
+            {health.score}
           </span>
-        </div>
+        )}
+      </div>
 
-        <div className="flex flex-wrap gap-1.5 mb-3">
-          {client.isVip && (
-            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-xs">
-              VIP
-            </Badge>
-          )}
-          {client.isNew && (
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs">
-              New
-            </Badge>
-          )}
-          {client.recurringPlanStatus === "active" && (
-            <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs">
-              <LuRepeat className="h-3 w-3 mr-1" />
-              Recurring
-            </Badge>
-          )}
-          {isAtRisk && (
-            <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 text-xs">
-              At risk
-            </Badge>
-          )}
-        </div>
+      <div className="mb-3 flex min-h-5 flex-wrap gap-1.5">
+        {client.archived_at && <Tag className="bg-muted text-muted-foreground">Archived</Tag>}
+        {client.is_vip && <Tag className="bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-200">VIP</Tag>}
+        {isNewClient(client) && <Tag className="bg-sky-50 text-sky-800 dark:bg-sky-950 dark:text-sky-200">New</Tag>}
+        {hasActivePlan(client) && (
+          <Tag className="bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">
+            <Repeat className="size-3" /> Recurring
+          </Tag>
+        )}
+        {client.overdue_count > 0 && <Tag className="bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200">{client.overdue_count} overdue</Tag>}
+      </div>
 
-        <div className="space-y-1 text-xs text-gray-500 mb-3">
+      <div className="mb-3 space-y-1 text-xs text-muted-foreground">
+        {client.email && (
           <p className="flex items-center gap-1.5 truncate">
-            <LuMapPin className="h-3 w-3 shrink-0" />
-            {client.location}
+            <Mail className="size-3 shrink-0" /> {client.email}
           </p>
+        )}
+        {client.phone && (
           <p className="flex items-center gap-1.5 truncate">
-            <LuMail className="h-3 w-3 shrink-0" />
-            {client.email}
+            <Phone className="size-3 shrink-0" /> {client.phone}
           </p>
+        )}
+        {!client.email && !client.phone && client.location && (
           <p className="flex items-center gap-1.5 truncate">
-            <LuPhone className="h-3 w-3 shrink-0" />
-            {client.phone}
+            <MapPin className="size-3 shrink-0" /> {client.location}
           </p>
-        </div>
+        )}
+      </div>
 
-        <div className="flex items-center justify-between text-sm mb-3 pt-3 border-t border-gray-100">
-          <div>
-            <p className="text-gray-400 text-xs">Lifetime revenue</p>
-            <p className="font-medium text-gray-900">
-              {formatMoney(client.totalRevenue, client.currency)}
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-gray-400 text-xs">Last activity</p>
-            <p className="font-medium text-gray-900">{formatShortDate(client.lastActivityDate)}</p>
-          </div>
+      <div className="mt-auto flex w-full items-end justify-between gap-3 border-t pt-3 text-sm">
+        <div className="min-w-0">
+          <p className="text-xs text-muted-foreground">Paid to you</p>
+          <p className="truncate font-medium tabular-nums">{amounts(client.revenue)}</p>
         </div>
-
-        <div className="flex gap-2 rounded-md bg-gray-50 px-2.5 py-2">
-          <LuSparkles className="h-3.5 w-3.5 text-emerald-600 mt-0.5 shrink-0" />
-          <p className="text-xs text-gray-600 leading-relaxed">{client.aiNote}</p>
+        <div className="shrink-0 text-right">
+          <p className="text-xs text-muted-foreground">Last activity</p>
+          <p className="font-medium">{formatDay(lastActivity(client), false)}</p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      <p className="mt-3 w-full truncate rounded-md bg-muted/60 px-2.5 py-1.5 text-xs text-muted-foreground" title={health.reasons.join(" · ")}>
+        {health.reasons[0]}
+      </p>
+    </button>
   );
 }

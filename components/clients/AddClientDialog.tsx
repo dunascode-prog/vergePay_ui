@@ -1,157 +1,129 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { ErrorNote } from "@/components/money/parts";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LuPlus } from "react-icons/lu";
-import { ClientProfile } from "@/types/client";
-import { CreateClientInput } from "@/data/mock-clients";
+import { Textarea } from "@/components/ui/textarea";
+import { ApiError } from "@/lib/api";
+import { createClient, updateClient } from "@/services/invoices";
+import { ApiClient, ClientFields } from "@/types/invoicing";
 
-interface AddClientDialogProps {
-  onCreate: (input: CreateClientInput) => Promise<ClientProfile>;
-  onCreated: (client: ClientProfile) => void;
-}
+type Form = Record<"name" | "contact_name" | "email" | "phone" | "industry" | "location" | "notes", string> & { is_vip: boolean };
 
-const EMPTY_FORM: CreateClientInput = {
-  name: "",
-  contactName: "",
-  email: "",
-  phone: "",
-  industry: "",
-  location: "",
-};
+const fromClient = (c?: ApiClient | null): Form => ({
+  name: c?.name ?? "",
+  contact_name: c?.contact_name ?? "",
+  email: c?.email ?? "",
+  phone: c?.phone ?? "",
+  industry: c?.industry ?? "",
+  location: c?.location ?? "",
+  notes: c?.notes ?? "",
+  is_vip: c?.is_vip ?? false,
+});
 
-export function AddClientDialog({ onCreate, onCreated }: AddClientDialogProps) {
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<CreateClientInput>(EMPTY_FORM);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const isValid = form.name.trim() !== "" && form.email.trim() !== "";
-
-  function update<K extends keyof CreateClientInput>(
-    key: K,
-    value: CreateClientInput[K],
-  ) {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  }
-
-  async function handleSubmit() {
-    if (!isValid) {
-      setError("At minimum, a client name and email are needed.");
-      return;
-    }
-    setError(null);
-    setSubmitting(true);
-    try {
-      const client = await onCreate(form);
-      onCreated(client);
-      setForm(EMPTY_FORM);
-      setOpen(false);
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
+/** Add a client, or edit one (pass `client`). */
+export function AddClientDialog({
+  open,
+  onOpenChange,
+  client,
+  onSaved,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  client?: ApiClient | null;
+  onSaved: (client: ApiClient) => void;
+}) {
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          <Button className="bg-emerald-700 hover:bg-emerald-800">
-            <LuPlus className="h-4 w-4 mr-1.5" />
-            Add client
-          </Button>
-        }
-      />
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Add a client</DialogTitle>
-          <DialogDescription>
-            Health scores and revenue figures will populate once invoices are
-            created for them.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="name">Client / company name</Label>
-            <Input
-              id="name"
-              value={form.name}
-              onChange={(e) => update("name", e.target.value)}
-              placeholder="e.g. Acme Ltd"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="contact-name">Contact name</Label>
-              <Input
-                id="contact-name"
-                value={form.contactName}
-                onChange={(e) => update("contactName", e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="industry">Industry</Label>
-              <Input
-                id="industry"
-                value={form.industry}
-                onChange={(e) => update("industry", e.target.value)}
-                placeholder="e.g. E-commerce"
-              />
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={form.email}
-              onChange={(e) => update("email", e.target.value)}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="phone">Phone</Label>
-              <Input
-                id="phone"
-                value={form.phone}
-                onChange={(e) => update("phone", e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="location">Location</Label>
-              <Input
-                id="location"
-                value={form.location}
-                onChange={(e) => update("location", e.target.value)}
-                placeholder="e.g. Lagos, Nigeria"
-              />
-            </div>
-          </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-        </div>
-
-        <DialogFooter>
-          <Button
-            className="bg-emerald-700 hover:bg-emerald-800"
-            disabled={submitting}
-            onClick={handleSubmit}
-          >
-            {submitting ? "Adding…" : "Add client"}
-          </Button>
-        </DialogFooter>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-lg">
+        {/* remounted on every open, so it starts from the client as it is now */}
+        {open && <ClientForm client={client} onCancel={() => onOpenChange(false)} onSaved={onSaved} />}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function ClientForm({ client, onCancel, onSaved }: { client?: ApiClient | null; onCancel: () => void; onSaved: (c: ApiClient) => void }) {
+  const [form, setForm] = useState<Form>(() => fromClient(client));
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const set = (key: keyof Form, value: string | boolean) => setForm((f) => ({ ...f, [key]: value }));
+
+  const save = async () => {
+    if (!form.name.trim()) return setErrors({ name: "Enter a name." });
+    setBusy(true);
+    setError(null);
+    setErrors({});
+    // empty fields: left out when adding, cleared when editing
+    const value = (key: Exclude<keyof Form, "is_vip">) => form[key].trim() || (client ? null : undefined);
+    const body: ClientFields = {
+      name: form.name.trim(),
+      email: value("email"),
+      phone: value("phone"),
+      contact_name: value("contact_name"),
+      industry: value("industry"),
+      location: value("location"),
+      notes: value("notes"),
+      is_vip: form.is_vip,
+    };
+    try {
+      onSaved(client ? await updateClient(client.client_id, body) : await createClient(body));
+    } catch (err) {
+      if (err instanceof ApiError) setErrors(err.fieldErrors());
+      setError(err instanceof ApiError ? err.message : "Couldn't save. Please try again.");
+      setBusy(false);
+    }
+  };
+
+  const field = (key: Exclude<keyof Form, "is_vip" | "notes">, label: string, props: React.ComponentProps<typeof Input> = {}) => (
+    <div className="space-y-1.5">
+      <Label htmlFor={`client-${key}`}>{label}</Label>
+      <Input id={`client-${key}`} value={form[key]} onChange={(e) => set(key, e.target.value)} aria-invalid={!!errors[key]} {...props} />
+      {errors[key] && <p className="text-xs text-destructive">{errors[key]}</p>}
+    </div>
+  );
+
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle>{client ? `Edit ${client.name}` : "Add a client"}</DialogTitle>
+        <DialogDescription>
+          {client ? "Changes show on invoices you send from now on." : "Only the name is needed. How they pay fills in as you invoice them."}
+        </DialogDescription>
+      </DialogHeader>
+      <div className="space-y-3">
+        {field("name", "Client or company name", { placeholder: "e.g. Northwind Studio", maxLength: 120 })}
+        <div className="grid gap-3 sm:grid-cols-2">
+          {field("contact_name", "Contact person", { placeholder: "e.g. Funke Ade", maxLength: 120 })}
+          {field("industry", "Industry", { placeholder: "e.g. E-commerce", maxLength: 80 })}
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {field("email", "Email", { type: "email", placeholder: "Where invoices are sent" })}
+          {field("phone", "Phone", { type: "tel", placeholder: "+234 803 000 0000" })}
+        </div>
+        {field("location", "Location", { placeholder: "e.g. Yaba, Lagos", maxLength: 120 })}
+        <div className="space-y-1.5">
+          <Label htmlFor="client-notes">Notes (only you see these)</Label>
+          <Textarea id="client-notes" rows={3} maxLength={2000} value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Prefers WhatsApp, pays after the 25th…" />
+        </div>
+        <label className="flex items-center gap-2.5 text-sm">
+          <input type="checkbox" checked={form.is_vip} onChange={(e) => set("is_vip", e.target.checked)} className="accent-emerald-700" />
+          Mark as a VIP client
+        </label>
+        {error && <ErrorNote>{error}</ErrorNote>}
+        <div className="flex justify-end gap-2 pt-1">
+          <Button variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button onClick={save} disabled={busy} className="bg-emerald-700 text-white hover:bg-emerald-800">
+            {busy ? "Saving…" : client ? "Save changes" : "Add client"}
+          </Button>
+        </div>
+      </div>
+    </>
   );
 }

@@ -1,99 +1,38 @@
-import { ClientProfile } from "@/types/client";
-import { formatMoneyByCurrency, sumByCurrency } from "@/lib/format";
-import { LuSparkles, LuTriangleAlert, LuTrendingUp } from "react-icons/lu";
+import { AlertTriangle, Info, TrendingUp } from "lucide-react";
+import { clientInsights } from "@/lib/clients";
 import { cn } from "@/lib/utils";
+import { ApiClient } from "@/types/invoicing";
 
-interface ClientPortfolioAISummaryProps {
-  clients: ClientProfile[];
-}
-
-interface Insight {
-  tone: "positive" | "warning" | "info";
-  text: string;
-}
-
-function buildInsights(clients: ClientProfile[]): Insight[] {
-  const insights: Insight[] = [];
-
-  // Concentration: does one client dominate revenue within its own currency?
-  const ngnClients = clients.filter((c) => c.currency === "NGN");
-  const ngnTotal = sumByCurrency(
-    ngnClients.map((c) => ({ amount: c.totalRevenue, currency: c.currency }))
-  ).NGN ?? 0;
-  const topNgnClient = [...ngnClients].sort((a, b) => b.totalRevenue - a.totalRevenue)[0];
-  if (topNgnClient && ngnTotal > 0) {
-    const share = Math.round((topNgnClient.totalRevenue / ngnTotal) * 100);
-    if (share >= 35) {
-      insights.push({
-        tone: "warning",
-        text: `${topNgnClient.name} makes up ${share}% of your NGN revenue — losing this client would meaningfully affect cash flow.`,
-      });
-    }
-  }
-
-  const atRisk = clients.filter((c) => c.healthScore < 55);
-  if (atRisk.length > 0) {
-    insights.push({
-      tone: "warning",
-      text: `${atRisk.map((c) => c.name).join(" and ")} ${
-        atRisk.length === 1 ? "has" : "have"
-      } below-average payment reliability — worth a check-in before taking on more work for them.`,
-    });
-  }
-
-  const rising = clients.filter((c) => c.isNew === false && c.aiNote.toLowerCase().includes("tripled"));
-  if (rising.length > 0) {
-    insights.push({
-      tone: "positive",
-      text: `${rising.map((c) => c.name).join(", ")} is a fast-growing relationship worth investing more time in.`,
-    });
-  }
-
-  const newClients = clients.filter((c) => c.isNew);
-  if (newClients.length > 0) {
-    insights.push({
-      tone: "info",
-      text: `${newClients.map((c) => c.name).join(", ")} ${
-        newClients.length === 1 ? "is a" : "are"
-      } new client${newClients.length === 1 ? "" : "s"} with no payment history yet — health scores will sharpen after their first invoice cycle.`,
-    });
-  }
-
-  return insights;
-}
-
-const TONE_CONFIG = {
-  positive: { icon: LuTrendingUp, className: "text-emerald-700" },
-  warning: { icon: LuTriangleAlert, className: "text-amber-700" },
-  info: { icon: LuSparkles, className: "text-blue-700" },
+const TONE = {
+  warning: { icon: AlertTriangle, className: "text-amber-600 dark:text-amber-400" },
+  positive: { icon: TrendingUp, className: "text-emerald-600 dark:text-emerald-400" },
+  info: { icon: Info, className: "text-sky-600 dark:text-sky-400" },
 };
 
-export function ClientPortfolioAISummary({ clients }: ClientPortfolioAISummaryProps) {
-  const insights = buildInsights(clients);
-
+/** What's worth knowing about the client book, from their invoices. */
+export function ClientPortfolioAISummary({ clients }: { clients: ApiClient[] }) {
+  const insights = clientInsights(clients);
+  if (!clients.length) return null;
   return (
-    <div className="rounded-lg border border-emerald-200 bg-emerald-50/70 p-4">
-      <div className="flex items-center gap-1.5 mb-3">
-        <LuSparkles className="h-4 w-4 text-emerald-600" />
-        <p className="text-sm font-semibold text-emerald-800">AI client portfolio summary</p>
-      </div>
+    <section className="rounded-xl border bg-card p-4">
+      <h2 className="mb-2.5 text-sm font-medium">
+        Client insights <span className="font-normal text-muted-foreground">· from your invoices</span>
+      </h2>
       {insights.length === 0 ? (
-        <p className="text-sm text-emerald-900">
-          Nothing urgent — your client base looks healthy and reasonably diversified.
-        </p>
+        <p className="text-sm text-muted-foreground">Nothing needs your attention: no overdue invoices, and no one client carrying most of your revenue.</p>
       ) : (
         <ul className="space-y-2">
           {insights.map((insight, i) => {
-            const config = TONE_CONFIG[insight.tone];
+            const tone = TONE[insight.tone];
             return (
-              <li key={i} className="flex items-start gap-2 text-sm text-emerald-900">
-                <config.icon className={cn("h-3.5 w-3.5 mt-0.5 shrink-0", config.className)} />
+              <li key={i} className="flex items-start gap-2 text-sm">
+                <tone.icon className={cn("mt-0.5 size-4 shrink-0", tone.className)} aria-hidden />
                 <span>{insight.text}</span>
               </li>
             );
           })}
         </ul>
       )}
-    </div>
+    </section>
   );
 }
