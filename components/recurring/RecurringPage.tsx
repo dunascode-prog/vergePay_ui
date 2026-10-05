@@ -35,7 +35,7 @@ export function RecurringPage() {
   const replace = (updated: ApiRecurringPlan) => setPlans((ps) => (ps ?? []).map((p) => (p.plan_id === updated.plan_id ? updated : p)));
 
   return (
-    <div className="mx-auto max-w-6xl space-y-5">
+    <div className="space-y-5">
       <p className="max-w-xl text-sm text-muted-foreground">
         Bill a client the same amount on a schedule. Each invoice goes out by itself, with a pay link, and you&apos;re told when it does.
       </p>
