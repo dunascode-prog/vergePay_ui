@@ -13,6 +13,7 @@ import {
   earliestNeeded,
   insights,
   latePayments,
+  lastTwoMonths,
   periodWindow,
   reminderEffectiveness,
   revenueTrend,
@@ -83,9 +84,10 @@ export function AnalyticsPage() {
   const invoices = useMemo(() => (allInvoices ?? []).filter((i) => scoped.has(i.issuer_account_id)), [allInvoices, scoped]);
 
   const data = useMemo(() => {
-    const { start, trendMonths, label } = periodWindow(period, now);
+    const { start, trend, label } = periodWindow(period, now);
     const clients = clientShares(invoices, start);
-    const revenue = revenueTrend(ledger.lines, scoped, trendMonths);
+    const revenue = revenueTrend(ledger.lines, scoped, trend);
+    const monthly = revenueTrend(ledger.lines, scoped, lastTwoMonths(now));
     const forecast = cashFlowForecast(invoices, now);
     const reminders = reminderEffectiveness(invoices, start);
     return {
@@ -93,9 +95,10 @@ export function AnalyticsPage() {
       revenue,
       forecast,
       reminders,
+      periodLabel: label,
       late: latePayments(invoices, start),
       spending: spendingByType(ledger.lines, scoped, start, currency),
-      insights: insights({ invoices, clients, revenue, forecast, reminders, currency, periodLabel: label }),
+      insights: insights({ invoices, clients, monthly, forecast, reminders, currency, periodLabel: label }),
     };
   }, [period, now, invoices, ledger.lines, scoped, currency]);
 
@@ -135,7 +138,7 @@ export function AnalyticsPage() {
         <>
           <AIInsightsFeed insights={data.insights} />
 
-          <RevenueTrendChart data={data.revenue} />
+          <RevenueTrendChart data={data.revenue} periodLabel={data.periodLabel} />
           <CashFlowForecastCard buckets={data.forecast} />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
