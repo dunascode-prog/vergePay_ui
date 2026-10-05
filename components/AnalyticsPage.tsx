@@ -135,12 +135,8 @@ export function AnalyticsPage() {
         <>
           <AIInsightsFeed insights={data.insights} />
 
-          <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-3">
-            <div className="lg:col-span-2">
-              <RevenueTrendChart data={data.revenue} />
-            </div>
-            <CashFlowForecastCard buckets={data.forecast} />
-          </div>
+          <RevenueTrendChart data={data.revenue} />
+          <CashFlowForecastCard buckets={data.forecast} />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
             <CollectionMetricsCard clients={data.clients} />
