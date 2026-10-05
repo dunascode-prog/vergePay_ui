@@ -85,16 +85,65 @@ export interface ClientInvoiceRequest {
   send_email?: boolean;
 }
 
+export interface Amount {
+  currency_code: string;
+  amount_minor: number;
+}
+
+export type ClientHealthLabel = "new" | "reliable" | "watch" | "at_risk";
+
 export interface ApiClient {
   client_id: string;
   name: string;
   email: string | null;
   phone: string | null;
+  contact_name: string | null;
+  industry: string | null;
+  location: string | null;
+  notes: string | null;
+  is_vip: boolean;
   archived_at: string | null;
   created_at: string;
+  // worked out from their invoices (drafts don't count)
   invoice_count: number;
-  outstanding: { currency_code: string; amount_minor: number }[];
+  open_count: number;
+  overdue_count: number;
+  paid_count: number;
+  paid_on_time_count: number;
+  avg_days_to_pay: number | null;
+  avg_days_late: number | null;
+  oldest_overdue_days: number | null;
   last_invoiced_at: string | null;
+  last_paid_at: string | null;
+  /** paid, per currency */
+  revenue: Amount[];
+  /** sent and unpaid (overdue included), per currency */
+  outstanding: Amount[];
+  overdue: Amount[];
+  recurring_plans: {
+    plan_id: string;
+    plan_status: "active" | "paused" | "cancelled";
+    description: string;
+    frequency: "weekly" | "monthly" | "quarterly" | "yearly";
+    amount_minor: number;
+    currency_code: string;
+    next_billing_date: string | null;
+  }[];
+  /** 0–100 (null until they've paid or gone overdue), and why */
+  health: { score: number | null; label: ClientHealthLabel; reasons: string[] };
+  /** GET /v1/clients/:id only: the latest invoices, newest first */
+  invoices?: Omit<ApiInvoice, "items">[];
+}
+
+export interface ClientFields {
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  contact_name?: string | null;
+  industry?: string | null;
+  location?: string | null;
+  notes?: string | null;
+  is_vip?: boolean;
 }
 
 export interface PayLink {

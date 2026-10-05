@@ -3,6 +3,7 @@ import { Account } from "@/types/account";
 import {
   ApiClient,
   ApiInvoice,
+  ClientFields,
   ClientInvoiceRequest,
   InvoiceEmail,
   InvoicePage,
@@ -64,10 +65,21 @@ export const payInvoice = (id: string, sourceAccountId: string, key: string) =>
 
 // ---- clients
 
-export const listClients = () => api<{ data: ApiClient[] }>("/v1/clients").then((r) => r.data);
+export const listClients = ({ includeArchived = false } = {}) =>
+  api<{ data: ApiClient[] }>(`/v1/clients${includeArchived ? "?include_archived=true" : ""}`).then((r) => r.data);
 
-export const createClient = (body: { name: string; email?: string; phone?: string }) =>
-  api<ApiClient>("/v1/clients", { method: "POST", ...json(body) });
+export const getClient = (id: string) => api<ApiClient>(`/v1/clients/${id}`);
+
+export const createClient = (body: ClientFields) => api<ApiClient>("/v1/clients", { method: "POST", ...json(body) });
+
+/** null clears a field */
+export const updateClient = (id: string, changes: Partial<ClientFields>) =>
+  api<ApiClient>(`/v1/clients/${id}`, { method: "PATCH", ...json(changes) });
+
+/** Hidden from pickers; their invoices are kept. */
+export const archiveClient = (id: string) => api<ApiClient>(`/v1/clients/${id}`, { method: "DELETE" });
+
+export const restoreClient = (id: string) => api<ApiClient>(`/v1/clients/${id}/restore`, { method: "POST" });
 
 // ---- pay links (public: no session, and a 401 must never send a payer to sign-in)
 
