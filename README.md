@@ -71,7 +71,7 @@ The sidebar groups the app the way a small-business owner thinks about their mon
 | **New / edit invoice** | `/dashboard/invoices/new`, `/[id]/edit` | Bill a client (add one without leaving the form), choose the wallet it's paid into, line items with live totals, due-date shortcuts and a note. **Send** (with or without emailing it) or **save a draft** |
 | **Invoice detail** | `/dashboard/invoices/[id]` | The invoice as the client sees it, the **pay link** (copy, WhatsApp, email reminder), and an activity trail: sent, emailed (with delivery status), paid by card or wallet, receipt emailed. Send, edit or delete a draft; cancel an unpaid one; refund a wallet payment; pay an invoice you've received |
 | **Pay an invoice** | `/pay/[token]` | **Public, no account needed.** The client's hosted invoice page: who, what, how much, by when. Pays through Flutterwave checkout (card, bank transfer, USSD), or from a VergePay wallet when signed in, then confirms the payment with the API |
-| **Recurring billing** | `/dashboard/recurring`, `/new`, `/[id]` | Retainers and subscriptions: pause, resume or cancel, next billing date, invoices generated, and the monthly equivalent of weekly, quarterly and yearly plans |
+| **Recurring billing** | `/dashboard/recurring`, `/new`, `/[id]` | **Live.** Bill a client the same amount weekly, monthly, quarterly or yearly, with payment terms (on receipt, 7, 14 or 30 days). The form previews the first billing dates, and a plan that starts today sends its first invoice at once. Monthly recurring revenue, the next invoice, pause, resume, edit or cancel from the list or the plan, the invoices each plan has sent (each links back to its plan), and a warning when a plan couldn't send its last invoice |
 | **Clients** | `/dashboard/clients` | Client cards with health score, average days to pay, on-time rate, total revenue, and VIP and new tags. A detail sheet and an AI note on each client |
 
 ### Business
@@ -149,7 +149,8 @@ Every concept on screen has a TypeScript type in `types/`: `Invoice`, `ClientPro
 
 ### Business rules kept out of components
 Calculations live in small, pure modules in `lib/` rather than inside JSX:
-- `recurring-math.ts`: the monthly equivalent of any billing frequency
+- `recurring-math.ts`: the monthly equivalent of any billing frequency (the business overview's sample data)
+- `recurring.ts`: billing dates by the API's rule (counted from the start date, so the 31st stays the 31st where the month has one), monthly recurring revenue, labels
 - `goal-pace.ts`: whether a goal is on track for its deadline at the current contribution rate
 - `expense-category.ts`: category totals from line items, with colours shared across Analytics, Business and Expenses so a category looks the same everywhere
 - `format.ts`: currency formatting and per-currency sums
@@ -212,7 +213,8 @@ The screens were designed first, using sample data shaped like the real domain. 
 | Investments | dashboard Investments card, link reminder, `/dashboard/investments/linked` | `POST`/`GET /v1/brokerage-links` (opens the investment wallet), `/v1/holdings`, `/v1/auth/2fa/enable` + `/verify` | ✅ Connected |
 | Loans | new screen | `/v1/loans`, `/:id/schedule`, `/:id/repayments` | ⏳ Planned |
 | Analytics | `/dashboard/analytics` | `/v1/invoices` (with `reminders_sent`, `last_reminder_at`), `/v1/accounts/:id/transactions` | ✅ Connected (health score and goals still sample) |
-| Clients, recurring, expenses, payroll, goals, envelopes | their pages | none yet; the backend doesn't have these features | 🎨 Designed, sample data |
+| Recurring billing | `/dashboard/recurring/*` | `/v1/recurring-plans` (create, list, get, edit, `/pause`, `/resume`, `/cancel`), `/v1/clients` | ✅ Connected |
+| Clients, expenses, payroll, goals, envelopes | their pages | none yet; the backend doesn't have these features | 🎨 Designed, sample data |
 
 ---
 

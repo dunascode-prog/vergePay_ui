@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { ApiError } from "@/lib/api";
-import { formatDay, isoDay, lineAmount, money } from "@/lib/invoicing";
+import { formatDay, groupDigits, isoDay, lineAmount, money } from "@/lib/invoicing";
 import { walletName, walletsOf } from "@/lib/ledger";
 import { cn } from "@/lib/utils";
 import { createInvoice, getInvoice, listClients, sendInvoice, updateInvoice } from "@/services/invoices";
@@ -32,13 +32,6 @@ const DUE_PRESETS = [7, 14, 30];
 let nextKey = 1;
 const emptyLine = (): Line => ({ key: nextKey++, description: "", quantity: "1", rate: "" });
 
-// "150000" -> "150,000"; keeps up to two decimals as typed
-function groupDigits(text: string) {
-  const clean = text.replace(/[^\d.]/g, "");
-  const [whole, ...rest] = clean.split(".");
-  const decimals = rest.length ? "." + rest.join("").slice(0, 2) : "";
-  return whole.replace(/^0+(?=\d)/, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",") + decimals;
-}
 const minorToText = (minor: number) => groupDigits(String(minor / 100));
 const parseQuantity = (text: string) => (/^\d+(\.\d{1,2})?$/.test(text.trim()) ? Number(text) : null);
 

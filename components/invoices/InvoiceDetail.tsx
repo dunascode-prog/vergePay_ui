@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Check, Copy, ExternalLink, Mail, MessageCircle, Pencil, Send, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, Copy, ExternalLink, Mail, MessageCircle, Pencil, Repeat, Send, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -95,6 +95,14 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
             {issued ? `To ${invoice.client?.name ?? `account ${invoice.billed_account_number}`}` : `From ${invoice.issuer_name}`} · {dueLabel(invoice)}
+            {issued && invoice.recurring_plan_id && (
+              <>
+                {" · "}
+                <Link href={`/dashboard/recurring/${invoice.recurring_plan_id}`} className="inline-flex items-center gap-1 underline-offset-2 hover:text-foreground hover:underline">
+                  <Repeat className="size-3.5" /> From a recurring plan
+                </Link>
+              </>
+            )}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

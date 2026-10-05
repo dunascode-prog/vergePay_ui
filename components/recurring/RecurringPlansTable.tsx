@@ -1,23 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { AlertTriangle, Ban, EllipsisVertical, Pause, Play } from "lucide-react";
 import Link from "next/link";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,17 +14,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { RecurringPlan, RecurringStatus } from "@/types/recurring";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ApiError } from "@/lib/api";
+import { formatDay, money } from "@/lib/invoicing";
+import { FREQUENCY_LABEL } from "@/lib/recurring";
+import { cn } from "@/lib/utils";
+import { cancelRecurringPlan, pauseRecurringPlan, resumeRecurringPlan } from "@/services/recurring";
+import { ApiRecurringPlan, RecurringStatus } from "@/types/recurring";
 import { RecurringStatusBadge } from "./RecurringStatusBadge";
-import { formatMoney, formatShortDate } from "@/lib/format";
-import { LuPause, LuPlay, LuEllipsisVertical, LuBan } from "react-icons/lu";
-
-interface RecurringPlansTableProps {
-  plans: RecurringPlan[];
-  onPause: (id: string) => Promise<void>;
-  onResume: (id: string) => Promise<void>;
-  onCancel: (id: string) => Promise<void>;
-}
 
 type Filter = "all" | RecurringStatus;
 
@@ -49,210 +33,169 @@ const FILTERS: { value: Filter; label: string }[] = [
   { value: "cancelled", label: "Cancelled" },
 ];
 
-const FREQUENCY_LABEL: Record<RecurringPlan["frequency"], string> = {
-  weekly: "Weekly",
-  monthly: "Monthly",
-  quarterly: "Quarterly",
-  yearly: "Yearly",
-};
-
-export function RecurringPlansTable({
-  plans,
-  onPause,
-  onResume,
-  onCancel,
-}: RecurringPlansTableProps) {
+/** The customer's plans, with pause, resume and cancel on each row. */
+export function RecurringPlansTable({ plans, onChanged }: { plans: ApiRecurringPlan[]; onChanged: (plan: ApiRecurringPlan) => void }) {
+  const router = useRouter();
   const [filter, setFilter] = useState<Filter>("all");
-  const [pendingId, setPendingId] = useState<string | null>(null);
-  const [cancelTarget, setCancelTarget] = useState<RecurringPlan | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<ApiRecurringPlan | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const visible = useMemo(
-    () => plans.filter((plan) => filter === "all" || plan.status === filter),
-    [plans, filter],
-  );
+  const shown = useMemo(() => plans.filter((p) => filter === "all" || p.plan_status === filter), [plans, filter]);
+  const count = (f: Filter) => (f === "all" ? plans.length : plans.filter((p) => p.plan_status === f).length);
 
-  async function handlePauseOrResume(plan: RecurringPlan) {
-    setPendingId(plan.id);
-    if (plan.status === "paused") {
-      await onResume(plan.id);
-    } else {
-      await onPause(plan.id);
+  const run = async (plan: ApiRecurringPlan, action: (id: string) => Promise<ApiRecurringPlan>) => {
+    setBusyId(plan.plan_id);
+    setError(null);
+    try {
+      onChanged(await action(plan.plan_id));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "That didn't work. Please try again.");
+    } finally {
+      setBusyId(null);
     }
-    setPendingId(null);
-  }
-
-  async function confirmCancel() {
-    if (!cancelTarget) return;
-    const id = cancelTarget.id;
-    setPendingId(id);
-    await onCancel(id);
-    setPendingId(null);
-    setCancelTarget(null);
-  }
+  };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white">
-      <div className="border-b border-gray-100 p-4">
-        <Tabs value={filter} onValueChange={(v) => setFilter(v as Filter)}>
-          <TabsList>
-            {FILTERS.map((f) => (
-              <TabsTrigger key={f.value} value={f.value} className="text-sm">
-                {f.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+    <section className="rounded-xl border bg-card">
+      <div className="flex gap-1 overflow-x-auto border-b p-2" role="tablist" aria-label="Filter plans">
+        {FILTERS.map((f) => (
+          <button
+            key={f.value}
+            role="tab"
+            aria-selected={filter === f.value}
+            onClick={() => setFilter(f.value)}
+            className={cn(
+              "rounded-md px-3 py-1.5 text-sm whitespace-nowrap text-muted-foreground hover:text-foreground",
+              filter === f.value && "bg-muted font-medium text-foreground",
+            )}
+          >
+            {f.label} <span className="text-xs tabular-nums text-muted-foreground">{count(f.value)}</span>
+          </button>
+        ))}
       </div>
 
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead>Client</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Frequency</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead>Next billing</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {visible.length === 0 ? (
-              <TableRow>
-                <TableHead
-                  colSpan={7}
-                  className="h-24 text-center text-sm font-normal text-gray-400"
-                >
-                  {filter === "all"
-                    ? "No recurring plans yet — create one to get started."
-                    : `No ${filter} plans.`}
-                </TableHead>
-              </TableRow>
-            ) : (
-              visible.map((plan) => {
-                const rowBusy = pendingId === plan.id;
+      {error && <p className="border-b px-4 py-2.5 text-sm text-destructive">{error}</p>}
+
+      {shown.length === 0 ? (
+        <p className="px-4 py-12 text-center text-sm text-muted-foreground">
+          {filter === "all" ? "No plans yet. A plan sends an invoice to a client on a schedule, so you don't have to." : `No ${filter} plans.`}
+        </p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b text-left text-xs text-muted-foreground">
+                <th className="px-4 py-2.5 font-normal">Client</th>
+                <th className="hidden px-4 py-2.5 font-normal md:table-cell">Frequency</th>
+                <th className="px-4 py-2.5 text-right font-normal">Amount</th>
+                <th className="hidden px-4 py-2.5 font-normal sm:table-cell">Next invoice</th>
+                <th className="px-4 py-2.5 font-normal">Status</th>
+                <th className="px-4 py-2.5" aria-label="Actions" />
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {shown.map((plan) => {
+                const busy = busyId === plan.plan_id;
+                const href = `/dashboard/recurring/${plan.plan_id}`;
                 return (
-                  <TableRow
-                    key={plan.id}
-                    className={rowBusy ? "opacity-60" : undefined}
-                  >
-                    <TableCell className="font-medium text-gray-800">
-                      <Link
-                        href={`/dashboard/recurring/${plan.id}`}
-                        className="hover:underline"
-                      >
+                  <tr key={plan.plan_id} className={cn("cursor-pointer hover:bg-muted/40", busy && "opacity-60")} onClick={() => router.push(href)}>
+                    <td className="max-w-[16rem] px-4 py-3">
+                      <Link href={href} onClick={(e) => e.stopPropagation()} className="block truncate font-medium hover:underline">
                         {plan.client.name}
                       </Link>
-                    </TableCell>
-                    <TableCell className="text-gray-500 max-w-[220px] truncate">
-                      {plan.description}
-                    </TableCell>
-                    <TableCell className="text-gray-500">
-                      {FREQUENCY_LABEL[plan.frequency]}
-                    </TableCell>
-                    <TableCell className="text-right font-medium text-gray-900 whitespace-nowrap">
-                      {formatMoney(plan.amount, plan.currency)}
-                    </TableCell>
-                    <TableCell className="text-gray-500 whitespace-nowrap">
-                      {formatShortDate(plan.nextBillingDate)}
-                    </TableCell>
-                    <TableCell>
-                      <RecurringStatusBadge status={plan.status} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {plan.status !== "cancelled" && (
-                        <div className="flex items-center justify-end gap-1.5">
+                      <span className="block truncate text-xs text-muted-foreground">{plan.description}</span>
+                    </td>
+                    <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">{FREQUENCY_LABEL[plan.frequency]}</td>
+                    <td className="px-4 py-3 text-right font-medium whitespace-nowrap tabular-nums">{money(plan.amount_minor, plan.currency_code)}</td>
+                    <td className="hidden px-4 py-3 whitespace-nowrap text-muted-foreground sm:table-cell">
+                      {plan.plan_status === "active" && plan.next_billing_date ? formatDay(plan.next_billing_date) : "—"}
+                      {plan.plan_status === "active" && plan.last_error && (
+                        <span className="mt-0.5 flex items-center gap-1 text-xs text-amber-700 dark:text-amber-300" title={plan.last_error}>
+                          <AlertTriangle className="size-3" /> Last invoice didn&apos;t send
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <RecurringStatusBadge status={plan.plan_status} />
+                    </td>
+                    <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                      {plan.plan_status !== "cancelled" && (
+                        <div className="flex items-center justify-end gap-1">
                           <Button
                             variant="outline"
                             size="sm"
-                            className="h-8"
-                            disabled={rowBusy}
-                            onClick={() => handlePauseOrResume(plan)}
+                            disabled={busy}
+                            onClick={() => run(plan, plan.plan_status === "paused" ? resumeRecurringPlan : pauseRecurringPlan)}
+                            className="hidden sm:inline-flex"
                           >
-                            {rowBusy ? (
-                              "Updating…"
-                            ) : plan.status === "paused" ? (
+                            {plan.plan_status === "paused" ? (
                               <>
-                                <LuPlay className="h-3.5 w-3.5 mr-1.5" />
-                                Resume
+                                <Play className="size-3.5" /> Resume
                               </>
                             ) : (
                               <>
-                                <LuPause className="h-3.5 w-3.5 mr-1.5" />
-                                Pause
+                                <Pause className="size-3.5" /> Pause
                               </>
                             )}
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger
                               render={
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 text-gray-400"
-                                  disabled={rowBusy}
-                                >
-                                  <LuEllipsisVertical className="h-4 w-4" />
+                                <Button variant="ghost" size="icon" disabled={busy} aria-label={`More for ${plan.client.name}`} className="text-muted-foreground">
+                                  <EllipsisVertical className="size-4" />
                                 </Button>
                               }
                             />
-
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                className="text-red-600 focus:text-red-600"
-                                onClick={() => setCancelTarget(plan)}
-                              >
-                                <LuBan className="h-3.5 w-3.5 mr-2" />
-                                Cancel plan
+                              <DropdownMenuItem className="sm:hidden" onClick={() => run(plan, plan.plan_status === "paused" ? resumeRecurringPlan : pauseRecurringPlan)}>
+                                {plan.plan_status === "paused" ? <Play className="size-3.5" /> : <Pause className="size-3.5" />}
+                                {plan.plan_status === "paused" ? "Resume" : "Pause"}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => setCancelTarget(plan)}>
+                                <Ban className="size-3.5" /> Cancel plan
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
                       )}
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 );
-              })
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      <AlertDialog
-        open={cancelTarget !== null}
-        onOpenChange={(open) => !open && setCancelTarget(null)}
-      >
+      <AlertDialog open={cancelTarget !== null} onOpenChange={(open) => !open && setCancelTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Cancel this recurring plan?</AlertDialogTitle>
+            <AlertDialogTitle>Cancel this plan?</AlertDialogTitle>
             <AlertDialogDescription>
               {cancelTarget && (
                 <>
-                  This stops future billing for{" "}
-                  <strong>{cancelTarget.client.name}</strong> (
-                  {formatMoney(cancelTarget.amount, cancelTarget.currency)} /{" "}
-                  {FREQUENCY_LABEL[cancelTarget.frequency].toLowerCase()}). This
-                  can&apos;t be undone — you&apos;d need to create a new plan to
-                  resume billing this client.
+                  No more invoices go to <strong>{cancelTarget.client.name}</strong> for {cancelTarget.description}. Invoices already sent stay as they
+                  are. This can&apos;t be undone.
                 </>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={pendingId !== null}>
-              Keep plan
-            </AlertDialogCancel>
+            <AlertDialogCancel>Keep plan</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700"
-              disabled={pendingId !== null}
-              onClick={confirmCancel}
+              className="bg-destructive text-white hover:bg-destructive/90"
+              onClick={() => {
+                const plan = cancelTarget;
+                setCancelTarget(null);
+                if (plan) void run(plan, cancelRecurringPlan);
+              }}
             >
-              {pendingId === cancelTarget?.id ? "Cancelling…" : "Cancel plan"}
+              Cancel plan
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </section>
   );
 }
