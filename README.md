@@ -62,7 +62,7 @@ The sidebar groups the app the way a small-business owner thinks about their mon
 |---|---|---|
 | **Overview** | `/dashboard` | **Live from the ledger.** Every customer has up to two wallets, a **Personal** and a **Business** one, and the **Personal / Business / Combined** toggle shows one, the other, or both. A performance card (income, spent and net this month, and the balance, each compared with last month, with six-month sparklines), the wallet cards (balance, currency, copyable account number, or "Add a business wallet" if it's missing), a six-month income-vs-spending chart and the latest transactions (*Personal wallet → Business wallet*). An **Investments** card links Alpaca and then shows synced holdings. A reminder to link comes back every 3 days until they do. Widgets whose features aren't connected yet (AI insight, client health, upcoming billing, outstanding invoices, goals, budgets) follow the toggle and are tagged **Sample data** |
 | **Move money** | wallet card actions | **Add money** by bank transfer (a permanent account number for the wallet) or debit card (linked once through Flutterwave's hosted checkout, then one-tap top-ups, with 3-D Secure handled). **Send** to any VergePay wallet after a name check ("Ada Obi"), with a review screen and receipt. **Transfer** between your own personal and business wallets. The first time money moves, a one-time **identity check** (BVN, legal name, date of birth) runs inside the same dialog, and 2FA is turned on when linking a card needs it |
-| **Analytics** | `/dashboard/analytics` | Revenue trend, client revenue share and concentration risk, cash-flow forecast, collection metrics, late-payment ageing, how effective reminders are, and a feed of AI insights. Filter by this month, the last 3 months or this year |
+| **Analytics** | `/dashboard/analytics` | **Live from your invoices and ledger**, following the Personal / Business / Combined toggle and a this month / last 3 months / this year filter. Insights written from your own numbers (overdue invoices, money due this week, one client carrying most of your revenue, revenue up or down), the revenue trend (NGN and USD apart), a cash-flow forecast from unpaid invoices (overdue, next 7 days, 8–30 days, later), collection metrics, client concentration, late-payment ageing, how often reminders led to payment, a client leaderboard and where money went (sent to others, invoices you paid, loan repayments, fees, refunds). The health score and goals cards are still tagged **Sample data** |
 
 ### Payments
 | Screen | Route | What it shows |
@@ -211,7 +211,8 @@ The screens were designed first, using sample data shaped like the real domain. 
 | Pay links | `/pay/[token]` (public) | `/v1/pay/:token`, `/checkout`, `/sync`, `/wallet` | ✅ Connected |
 | Investments | dashboard Investments card, link reminder, `/dashboard/investments/linked` | `POST`/`GET /v1/brokerage-links` (opens the investment wallet), `/v1/holdings`, `/v1/auth/2fa/enable` + `/verify` | ✅ Connected |
 | Loans | new screen | `/v1/loans`, `/:id/schedule`, `/:id/repayments` | ⏳ Planned |
-| Clients, recurring, expenses, payroll, goals, envelopes, analytics | their pages | none yet; the backend doesn't have these features | 🎨 Designed, sample data |
+| Analytics | `/dashboard/analytics` | `/v1/invoices` (with `reminders_sent`, `last_reminder_at`), `/v1/accounts/:id/transactions` | ✅ Connected (health score and goals still sample) |
+| Clients, recurring, expenses, payroll, goals, envelopes | their pages | none yet; the backend doesn't have these features | 🎨 Designed, sample data |
 
 ---
 

@@ -27,10 +27,15 @@ export function InvoiceBehaviorCard({ reminders, latePayments }: InvoiceBehavior
         <div>
           <div className="flex items-center justify-between mb-2">
             <p className="text-xs font-medium text-muted-foreground">Reminder effectiveness</p>
-            <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
-              {effectivenessRate}% led to payment
-            </p>
+            {reminderTotal > 0 && (
+              <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                {effectivenessRate}% led to payment
+              </p>
+            )}
           </div>
+          {reminderTotal === 0 ? (
+            <p className="text-sm text-muted-foreground">No reminders sent in this period.</p>
+          ) : (
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="rounded-md bg-emerald-50 dark:bg-emerald-950/40 py-2">
               <p className="text-lg font-semibold text-emerald-700 dark:text-emerald-400">
@@ -51,11 +56,16 @@ export function InvoiceBehaviorCard({ reminders, latePayments }: InvoiceBehavior
               <p className="text-xs text-red-600 dark:text-red-400/80">Still unpaid</p>
             </div>
           </div>
+          )}
           <p className="text-xs text-muted-foreground mt-2">{reminderTotal} reminders sent this period</p>
         </div>
 
         <div className="border-t border-border pt-4">
           <p className="text-xs font-medium text-muted-foreground mb-2">Late payment distribution</p>
+          {lateTotal === 0 ? (
+            <p className="text-sm text-muted-foreground">No invoices were paid in this period.</p>
+          ) : (
+          <>
           <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-muted mb-3">
             {latePayments.map((bucket, i) =>
               bucket.count > 0 ? (
@@ -76,6 +86,8 @@ export function InvoiceBehaviorCard({ reminders, latePayments }: InvoiceBehavior
               </div>
             ))}
           </div>
+          </>
+          )}
         </div>
       </CardContent>
     </Card>

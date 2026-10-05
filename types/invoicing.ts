@@ -51,6 +51,9 @@ export interface ApiInvoice {
   refunded_at: string | null;
   refund_reason: string | null;
   sent_at: string | null;
+  /** Reminders emailed to the client, and when the last one went. */
+  reminders_sent?: number;
+  last_reminder_at?: string | null;
   created_at: string;
   pay_url: string | null;
   /** Issuer only, on GET /v1/invoices/:id. */
