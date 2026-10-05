@@ -24,7 +24,8 @@ export interface ClientRevenueShare {
   clientId: string;
   name: string;
   initials: string;
-  healthScore: number;
+  /** Not computed from real data yet; the leaderboard hides the column when null. */
+  healthScore: number | null;
   avgCollectionDays: number;
   onTimeRate: number; // 0-100
   revenue: number;

@@ -29,6 +29,8 @@ function onTimeTone(rate: number) {
 
 export function ClientLeaderboardTable({ clients }: ClientLeaderboardTableProps) {
   const sorted = [...clients].sort((a, b) => b.shareOfTotal - a.shareOfTotal);
+  // the column only shows when there's a real score to put in it
+  const showHealth = clients.some((c) => c.healthScore !== null);
 
   return (
     <Card className="shadow-none">
@@ -36,6 +38,9 @@ export function ClientLeaderboardTable({ clients }: ClientLeaderboardTableProps)
         <CardTitle className="text-sm font-medium text-foreground">Client leaderboard</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
+        {sorted.length === 0 ? (
+          <p className="px-6 pb-6 text-sm text-muted-foreground">No invoices were paid in this period yet.</p>
+        ) : (
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -44,7 +49,7 @@ export function ClientLeaderboardTable({ clients }: ClientLeaderboardTableProps)
               <TableHead className="hidden text-right sm:table-cell">Share</TableHead>
               <TableHead className="hidden text-right md:table-cell">Avg. collection</TableHead>
               <TableHead className="text-right">On-time rate</TableHead>
-              <TableHead className="text-right">Health</TableHead>
+              {showHealth && <TableHead className="text-right">Health</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -63,20 +68,25 @@ export function ClientLeaderboardTable({ clients }: ClientLeaderboardTableProps)
                 <TableCell className={cn("text-right font-medium", onTimeTone(client.onTimeRate))}>
                   {client.onTimeRate}%
                 </TableCell>
-                <TableCell className="text-right">
-                  <span
-                    className={cn(
-                      "inline-block rounded-full px-2 py-0.5 text-xs font-medium",
-                      healthTone(client.healthScore)
+                {showHealth && (
+                  <TableCell className="text-right">
+                    {client.healthScore !== null && (
+                      <span
+                        className={cn(
+                          "inline-block rounded-full px-2 py-0.5 text-xs font-medium",
+                          healthTone(client.healthScore)
+                        )}
+                      >
+                        {client.healthScore}
+                      </span>
                     )}
-                  >
-                    {client.healthScore}
-                  </span>
-                </TableCell>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        )}
       </CardContent>
     </Card>
   );

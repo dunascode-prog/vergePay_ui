@@ -56,8 +56,8 @@ const SECTION_CONFIG: Record<Section, SectionConfig> = {
     basePath: "/dashboard/analytics",
     title: "Analytics",
     description: "Financial health & habits",
-    // still sample data, so the Personal/Business toggle would do nothing here
-    showAccountScope: false,
+    // real data now: follows the Personal / Business / Combined view
+    showAccountScope: true,
     // An "Export report" button comes back once there's an export to link to.
   },
   invoices: {

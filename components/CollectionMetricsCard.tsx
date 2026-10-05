@@ -29,14 +29,17 @@ export function CollectionMetricsCard({ clients }: CollectionMetricsCardProps) {
       <CardContent>
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <p className="text-2xl font-semibold text-foreground">{avgDays}d</p>
+            <p className="text-2xl font-semibold text-foreground">{clients.length ? `${avgDays}d` : "—"}</p>
             <p className="text-xs text-muted-foreground">Avg. days to pay</p>
           </div>
           <div>
-            <p className="text-2xl font-semibold text-foreground">{avgOnTime}%</p>
+            <p className="text-2xl font-semibold text-foreground">{clients.length ? `${avgOnTime}%` : "—"}</p>
             <p className="text-xs text-muted-foreground">Paid on time</p>
           </div>
         </div>
+        {clients.length === 0 && (
+          <p className="border-t border-border pt-3 text-xs text-muted-foreground">Shows once clients pay invoices in this period.</p>
+        )}
         {fastest && slowest && (
           <div className="space-y-1.5 text-xs border-t border-border pt-3">
             <p className="text-muted-foreground">
