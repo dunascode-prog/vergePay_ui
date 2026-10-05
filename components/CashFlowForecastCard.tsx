@@ -37,22 +37,18 @@ export function CashFlowForecastCard({ buckets }: CashFlowForecastCardProps) {
           currencies.map((currency) => (
             <div key={currency}>
               <p className="text-xs font-medium text-muted-foreground mb-2">{currency}</p>
-              <div className="space-y-2">
+              {/* one row of buckets: the card sits full width under the revenue trend */}
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {grouped[currency].map((bucket) => (
-                  <div
-                    key={bucket.label}
-                    className="flex items-center justify-between text-sm rounded-md bg-muted px-3 py-2"
-                  >
-                    <div>
-                      <p className="text-foreground/90">{bucket.label}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {bucket.invoiceCount === 0
-                          ? "No invoices due"
-                          : `${bucket.invoiceCount} invoice${bucket.invoiceCount === 1 ? "" : "s"}`}
-                      </p>
-                    </div>
-                    <p className="font-medium text-foreground">
+                  <div key={bucket.label} className="rounded-md bg-muted px-3 py-2.5">
+                    <p className="text-xs text-muted-foreground">{bucket.label}</p>
+                    <p className="mt-1 text-base font-medium text-foreground tabular-nums">
                       {bucket.expected === 0 ? "—" : formatMoney(bucket.expected, currency)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {bucket.invoiceCount === 0
+                        ? "No invoices due"
+                        : `${bucket.invoiceCount} invoice${bucket.invoiceCount === 1 ? "" : "s"}`}
                     </p>
                   </div>
                 ))}

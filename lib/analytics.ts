@@ -4,7 +4,6 @@
 // dollars), which is what the analytics cards display.
 
 import { formatDay } from "@/lib/invoicing";
-import { lastMonths, type MonthKey } from "@/lib/ledger";
 import { ScopedTransaction } from "@/types/account";
 import {
   AIInsight,
@@ -23,25 +22,65 @@ const DAY = 86_400_000;
 const major = (minor: number) => minor / 100;
 const asCurrency = (code: string): Currency | null => (code === "NGN" || code === "USD" ? code : null);
 
-/** Start of the selected period, and the months the trend chart shows. */
-export function periodWindow(period: Period, now = new Date()): { start: Date; trendMonths: MonthKey[]; label: string } {
-  const month = new Date(now.getFullYear(), now.getMonth(), 1);
+/** One bar of the revenue trend: [start, end). */
+export interface TrendBucket {
+  key: string;
+  label: string;
+  start: Date;
+  end: Date;
+}
+
+const shortMonth = (d: Date) => d.toLocaleString("en-US", { month: "short" });
+
+/** The last `count` calendar months, oldest first, ending with this one. */
+function monthBuckets(count: number, now: Date): TrendBucket[] {
+  return Array.from({ length: count }, (_, i) => {
+    const start = new Date(now.getFullYear(), now.getMonth() - (count - 1 - i), 1);
+    const end = new Date(start.getFullYear(), start.getMonth() + 1, 1);
+    return { key: `${start.getFullYear()}-${start.getMonth() + 1}`, label: shortMonth(start), start, end };
+  });
+}
+
+/** This month in weeks (1–7, 8–14, …), up to the week we're in. */
+function weekBuckets(now: Date): TrendBucket[] {
+  const y = now.getFullYear(), m = now.getMonth();
+  const lastDay = new Date(y, m + 1, 0).getDate();
+  const out: TrendBucket[] = [];
+  for (let day = 1; day <= Math.min(lastDay, now.getDate()); day += 7) {
+    const endDay = Math.min(day + 6, lastDay);
+    out.push({
+      key: `w${day}`,
+      label: day === endDay ? `${day} ${shortMonth(now)}` : `${day}–${endDay} ${shortMonth(now)}`,
+      start: new Date(y, m, day),
+      end: new Date(y, m, endDay + 1),
+    });
+  }
+  return out;
+}
+
+/** Start of the selected period, and the bars the trend chart shows for it. */
+export function periodWindow(period: Period, now = new Date()): { start: Date; trend: TrendBucket[]; label: string } {
   switch (period) {
     case "this_month":
-      return { start: month, trendMonths: lastMonths(6, now), label: "this month" };
+      return { start: new Date(now.getFullYear(), now.getMonth(), 1), trend: weekBuckets(now), label: "this month" };
     case "last_3_months":
-      return { start: new Date(now.getFullYear(), now.getMonth() - 2, 1), trendMonths: lastMonths(6, now), label: "the last 3 months" };
+      return { start: new Date(now.getFullYear(), now.getMonth() - 2, 1), trend: monthBuckets(3, now), label: "in the last 3 months" };
     case "this_year":
-      return { start: new Date(now.getFullYear(), 0, 1), trendMonths: lastMonths(now.getMonth() + 1, now), label: "this year" };
+      return { start: new Date(now.getFullYear(), 0, 1), trend: monthBuckets(now.getMonth() + 1, now), label: "this year" };
   }
 }
 
-/** YYYY-MM-DD of the earliest date any card needs, for loading ledger lines once. */
+/** Last month and this one, for the month-on-month insight whatever the period. */
+export const lastTwoMonths = (now = new Date()) => monthBuckets(2, now);
+
+/**
+ * YYYY-MM-DD of the earliest date any card needs, for loading ledger lines
+ * once: the period's start, or last month's for the month-on-month insight.
+ */
 export function earliestNeeded(period: Period, now = new Date()): string {
-  const { start, trendMonths } = periodWindow(period, now);
-  const [y, m] = trendMonths[0].key.split("-").map(Number);
-  const trendStart = new Date(y, m - 1, 1);
-  const d = trendStart < start ? trendStart : start;
+  const { start } = periodWindow(period, now);
+  const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const d = lastMonth < start ? lastMonth : start;
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
 }
 
@@ -56,18 +95,18 @@ const internal = (l: ScopedTransaction, scoped: Set<string>) =>
  */
 const REVENUE_TYPES = new Set(["invoice_payment", "transfer", "bank_deposit"]);
 
-export function revenueTrend(lines: ScopedTransaction[], scoped: Set<string>, months: MonthKey[]): RevenuePoint[] {
-  const points = new Map(months.map((m) => [m.key, { month: m.label, ngn: 0, usdRaw: 0, usdInNgnEquivalent: 0 }]));
+export function revenueTrend(lines: ScopedTransaction[], scoped: Set<string>, buckets: TrendBucket[]): RevenuePoint[] {
+  const points = buckets.map((b) => ({ month: b.label, ngn: 0, usdRaw: 0, usdInNgnEquivalent: 0 }));
   for (const l of lines) {
     if (!settled(l) || l.direction !== "credit" || !scoped.has(l.account_id) || internal(l, scoped)) continue;
     if (!REVENUE_TYPES.has(l.transaction_type)) continue;
     const d = new Date(l.created_at);
-    const point = points.get(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`);
+    const point = points[buckets.findIndex((b) => d >= b.start && d < b.end)];
     if (!point) continue;
     if (l.currency_code === "NGN") point.ngn += major(l.amount_minor);
     else if (l.currency_code === "USD") point.usdRaw += major(l.amount_minor);
   }
-  return months.map((m) => points.get(m.key)!);
+  return points;
 }
 
 /** Money out in the period, grouped by what it was for. */
@@ -219,7 +258,7 @@ const fmt = (amount: number, currency: Currency) =>
 export function insights({
   invoices,
   clients,
-  revenue,
+  monthly,
   forecast,
   reminders,
   currency,
@@ -227,7 +266,8 @@ export function insights({
 }: {
   invoices: ApiInvoice[];
   clients: ClientRevenueShare[];
-  revenue: RevenuePoint[];
+  /** last month and this month, from lastTwoMonths() */
+  monthly: RevenuePoint[];
   forecast: CashFlowBucket[];
   reminders: ReminderEffectiveness;
   currency: Currency;
@@ -258,8 +298,8 @@ export function insights({
   }
 
   const key = currency === "NGN" ? "ngn" : "usdRaw";
-  const [prev, cur] = revenue.slice(-2).map((p) => p[key]);
-  if (revenue.length >= 2 && prev > 0) {
+  const [prev, cur] = monthly.map((p) => p[key]);
+  if (monthly.length === 2 && prev > 0) {
     const change = Math.round(((cur - prev) / prev) * 100);
     if (Math.abs(change) >= 10) {
       out.push({
