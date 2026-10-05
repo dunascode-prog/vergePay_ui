@@ -85,9 +85,10 @@ const SECTION_CONFIG: Record<Section, SectionConfig> = {
   },
   business: {
     basePath: "/dashboard/business",
-    title: "Business Overview",
-    description: "Check Full Overview",
-    showAccountScope: false,
+    title: "Business overview",
+    description: "How your business is doing",
+    // real data now: follows the Personal / Business / Combined view
+    showAccountScope: true,
     // headerAction: { label: "New Plan", href: "/dashboard/recurring/new", icon: Plus },
   },
   clients: {

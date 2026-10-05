@@ -77,7 +77,7 @@ The sidebar groups the app the way a small-business owner thinks about their mon
 ### Business
 | Screen | Route | What it shows |
 |---|---|---|
-| **Business overview** | `/dashboard/business` | A business health score and the factors behind it, a ledger snapshot (cash, receivables, revenue and expenses year to date), revenue vs. expenses, top clients, recurring revenue, and a **"needs attention"** list that links straight to the problem |
+| **Business overview** | `/dashboard/business` | **Live.** Follows the Personal / Business / Combined toggle. Revenue, money out and net this year (per currency, and moves between your own wallets don't count), what clients owe and how much is overdue, revenue and money out over six months, and a **business health score** worked out from five checks shown under it: paying on time, overdue invoices, how much rests on one client, how many months your cash covers, and revenue against the previous 90 days. A **"needs attention"** list links straight to each problem: overdue invoices, plans that couldn't send, late-paying clients, paused plans and unsent drafts. Also top clients, recurring revenue with the next invoice, wallet balances and where money went |
 | **Expenses** | `/dashboard/expenses` | Expense table with category breakdown and trend. Flags recurring expenses and **missing receipts** |
 | **Payroll** | `/dashboard/payroll` | Payees (salary or contract), pay frequency and bank details (masked). A payroll run shows gross, PAYE, pension and net, and writes each payment to Expenses automatically |
 
@@ -215,6 +215,7 @@ The screens were designed first, using sample data shaped like the real domain. 
 | Analytics | `/dashboard/analytics` | `/v1/invoices` (with `reminders_sent`, `last_reminder_at`), `/v1/accounts/:id/transactions` | ✅ Connected (health score and goals still sample) |
 | Recurring billing | `/dashboard/recurring/*` | `/v1/recurring-plans` (create, list, get, edit, `/pause`, `/resume`, `/cancel`), `/v1/clients` | ✅ Connected |
 | Clients | `/dashboard/clients` | `/v1/clients` (list with stats and health, get with invoices, create, edit, archive, `/restore`) | ✅ Connected |
+| Business overview | `/dashboard/business` | `/v1/accounts` and `/:id/transactions`, `/v1/invoices`, `/v1/recurring-plans`, `/v1/clients` | ✅ Connected |
 | Expenses, payroll, goals, envelopes | their pages | none yet; the backend doesn't have these features | 🎨 Designed, sample data |
 
 ---

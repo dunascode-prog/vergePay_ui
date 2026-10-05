@@ -1,40 +1,43 @@
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ClientProfile } from "@/types/client";
-import { ClientAvatar } from "./ClientAvatar";
+import { ArrowRight } from "lucide-react";
+import { ClientAvatar } from "@/components/clients/ClientAvatar";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
 import { formatMoney } from "@/lib/format";
-import { LuArrowRight } from "react-icons/lu";
+import { ClientRevenueShare } from "@/types/analytics";
 
-interface TopClientsCardProps {
-  clients: ClientProfile[];
-}
-
-export function TopClientsCard({ clients }: TopClientsCardProps) {
+/** The clients who paid the most this year (each currency ranked on its own). */
+export function TopClientsCard({ clients }: { clients: ClientRevenueShare[] }) {
   return (
-    <Card className="border-gray-200 shadow-none">
-      <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm font-medium text-gray-700">Top clients</CardTitle>
-        <Link href="/dashboard/clients">
-          <Button variant="ghost" size="sm" className="h-7 text-gray-500">
-            View all
-            <LuArrowRight className="h-3.5 w-3.5 ml-1" />
-          </Button>
-        </Link>
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle>Top clients</CardTitle>
+        <CardDescription>Invoices paid this year</CardDescription>
+        <CardAction>
+          <Link href="/dashboard/clients" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+            All clients <ArrowRight className="size-3.5" />
+          </Link>
+        </CardAction>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {clients.map((client) => (
-          <div key={client.id} className="flex items-center gap-3">
-            <ClientAvatar name={client.name} initials={client.initials} size="sm" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm text-gray-800 truncate">{client.name}</p>
-              <p className="text-xs text-gray-400 truncate">{client.industry}</p>
-            </div>
-            <p className="text-sm font-medium text-gray-900 whitespace-nowrap">
-              {formatMoney(client.totalRevenue, client.currency)}
-            </p>
-          </div>
-        ))}
+      <CardContent>
+        {clients.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No invoices paid yet this year. Clients appear here as they pay.</p>
+        ) : (
+          <ul className="space-y-3">
+            {clients.map((c) => (
+              <li key={c.clientId} className="flex items-center gap-3">
+                <ClientAvatar name={c.name} initials={c.initials} size="sm" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">{c.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {c.shareOfTotal}% of {c.currency} revenue · {c.onTimeRate}% on time
+                  </p>
+                </div>
+                <p className="text-sm font-medium whitespace-nowrap tabular-nums">{formatMoney(c.revenue, c.currency)}</p>
+              </li>
+            ))}
+          </ul>
+        )}
       </CardContent>
     </Card>
   );

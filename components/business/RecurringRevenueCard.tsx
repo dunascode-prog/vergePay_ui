@@ -1,53 +1,52 @@
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { formatMoneyByCurrency } from "@/lib/format";
-import { Currency } from "@/types/invoice";
-import { LuRepeat, LuArrowRight } from "react-icons/lu";
+import { ArrowRight } from "lucide-react";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
+import { formatDay, money, moneyByCurrency } from "@/lib/invoicing";
+import { monthlyRecurring } from "@/lib/recurring";
+import { nextBilling } from "@/lib/business";
+import { ApiRecurringPlan } from "@/types/recurring";
 
-interface RecurringRevenueCardProps {
-  mrrByCurrency: Partial<Record<Currency, number>>;
-  activeCount: number;
-  pausedCount: number;
-  totalCount: number;
-}
+/** Monthly recurring revenue of the plans paid into the wallets in view. */
+export function RecurringRevenueCard({ plans }: { plans: ApiRecurringPlan[] }) {
+  const mrr = monthlyRecurring(plans);
+  const active = plans.filter((p) => p.plan_status === "active").length;
+  const paused = plans.filter((p) => p.plan_status === "paused").length;
+  const next = nextBilling(plans);
 
-export function RecurringRevenueCard({
-  mrrByCurrency,
-  activeCount,
-  pausedCount,
-  totalCount,
-}: RecurringRevenueCardProps) {
   return (
-    <Card className="border-gray-200 shadow-none">
-      <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
-          <LuRepeat className="h-4 w-4 text-emerald-600" />
-          Recurring revenue
-        </CardTitle>
-        <Link href="/dashboard/recurring">
-          <Button variant="ghost" size="sm" className="h-7 text-gray-500">
-            View all
-            <LuArrowRight className="h-3.5 w-3.5 ml-1" />
-          </Button>
-        </Link>
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle>Recurring revenue</CardTitle>
+        <CardDescription>A month of your active plans</CardDescription>
+        <CardAction>
+          <Link href="/dashboard/recurring" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+            Plans <ArrowRight className="size-3.5" />
+          </Link>
+        </CardAction>
       </CardHeader>
       <CardContent>
-        <p className="text-2xl font-semibold text-gray-900 mb-1">
-          {formatMoneyByCurrency(mrrByCurrency)}
-        </p>
-        <p className="text-xs text-gray-400 mb-3">Monthly recurring revenue, normalized</p>
-        <div className="flex items-center gap-4 text-sm">
-          <span className="text-gray-600">
-            <strong className="text-gray-900">{activeCount}</strong> active
-          </span>
-          {pausedCount > 0 && (
-            <span className="text-amber-600">
-              <strong>{pausedCount}</strong> paused
-            </span>
-          )}
-          <span className="text-gray-400">of {totalCount} total plans</span>
-        </div>
+        {active === 0 && paused === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No recurring plans yet.{" "}
+            <Link href="/dashboard/recurring/new" className="font-medium text-emerald-700 hover:underline dark:text-emerald-400">
+              Bill a client on a schedule
+            </Link>
+          </p>
+        ) : (
+          <>
+            <p className="text-2xl font-semibold tracking-tight tabular-nums">{mrr.size ? moneyByCurrency(mrr) : "—"}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {active} active{paused ? <span className="text-amber-700 dark:text-amber-300"> · {paused} paused</span> : null}
+            </p>
+            {next && (
+              <p className="mt-3 border-t pt-3 text-sm">
+                <span className="text-muted-foreground">Next invoice </span>
+                {formatDay(next.next_billing_date!, false)} · {next.client.name}, {money(next.amount_minor, next.currency_code)}
+              </p>
+            )}
+          </>
+        )}
       </CardContent>
     </Card>
   );
