@@ -1,80 +1,66 @@
-"use client";
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BusinessHealthFactor, HealthScoreSnapshot } from "@/types/business";
-import { LineChart, Line, ResponsiveContainer, YAxis } from "recharts";
+import { CircleCheck, Eye, TriangleAlert } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BusinessHealth } from "@/lib/business";
 import { cn } from "@/lib/utils";
-import { LuCircleCheck, LuEye, LuTriangleAlert } from "react-icons/lu";
 
-interface BusinessHealthScoreCardProps {
-  currentScore: number;
-  history: HealthScoreSnapshot[];
-  factors: BusinessHealthFactor[];
+const ICON = { good: CircleCheck, watch: Eye, risk: TriangleAlert };
+const TONE = {
+  good: "text-emerald-600 dark:text-emerald-400",
+  watch: "text-amber-600 dark:text-amber-400",
+  risk: "text-red-600 dark:text-red-400",
+};
+
+function scoreTone(score: number) {
+  return score >= 75 ? "bg-emerald-600 dark:bg-emerald-400" : score >= 50 ? "bg-amber-500" : "bg-red-500";
 }
 
-const FACTOR_ICON = {
-  good: LuCircleCheck,
-  watch: LuEye,
-  risk: LuTriangleAlert,
-};
-
-const FACTOR_TONE = {
-  good: "text-emerald-600",
-  watch: "text-amber-600",
-  risk: "text-red-600",
-};
-
-export function BusinessHealthScoreCard({
-  currentScore,
-  history,
-  factors,
-}: BusinessHealthScoreCardProps) {
-  const previous = history[history.length - 2]?.score ?? currentScore;
-  const delta = currentScore - previous;
-
+/** The score and every rule behind it, so it's never a mystery number. */
+export function BusinessHealthScoreCard({ health }: { health: BusinessHealth }) {
   return (
-    <Card className="border-gray-200 shadow-none">
+    <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-gray-700">Business Health Score</CardTitle>
+        <CardTitle>Business health</CardTitle>
+        <CardDescription>From your invoices, cash and money out</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-4xl font-semibold text-gray-900">{currentScore}</p>
-            <p
-              className={cn(
-                "text-xs font-medium mt-1",
-                delta >= 0 ? "text-emerald-600" : "text-red-600"
-              )}
+        {health.score === null ? (
+          <p className="text-sm text-muted-foreground">
+            Your score appears once clients have been invoiced or money has moved. Send an invoice to get started.
+          </p>
+        ) : (
+          <>
+            <div className="flex items-baseline gap-2">
+              <p className="text-4xl font-semibold tracking-tight tabular-nums">{health.score}</p>
+              <p className="text-sm text-muted-foreground">/ 100 · {health.label}</p>
+            </div>
+            <div
+              className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted"
+              role="meter"
+              aria-label="Business health score"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={health.score}
             >
-              {delta >= 0 ? "+" : ""}
-              {delta} vs last month
-            </p>
-          </div>
-          <div className="h-12 w-28">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={history}>
-                <YAxis hide domain={["dataMin - 5", "dataMax + 5"]} />
-                <Line type="monotone" dataKey="score" stroke="#047857" strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+              <div className={cn("h-full rounded-full", scoreTone(health.score))} style={{ width: `${health.score}%` }} />
+            </div>
 
-        <div className="mt-4 space-y-2.5 border-t border-gray-100 pt-4">
-          {factors.map((factor) => {
-            const Icon = FACTOR_ICON[factor.status];
-            return (
-              <div key={factor.label} className="flex items-start gap-2.5">
-                <Icon className={cn("h-3.5 w-3.5 mt-0.5 shrink-0", FACTOR_TONE[factor.status])} />
-                <div>
-                  <p className="text-sm text-gray-800">{factor.label}</p>
-                  <p className="text-xs text-gray-400">{factor.detail}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+            <ul className="mt-4 space-y-3 border-t pt-4">
+              {health.factors.map((f) => {
+                const Icon = ICON[f.status];
+                return (
+                  <li key={f.label} className="flex items-start gap-2.5">
+                    <Icon className={cn("mt-0.5 size-4 shrink-0", TONE[f.status])} aria-hidden />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium">{f.label}</p>
+                      <p className="text-xs text-muted-foreground">{f.detail}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="mt-4 text-xs text-muted-foreground">The average of the checks above. It changes as clients pay.</p>
+          </>
+        )}
       </CardContent>
     </Card>
   );

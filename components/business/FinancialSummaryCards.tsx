@@ -1,74 +1,54 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { CurrencyAmount } from "@/types/business";
-import { formatMoneyByCurrency, sumByCurrency } from "@/lib/format";
-import { LuTrendingUp, LuTrendingDown, LuWallet, LuScale } from "react-icons/lu";
-import { cn } from "@/lib/utils";
+import { ArrowDownLeft, ArrowUpRight, HandCoins, Scale } from "lucide-react";
+import { moneyByCurrency } from "@/lib/invoicing";
+import { YearTotals } from "@/lib/business";
 
-interface FinancialSummaryCardsProps {
-  revenue: CurrencyAmount[];
-  expenses: CurrencyAmount[];
-  cash: CurrencyAmount[];
-}
+/** Four headline numbers for the year so far, per currency (never converted). */
+export function FinancialSummaryCards({
+  totals,
+  owed,
+  overdue,
+}: {
+  totals: YearTotals;
+  owed: Map<string, number>;
+  overdue: Map<string, number>;
+}) {
+  const shown = (m: Map<string, number>) => (m.size ? moneyByCurrency(m) : "—");
+  const loss = [...totals.net.values()].some((v) => v < 0);
 
-function subtractByCurrency(a: CurrencyAmount[], b: CurrencyAmount[]): CurrencyAmount[] {
-  const aTotals = sumByCurrency(a);
-  const bTotals = sumByCurrency(b);
-  const currencies = new Set([...Object.keys(aTotals), ...Object.keys(bTotals)]);
-  return Array.from(currencies).map((currency) => ({
-    currency: currency as CurrencyAmount["currency"],
-    amount: (aTotals[currency as keyof typeof aTotals] ?? 0) - (bTotals[currency as keyof typeof bTotals] ?? 0),
-  }));
-}
-
-export function FinancialSummaryCards({ revenue, expenses, cash }: FinancialSummaryCardsProps) {
-  const netProfit = subtractByCurrency(revenue, expenses);
-
-  const cards = [
+  const tiles = [
+    { label: "Revenue this year", value: shown(totals.revenue), sub: "Paid to you since 1 January", icon: ArrowDownLeft },
+    { label: "Money out this year", value: shown(totals.moneyOut), sub: "Payments, transfers out and fees", icon: ArrowUpRight },
     {
-      label: "Revenue (YTD)",
-      value: formatMoneyByCurrency(sumByCurrency(revenue)),
-      sub: "All clients, all invoices",
-      icon: LuTrendingUp,
-      tone: "text-emerald-600",
+      label: "Net this year",
+      value: shown(totals.net),
+      sub: loss ? "More went out than came in" : "Revenue minus money out",
+      icon: Scale,
+      warn: loss,
     },
     {
-      label: "Expenses (YTD)",
-      value: formatMoneyByCurrency(sumByCurrency(expenses)),
-      sub: "Software, contractors, marketing & more",
-      icon: LuTrendingDown,
-      tone: "text-red-500",
-    },
-    {
-      label: "Net profit (YTD)",
-      value: formatMoneyByCurrency(sumByCurrency(netProfit)),
-      sub: "Revenue minus expenses",
-      icon: LuScale,
-      tone: "text-emerald-600",
-    },
-    {
-      label: "Cash position",
-      value: formatMoneyByCurrency(sumByCurrency(cash)),
-      sub: "Personal + Business wallets",
-      icon: LuWallet,
-      tone: "text-gray-500",
+      label: "Owed to you",
+      value: shown(owed),
+      sub: overdue.size ? `${moneyByCurrency(overdue)} of it overdue` : owed.size ? "Nothing overdue" : "No unpaid invoices",
+      icon: HandCoins,
+      warn: overdue.size > 0,
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {cards.map((card) => (
-        <Card key={card.label} className="border-gray-200 shadow-none">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                {card.label}
-              </p>
-              <card.icon className={cn("h-4 w-4", card.tone)} />
-            </div>
-            <p className="text-2xl font-semibold text-gray-900 leading-tight">{card.value}</p>
-            <p className="text-xs text-gray-400 mt-1">{card.sub}</p>
-          </CardContent>
-        </Card>
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      {tiles.map((t) => (
+        <div key={t.label} className="rounded-xl border bg-card p-4">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs text-muted-foreground">{t.label}</p>
+            <t.icon className="size-4 text-muted-foreground" aria-hidden />
+          </div>
+          <p className="mt-1.5 truncate text-xl font-semibold tracking-tight tabular-nums" title={t.value}>
+            {t.value}
+          </p>
+          <p className={t.warn ? "mt-0.5 truncate text-xs text-amber-700 dark:text-amber-300" : "mt-0.5 truncate text-xs text-muted-foreground"} title={t.sub}>
+            {t.sub}
+          </p>
+        </div>
       ))}
     </div>
   );

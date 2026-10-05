@@ -1,39 +1,32 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { WalletBalance } from "@/types/business";
-import { formatMoneyByCurrency } from "@/lib/format";
-import { LuWallet, LuBriefcase } from "react-icons/lu";
+import { Briefcase, Wallet } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatMinor, walletName } from "@/lib/ledger";
+import { Account } from "@/types/account";
 
-interface WalletBalancesCardProps {
-  wallets: WalletBalance[];
-}
-
-export function WalletBalancesCard({ wallets }: WalletBalancesCardProps) {
+/** Cash on hand: the balance of each wallet in view. */
+export function WalletBalancesCard({ wallets }: { wallets: Account[] }) {
   return (
-    <Card className="border-gray-200 shadow-none">
+    <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-gray-700">Wallet balances</CardTitle>
+        <CardTitle>Cash</CardTitle>
+        <CardDescription>What&apos;s in your wallets now</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {wallets.map((wallet) => (
-          <div
-            key={wallet.label}
-            className="flex items-center justify-between rounded-md bg-gray-50 px-3 py-2.5"
-          >
-            <div className="flex items-center gap-2 text-sm text-gray-700">
-              {wallet.label === "Personal" ? (
-                <LuWallet className="h-4 w-4 text-gray-400" />
-              ) : (
-                <LuBriefcase className="h-4 w-4 text-gray-400" />
-              )}
-              {wallet.label}
+      <CardContent className="space-y-2">
+        {wallets.map((w) => {
+          const Icon = w.purpose === "business" ? Briefcase : Wallet;
+          return (
+            <div key={w.account_id} className="flex items-center justify-between gap-3 rounded-lg bg-muted/60 px-3 py-2.5">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">{walletName(w.purpose)}</p>
+                  <p className="text-xs text-muted-foreground tabular-nums">{w.account_number}</p>
+                </div>
+              </div>
+              <p className="text-sm font-semibold whitespace-nowrap tabular-nums">{formatMinor(w.balance_minor, w.currency_code)}</p>
             </div>
-            <p className="font-medium text-gray-900 text-sm">
-              {formatMoneyByCurrency(
-                Object.fromEntries(wallet.amounts.map((a) => [a.currency, a.amount]))
-              )}
-            </p>
-          </div>
-        ))}
+          );
+        })}
       </CardContent>
     </Card>
   );

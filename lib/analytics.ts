@@ -119,10 +119,17 @@ const SPEND_LABEL: Record<string, string> = {
 };
 const SPEND_COLORS = ["bg-emerald-600", "bg-sky-500", "bg-amber-500", "bg-violet-500", "bg-rose-500", "bg-slate-400"];
 
-export function spendingByType(lines: ScopedTransaction[], scoped: Set<string>, start: Date, currency: Currency): ExpenseCategory[] {
+/** `own`: accounts whose moves between each other don't count (default: the ones in view). */
+export function spendingByType(
+  lines: ScopedTransaction[],
+  scoped: Set<string>,
+  start: Date,
+  currency: Currency,
+  own: Set<string> = scoped,
+): ExpenseCategory[] {
   const totals = new Map<string, number>();
   for (const l of lines) {
-    if (!settled(l) || l.direction !== "debit" || !scoped.has(l.account_id) || internal(l, scoped)) continue;
+    if (!settled(l) || l.direction !== "debit" || !scoped.has(l.account_id) || internal(l, own)) continue;
     if (l.currency_code !== currency || new Date(l.created_at) < start) continue;
     const label = SPEND_LABEL[l.transaction_type] ?? "Other";
     totals.set(label, (totals.get(label) ?? 0) + major(l.amount_minor));

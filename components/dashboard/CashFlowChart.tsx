@@ -1,7 +1,7 @@
 "use client";
 
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -20,7 +20,20 @@ const config = {
   spending: { label: "Spending", color: "var(--chart-spending)" },
 } satisfies ChartConfig;
 
-export function CashFlowChart({ flows, currency }: { flows: MonthFlow[]; currency: string }) {
+export function CashFlowChart({
+  flows,
+  currency,
+  title = "Cash flow",
+  description = `Money in and out over the last 6 months (${currency})`,
+  action,
+}: {
+  flows: MonthFlow[];
+  currency: string;
+  title?: string;
+  description?: string;
+  /** e.g. a currency switch, top right */
+  action?: React.ReactNode;
+}) {
   const data = flows.map((f) => ({ month: f.label, income: f.income / 100, spending: f.spent / 100 }));
   const empty = flows.every((f) => f.income === 0 && f.spent === 0);
   const major = (value: number) => formatMinor(Math.round(value * 100), currency, { compact: true });
@@ -28,8 +41,9 @@ export function CashFlowChart({ flows, currency }: { flows: MonthFlow[]; currenc
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>Cash flow</CardTitle>
-        <CardDescription>Money in and out over the last 6 months ({currency})</CardDescription>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
+        {action && <CardAction>{action}</CardAction>}
       </CardHeader>
       <CardContent>
         {empty ? (

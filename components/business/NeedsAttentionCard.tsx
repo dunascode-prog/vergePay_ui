@@ -1,49 +1,49 @@
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChevronRight, CircleCheck, TriangleAlert } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AttentionItem } from "@/types/business";
-import { LuTriangleAlert, LuCircleCheck } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 
-interface NeedsAttentionCardProps {
-  items: AttentionItem[];
-}
-
-export function NeedsAttentionCard({ items }: NeedsAttentionCardProps) {
+/** Each item links straight to where it can be fixed. */
+export function NeedsAttentionCard({ items }: { items: AttentionItem[] }) {
   return (
-    <Card className="border-gray-200 shadow-none">
+    <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-gray-700">Needs attention</CardTitle>
+        <CardTitle>Needs attention</CardTitle>
+        <CardDescription>{items.length ? `${items.length} thing${items.length === 1 ? "" : "s"} to look at` : "Overdue invoices, plans and late payers"}</CardDescription>
       </CardHeader>
       <CardContent>
         {items.length === 0 ? (
-          <div className="flex items-center gap-2 text-sm text-emerald-700 py-2">
-            <LuCircleCheck className="h-4 w-4" />
-            Nothing urgent right now.
-          </div>
+          <p className="flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-400">
+            <CircleCheck className="size-4" aria-hidden /> Nothing urgent right now.
+          </p>
         ) : (
-          <div className="space-y-2">
+          <ul className="space-y-2">
             {items.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                className="flex items-start gap-2.5 rounded-md border border-gray-100 hover:border-gray-200 hover:bg-gray-50 px-3 py-2.5 transition-colors"
-              >
-                <LuTriangleAlert
-                  className={cn(
-                    "h-4 w-4 mt-0.5 shrink-0",
-                    item.severity === "high" ? "text-red-500" : "text-amber-500"
-                  )}
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-gray-800">{item.title}</p>
-                  <p className="text-xs text-gray-400">{item.detail}</p>
-                </div>
-                <span className="text-xs text-emerald-700 whitespace-nowrap mt-0.5">
-                  {item.linkLabel} →
-                </span>
-              </Link>
+              <li key={item.id}>
+                <Link
+                  href={item.href}
+                  className="group flex items-start gap-3 rounded-lg border px-3 py-2.5 transition-colors hover:bg-muted/60"
+                >
+                  <TriangleAlert
+                    className={cn(
+                      "mt-0.5 size-4 shrink-0",
+                      item.severity === "high" ? "text-red-600 dark:text-red-400" : "text-amber-600 dark:text-amber-400",
+                    )}
+                    aria-hidden
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium">{item.title}</p>
+                    <p className="text-xs text-muted-foreground">{item.detail}</p>
+                  </div>
+                  <span className="mt-0.5 hidden items-center gap-0.5 text-xs font-medium whitespace-nowrap text-emerald-700 sm:flex dark:text-emerald-400">
+                    {item.linkLabel} <ChevronRight className="size-3.5" aria-hidden />
+                  </span>
+                  <ChevronRight className="mt-0.5 size-4 shrink-0 text-muted-foreground sm:hidden" aria-hidden />
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </CardContent>
     </Card>
