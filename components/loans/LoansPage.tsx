@@ -68,17 +68,15 @@ export function LoansPage() {
 
   if (!loans.length && !shown) {
     return (
-      <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-xl border bg-card px-6 py-12 text-center">
-        <span className="flex size-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+      <div className="flex flex-col items-center rounded-xl border bg-card px-4 py-14 text-center">
+        <span className="flex size-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
           <Landmark className="size-5" aria-hidden />
         </span>
-        <div>
-          <p className="text-lg font-semibold">Borrow when you need to</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Apply in a minute. If it&apos;s approved, the money lands in your wallet and you repay in fixed monthly installments, with the full schedule up front.
-          </p>
-        </div>
-        {applyButton}
+        <p className="mt-3 font-medium">Borrow when you need to</p>
+        <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+          Apply in a minute. If it&apos;s approved, the money lands in your wallet and you repay in fixed monthly installments, with the full schedule up front.
+        </p>
+        <div className="mt-4">{applyButton}</div>
       </div>
     );
   }
@@ -87,7 +85,7 @@ export function LoansPage() {
   const owed = owedByCurrency(loans);
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
+    <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">Fixed monthly installments, paid from your wallet.</p>
         {applyButton}
@@ -96,7 +94,7 @@ export function LoansPage() {
       {shown && <ApplicationNotice application={shown} onDecided={reload} />}
 
       {loans.length > 0 && (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
           <Tile icon={HandCoins} label="You owe" value={owed.size ? moneyByCurrency(owed) : "Nothing"} sub={`Across ${active.length} active loan${active.length === 1 ? "" : "s"}, interest included`} />
           <Tile
             icon={CalendarClock}
@@ -105,19 +103,21 @@ export function LoansPage() {
             sub={next?.next_installment ? `${dueIn(next.next_installment.due_date)} · ${formatDay(next.next_installment.due_date)}` : "Nothing due"}
             warn={!!next && isOverdue(next)}
           />
-          <Tile icon={CircleCheck} label="Paid off" value={String(closed.filter((l) => l.loan_status === "repaid").length)} sub={closed.length ? "Loans fully repaid" : "None yet"} />
+          <Tile className="col-span-2 lg:col-span-1" icon={CircleCheck} label="Paid off" value={String(closed.filter((l) => l.loan_status === "repaid").length)} sub={closed.length ? "Loans fully repaid" : "None yet"} />
         </div>
       )}
 
       {(active.length > 0 || approved.length > 0) && (
         <section className="space-y-3">
           <h2 className="text-sm font-medium text-muted-foreground">Active</h2>
-          {approved.map((l) => (
-            <ApprovedCard key={l.loan_id} loan={l} />
-          ))}
-          {active.map((l) => (
-            <LoanCard key={l.loan_id} loan={l} onPaid={reload} />
-          ))}
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+            {approved.map((l) => (
+              <ApprovedCard key={l.loan_id} loan={l} />
+            ))}
+            {active.map((l) => (
+              <LoanCard key={l.loan_id} loan={l} onPaid={reload} />
+            ))}
+          </div>
         </section>
       )}
 
@@ -149,9 +149,9 @@ export function LoansPage() {
   );
 }
 
-function Tile({ icon: Icon, label, value, sub, warn = false }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; sub: string; warn?: boolean }) {
+function Tile({ icon: Icon, label, value, sub, warn = false, className }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; sub: string; warn?: boolean; className?: string }) {
   return (
-    <div className="rounded-xl border bg-card p-4">
+    <div className={cn("rounded-xl border bg-card p-4", className)}>
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs text-muted-foreground">{label}</p>
         <Icon className="size-4 text-muted-foreground" />
@@ -184,7 +184,7 @@ function LoanCard({ loan, onPaid }: { loan: Loan; onPaid: () => void }) {
           </p>
         </div>
         {next && (
-          <div className="text-right">
+          <div className="sm:text-right">
             <p className={cn("text-xs font-medium", overdue ? "text-red-600 dark:text-red-400" : "text-muted-foreground")}>{dueIn(next.due_date)}</p>
             <p className="text-sm font-medium tabular-nums">{money(next.installment_amount_minor)}</p>
             <p className="text-xs text-muted-foreground">{formatDay(next.due_date)}</p>
@@ -305,9 +305,9 @@ function DevDecision({ applicationId, onDecided }: { applicationId: string; onDe
 
 export function LoansSkeleton() {
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
+    <div className="space-y-5">
       <Skeleton className="h-5 w-64" />
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         {[0, 1, 2].map((i) => (
           <Skeleton key={i} className="h-24 rounded-xl" />
         ))}
