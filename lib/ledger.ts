@@ -132,7 +132,8 @@ export interface MonthFlow extends MonthKey {
  * Income and spending per month for the accounts in scope, in one currency.
  * A move between two accounts that are both in scope (e.g. personal → business
  * while viewing Combined) is neither income nor spending, so it's left out,
- * and so is money put into or taken out of a savings goal.
+ * and so is money put into or taken out of a savings goal, or a withdrawal
+ * that bounced back.
  */
 export function monthlyFlows(
   lines: ScopedTransaction[],
@@ -142,7 +143,7 @@ export function monthlyFlows(
 ): MonthFlow[] {
   const byKey = new Map(months.map((m) => [m.key, { ...m, income: 0, spent: 0, net: 0 }]));
   for (const line of lines) {
-    if (!moved(line) || line.currency_code !== currency || isGoalMove(line)) continue;
+    if (!moved(line) || line.currency_code !== currency || isGoalMove(line) || isUndoneWithdrawal(line)) continue;
     if (!scopedAccountIds.has(line.account_id)) continue;
     if (line.counterparty_account_id && scopedAccountIds.has(line.counterparty_account_id)) continue;
     const month = byKey.get(keyOf(new Date(line.created_at)));
@@ -206,7 +207,16 @@ export const TRANSACTION_LABEL: Record<string, string> = {
   goal_contribution: "Saved to a goal",
   goal_withdrawal: "Withdrawn from a goal",
   payroll_payment: "Payroll",
+  withdrawal: "Withdrawal to bank",
 };
+
+/**
+ * A withdrawal to a bank (or its fee) that bounced, and VergePay's refund of
+ * it. Together they moved nothing, so neither counts as spending or income.
+ */
+export const isUndoneWithdrawal = (line: Pick<AccountTransaction, "transaction_type" | "status" | "counterparty_account_number">) =>
+  (line.status === "reversed" && (line.transaction_type === "withdrawal" || line.transaction_type === "fee")) ||
+  (line.transaction_type === "refund" && !!line.counterparty_account_number?.startsWith("SYS-"));
 
 /** Money moved between a wallet and one of your savings goals: saving, not spending or income. */
 export const isGoalMove = (line: Pick<AccountTransaction, "transaction_type">) =>

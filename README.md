@@ -207,6 +207,7 @@ The screens were designed first, using sample data shaped like the real domain. 
 | Sign-up and sign-in | `/signup`, `/signin` | `POST /v1/auth/signup`, `/signin` | ✅ Connected |
 | Session, 2FA, sign-out | `proxy.ts`, sign-in, user menu | `/v1/auth/refresh`, `/2fa/verify`, `/logout`, `/v1/users/me` | ✅ Connected |
 | Wallets and overview | `/onboarding`, `/dashboard`, sidebar wallets, greeting | `GET`/`POST /v1/accounts` (one personal and one business wallet), `/:id/transactions` | ✅ Connected |
+| Withdraw to a bank | wallet-card **Withdraw** (NGN wallets) | `/v1/banks`, `/v1/bank-accounts` (resolve, save, list, remove), `/v1/withdrawals` (quote, create, sync) | ✅ Connected |
 | Add money, Send, Transfer, identity | wallet-card actions, `/dashboard/payments/complete` | `POST /v1/kyc/submissions`, `/v1/accounts/lookup`, `POST /v1/transactions`, `/v1/cards` (link, charges), `/v1/accounts/:id/virtual-account`, `/v1/transactions/:id/sync` | ✅ Connected |
 | Notifications and live updates | top-bar bell, toasts, the whole dashboard | `GET /v1/notifications`, `/:id/read`, `/read-all`, WebSocket `/v1/ws` | ✅ Connected |
 | Invoices and clients | `/dashboard/invoices/*` | `/v1/invoices` (create, edit and delete drafts, `/send`, `/remind`, `/pay`, `/cancel`, `/refund`), `/v1/clients` | ✅ Connected |
@@ -304,6 +305,7 @@ Open [http://localhost:3000](http://localhost:3000) for the landing page, create
 - [ ] Security settings: turn 2FA on or off from the app
 - [x] Wallets, balances, cash flow and transaction history from the ledger, per Personal / Business / Combined
 - [x] Add money (bank-transfer account number, or a linked card via Flutterwave), Send with a name check, Transfer between your wallets, and one-time identity verification (BVN)
+- [x] Withdraw to any Nigerian bank account: saved accounts with a name check, the fee shown before confirming (you pay half), the daily limit, and the result followed live (arrived, or refunded with the bank's reason)
 - [x] Live dashboard: balances update the moment money moves, a notification bell, and toasts for money in
 - [x] Invoices on the real API: clients, drafts with line items, send and email, pay links clients pay by card or bank transfer, reminders, cancel and refund
 - [x] Investments: link Alpaca (with 2FA set up on the way), synced holdings, a reminder until linked

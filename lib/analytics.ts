@@ -4,7 +4,7 @@
 // dollars), which is what the analytics cards display.
 
 import { formatDay } from "@/lib/invoicing";
-import { isGoalMove } from "@/lib/ledger";
+import { isGoalMove, isUndoneWithdrawal } from "@/lib/ledger";
 import { ScopedTransaction } from "@/types/account";
 import {
   AIInsight,
@@ -87,9 +87,10 @@ export function earliestNeeded(period: Period, now = new Date()): string {
 
 const settled = (l: ScopedTransaction) => l.status === "settled" || l.status === "reversed";
 // money that moved between two wallets both in view is neither in nor out,
-// and neither is money put into or taken out of a savings goal
+// and neither is money put into or taken out of a savings goal, or a
+// withdrawal that bounced back
 const internal = (l: ScopedTransaction, scoped: Set<string>) =>
-  isGoalMove(l) || (!!l.counterparty_account_id && scoped.has(l.counterparty_account_id));
+  isGoalMove(l) || isUndoneWithdrawal(l) || (!!l.counterparty_account_id && scoped.has(l.counterparty_account_id));
 
 /**
  * Revenue: money others paid in (invoice payments, transfers, bank deposits, payroll).
@@ -117,6 +118,7 @@ const SPEND_LABEL: Record<string, string> = {
   invoice_payment: "Invoices you paid",
   loan_repayment: "Loan repayments",
   payroll_payment: "Payroll",
+  withdrawal: "Withdrawn to banks",
   fee: "Fees",
   refund: "Refunds you gave",
 };

@@ -9,7 +9,7 @@
 
 import { clientShares } from "@/lib/analytics";
 import { daysUntil, formatDay, isUnpaid, money, sumBy } from "@/lib/invoicing";
-import { MonthFlow, MonthKey } from "@/lib/ledger";
+import { isUndoneWithdrawal, MonthFlow, MonthKey } from "@/lib/ledger";
 import { Account, ScopedTransaction } from "@/types/account";
 import { AttentionItem, BusinessHealthFactor } from "@/types/business";
 import { Currency } from "@/types/invoice";
@@ -21,7 +21,8 @@ const DAY = 86_400_000;
 /** Money others paid in: invoice payments, transfers, bank deposits and payroll (not your own card top-ups). */
 const REVENUE_TYPES = new Set(["invoice_payment", "transfer", "bank_deposit", "payroll_payment"]);
 
-const moved = (l: ScopedTransaction) => l.status === "settled" || l.status === "reversed";
+// a withdrawal that bounced back moved nothing
+const moved = (l: ScopedTransaction) => (l.status === "settled" || l.status === "reversed") && !isUndoneWithdrawal(l);
 const fromOutside = (l: ScopedTransaction, own: Set<string>) => !l.counterparty_account_id || !own.has(l.counterparty_account_id);
 
 export const isRevenue = (l: ScopedTransaction, scoped: Set<string>, own: Set<string>) =>

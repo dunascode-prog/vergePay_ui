@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeftRight, Briefcase, Check, Copy, Plus, Send, Wallet } from "lucide-react";
+import { ArrowLeftRight, Briefcase, Check, Copy, Landmark, Plus, Send, Wallet } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AddWalletDialog } from "@/components/accounts/AddWalletDialog";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { AddMoneyDialog } from "@/components/money/AddMoneyDialog";
 import { SendMoneyDialog } from "@/components/money/SendMoneyDialog";
 import { TransferDialog } from "@/components/money/TransferDialog";
+import { WithdrawDialog } from "@/components/money/WithdrawDialog";
 import { AccountScope, formatMinor, walletName, Wallets } from "@/lib/ledger";
 import { Account, AccountPurpose } from "@/types/account";
 
@@ -44,6 +45,8 @@ function CopyNumber({ number }: { number: string }) {
 
 function WalletCard({ wallet, other }: { wallet: Account; other: Account | null }) {
   const Icon = ICON[wallet.purpose];
+  // withdrawals to Nigerian bank accounts are in naira only
+  const canWithdraw = wallet.currency_code === "NGN";
   return (
     <Card className="flex flex-col">
       <CardContent className="space-y-5 p-5">
@@ -69,7 +72,7 @@ function WalletCard({ wallet, other }: { wallet: Account; other: Account | null 
 
         <CopyNumber number={wallet.account_number} />
 
-        <div className={other ? "grid grid-cols-3 gap-2" : "grid grid-cols-2 gap-2"}>
+        <div className={(other ? 1 : 0) + (canWithdraw ? 1 : 0) === 1 ? "grid grid-cols-3 gap-2" : "grid grid-cols-2 gap-2"}>
           <AddMoneyDialog
             wallet={wallet}
             trigger={
@@ -86,6 +89,16 @@ function WalletCard({ wallet, other }: { wallet: Account; other: Account | null 
               </Button>
             }
           />
+          {canWithdraw && (
+            <WithdrawDialog
+              wallet={wallet}
+              trigger={
+                <Button variant="outline" className="h-10 gap-1.5 rounded-lg" aria-label={`Withdraw from your ${walletName(wallet.purpose).toLowerCase()} to a bank account`}>
+                  <Landmark className="size-4" aria-hidden /> Withdraw
+                </Button>
+              }
+            />
+          )}
           {other && (
             <TransferDialog
               from={wallet}
