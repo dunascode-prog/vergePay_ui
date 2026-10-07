@@ -19,7 +19,7 @@ export function CategoryBreakdownCard({
   return (
     <Card className="lg:col-span-6 border-gray-200 shadow-none">
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm font-medium text-gray-700">
+        <CardTitle>
           By category
         </CardTitle>
         <span className="text-sm font-semibold text-gray-900">

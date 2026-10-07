@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 export function StepHeader({ title, subtitle }: { title: string; subtitle?: React.ReactNode }) {
   return (
     <div className="space-y-1">
-      <DialogTitle className="text-lg font-semibold tracking-tight">{title}</DialogTitle>
+      <DialogTitle className="text-base font-semibold tracking-tight">{title}</DialogTitle>
       {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
     </div>
   );

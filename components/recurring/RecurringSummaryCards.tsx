@@ -28,7 +28,7 @@ export function RecurringSummaryCards({ plans }: { plans: ApiRecurringPlan[] }) 
             <p className="text-xs text-muted-foreground">{t.label}</p>
             <t.icon className="size-4 text-muted-foreground" aria-hidden />
           </div>
-          <p className="mt-1.5 text-xl font-semibold tracking-tight tabular-nums">{t.value}</p>
+          <p className="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">{t.value}</p>
           <p className={t.warn ? "mt-0.5 text-xs text-amber-700 dark:text-amber-300" : "mt-0.5 truncate text-xs text-muted-foreground"}>{t.sub}</p>
         </div>
       ))}

@@ -181,7 +181,7 @@ export function PayrollPage() {
 
       {runs.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-sm font-medium text-muted-foreground">Recent runs</h2>
+          <h2 className="text-sm font-semibold">Recent runs</h2>
           <ul className="divide-y rounded-xl border bg-card">
             {runs.slice(0, 10).map((r) => (
               <li key={r.run_id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
@@ -210,7 +210,7 @@ function Tile({ icon: Icon, label, value, sub, warn = false, className }: { icon
         <p className="text-xs text-muted-foreground">{label}</p>
         <Icon className="size-4 text-muted-foreground" />
       </div>
-      <p className="mt-1.5 truncate text-xl font-semibold tracking-tight tabular-nums" title={value}>
+      <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
         {value}
       </p>
       <p className={cn("mt-0.5 truncate text-xs", warn ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground")} title={sub}>

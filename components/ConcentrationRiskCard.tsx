@@ -31,7 +31,7 @@ export function ConcentrationRiskCard({ clients, currency, className }: Concentr
   return (
     <Card className={cn("shadow-none", className)}>
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm font-medium text-foreground">
+        <CardTitle>
           Client concentration ({currency})
         </CardTitle>
         <span className={cn("text-xs font-medium rounded-full px-2 py-0.5", risk.tone)}>

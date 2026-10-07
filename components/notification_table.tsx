@@ -59,7 +59,7 @@ export default function RecentTransactions() {
   return (
     <Card className="rounded-2xl shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between gap-2">
-        <CardTitle className="text-sm font-semibold tracking-wide uppercase text-muted-foreground">
+        <CardTitle>
           Recent Transactions
         </CardTitle>
 

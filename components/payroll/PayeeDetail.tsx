@@ -163,7 +163,7 @@ export function PayeeDetail({ payeeId }: { payeeId: string }) {
       </section>
 
       <section className="mt-5 space-y-2">
-        <h2 className="text-sm font-medium text-muted-foreground">Payments</h2>
+        <h2 className="text-sm font-semibold">Payments</h2>
         {payee.payments.length === 0 ? (
           <p className="rounded-xl border bg-card px-4 py-8 text-center text-sm text-muted-foreground">You haven&apos;t paid {payee.name} yet.</p>
         ) : (

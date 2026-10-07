@@ -15,7 +15,7 @@ export default function AiSummaryCard() {
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <CardTitle className="flex items-center gap-2 text-base">
+            <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
               AI Financial Insight
             </CardTitle>
@@ -46,25 +46,25 @@ export default function AiSummaryCard() {
             <div className="rounded-lg border p-4">
               <Target className="mb-2 h-5 w-5 text-primary" />
               <p className="text-sm text-muted-foreground">Emergency Fund</p>
-              <p className="text-xl font-bold">25.7%</p>
+              <p className="text-2xl font-semibold">25.7%</p>
             </div>
 
             <div className="rounded-lg border p-4">
               <Wallet className="mb-2 h-5 w-5 text-primary" />
               <p className="text-sm text-muted-foreground">Idle Cash</p>
-              <p className="text-xl font-bold">₦200,000</p>
+              <p className="text-2xl font-semibold">₦200,000</p>
             </div>
 
             <div className="rounded-lg border p-4">
               <TrendingUp className="mb-2 h-5 w-5 text-primary" />
               <p className="text-sm text-muted-foreground">Target Date</p>
-              <p className="text-xl font-bold">Jul 2025</p>
+              <p className="text-2xl font-semibold">Jul 2025</p>
             </div>
           </div>
         </div>
 
         <div className="space-y-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
-          <h4 className="flex items-center gap-2 font-semibold">
+          <h4 className="flex items-center gap-2 text-sm font-semibold">
             <Sparkles className="h-4 w-4 text-primary" />
             AI Recommendations
           </h4>

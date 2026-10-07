@@ -59,7 +59,7 @@ export function SubscriptionAuditCard() {
   return (
     <Card className="rounded-2xl shadow-sm">
       <CardHeader>
-        <CardTitle className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+        <CardTitle>
           Subscription Audit — 11 Active
         </CardTitle>
       </CardHeader>

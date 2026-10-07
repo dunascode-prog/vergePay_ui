@@ -71,11 +71,11 @@ export default function StatCard({
     <Card className="rounded-xl transition-all">
       <CardContent className="flex items-center justify-between gap-6 p-5">
         <div className="flex flex-1 flex-col gap-4">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <p className="text-xs font-semibold text-muted-foreground">
             {title}
           </p>
 
-          <h2 className="text-2xl font-bold tracking-tight tabular-nums">
+          <h2 className="text-2xl font-semibold tracking-tight tabular-nums">
             {value}
           </h2>
 

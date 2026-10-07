@@ -36,7 +36,7 @@ export function RevenueExpenseTrendChart({ data }: RevenueExpenseTrendChartProps
   return (
     <Card className="border-gray-200 shadow-none">
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm font-medium text-gray-700">Revenue vs. expenses</CardTitle>
+        <CardTitle>Revenue vs. expenses</CardTitle>
         <div className="flex items-center gap-3 text-xs text-gray-400">
           <span className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-sm bg-emerald-600" /> Revenue

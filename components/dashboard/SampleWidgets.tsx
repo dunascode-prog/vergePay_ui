@@ -24,7 +24,7 @@ export function SampleBadge({ className }: { className?: string }) {
           render={
             <span
               className={cn(
-                "inline-flex shrink-0 items-center rounded-full border border-dashed px-2 py-0.5 text-[11px] font-medium text-muted-foreground",
+                "inline-flex shrink-0 items-center rounded-full border border-dashed px-2 py-0.5 text-xs font-medium text-muted-foreground",
                 className,
               )}
             />
@@ -68,7 +68,7 @@ export function ClientHealthCard() {
                   content={({ viewBox }) =>
                     viewBox && "cx" in viewBox && "cy" in viewBox ? (
                       <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle" dominantBaseline="middle">
-                        <tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground text-xl font-bold">
+                        <tspan x={viewBox.cx} y={viewBox.cy} className="fill-foreground text-2xl font-semibold">
                           {score}%
                         </tspan>
                       </text>

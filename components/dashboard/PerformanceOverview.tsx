@@ -33,10 +33,10 @@ function Stat({
   const Icon = tone === "good" ? TrendingUp : tone === "bad" ? TrendingDown : Minus;
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{title}</p>
+      <p className="text-xs font-medium text-muted-foreground">{title}</p>
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-2xl font-bold tracking-tight tabular-nums sm:text-3xl" title={exact}>
+          <p className="truncate text-2xl font-semibold tracking-tight tabular-nums" title={exact}>
             {value}
           </p>
           <p

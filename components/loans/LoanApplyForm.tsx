@@ -126,7 +126,7 @@ export function LoanApplyForm() {
   return (
     <div className="mx-auto max-w-5xl">
       {back}
-      <h1 className="text-2xl font-semibold tracking-tight">Apply for a loan</h1>
+      <h1 className="text-xl font-semibold tracking-tight">Apply for a loan</h1>
       <p className="mb-5 mt-1 text-sm text-muted-foreground">It takes a minute. Nothing is paid out or charged until it&apos;s approved.</p>
 
       <div className="grid gap-5 lg:grid-cols-[1fr_20rem] lg:items-start">

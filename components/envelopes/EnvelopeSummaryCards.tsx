@@ -52,7 +52,7 @@ export function EnvelopeSummaryCards({ envelopes, availableCash }: EnvelopeSumma
         <Card key={card.label} className="border-gray-200 shadow-none">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+              <p className="text-xs font-medium text-gray-400">
                 {card.label}
               </p>
               <card.icon className={cn("h-4 w-4", card.tone)} />

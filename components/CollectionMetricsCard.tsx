@@ -21,7 +21,7 @@ export function CollectionMetricsCard({ clients }: CollectionMetricsCardProps) {
   return (
     <Card className="shadow-none">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-foreground flex items-center gap-1.5">
+        <CardTitle className="flex items-center gap-1.5">
           <LuClock4 className="h-4 w-4 text-muted-foreground" />
           Collection speed
         </CardTitle>

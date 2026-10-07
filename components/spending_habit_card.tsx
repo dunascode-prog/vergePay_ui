@@ -32,7 +32,7 @@ export function SpendingHabitsCard() {
   return (
     <Card className="rounded-2xl shadow-sm">
       <CardHeader>
-        <CardTitle className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+        <CardTitle>
           Spending Habits — By Day of Week
         </CardTitle>
       </CardHeader>

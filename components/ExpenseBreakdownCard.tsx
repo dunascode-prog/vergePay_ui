@@ -18,7 +18,7 @@ export function ExpenseBreakdownCard({ categories }: ExpenseBreakdownCardProps) 
   return (
     <Card className="shadow-none">
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm font-medium text-foreground">Where money went</CardTitle>
+        <CardTitle>Where money went</CardTitle>
         <span className="text-sm font-semibold text-foreground">{formatMoney(total, currency)}</span>
       </CardHeader>
       <CardContent>

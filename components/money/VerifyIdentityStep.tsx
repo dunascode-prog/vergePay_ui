@@ -102,7 +102,7 @@ export function VerifyIdentityStep({ onVerified }: { onVerified: () => void }) {
     return (
       <div className="space-y-3 py-4 text-center">
         <Loader2 className="mx-auto size-8 animate-spin text-emerald-700" aria-hidden />
-        <DialogTitle className="text-lg font-semibold">We&apos;re still checking your details</DialogTitle>
+        <DialogTitle className="text-base font-semibold">We&apos;re still checking your details</DialogTitle>
         <p className="text-sm text-muted-foreground">
           This can take a little longer. You&apos;ll be able to move money as soon as it&apos;s done.
         </p>
@@ -114,7 +114,7 @@ export function VerifyIdentityStep({ onVerified }: { onVerified: () => void }) {
     return (
       <div className="space-y-3 py-6 text-center" role="status">
         <Loader2 className="mx-auto size-8 animate-spin text-emerald-700" aria-hidden />
-        <DialogTitle className="text-lg font-semibold">Checking your details…</DialogTitle>
+        <DialogTitle className="text-base font-semibold">Checking your details…</DialogTitle>
         <p className="text-sm text-muted-foreground">This usually takes a few seconds.</p>
       </div>
     );
@@ -126,7 +126,7 @@ export function VerifyIdentityStep({ onVerified }: { onVerified: () => void }) {
         <span className="flex size-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
           <BadgeCheck className="size-5" />
         </span>
-        <DialogTitle className="text-lg font-semibold">Verify your identity</DialogTitle>
+        <DialogTitle className="text-base font-semibold">Verify your identity</DialogTitle>
         <p className="text-sm text-muted-foreground">
           To move money, the law requires us to confirm who you are. It&apos;s a one-time check with your BVN, which
           we store encrypted and never show again.

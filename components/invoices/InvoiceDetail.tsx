@@ -90,7 +90,7 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+            <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
             <InvoiceStatusBadge status={invoice.invoice_status} />
           </div>
           <p className="mt-1 text-sm text-muted-foreground">

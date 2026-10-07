@@ -133,7 +133,7 @@ export function InvoicesPage() {
                 onClick={() => setFilter(f.value)}
                 aria-pressed={filter === f.value}
                 className={cn(
-                  "shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                  "shrink-0 rounded-full border px-3 py-1 text-sm font-medium transition-colors",
                   filter === f.value ? "border-emerald-700 bg-emerald-700 text-white" : "text-muted-foreground hover:text-foreground",
                 )}
               >
@@ -223,7 +223,7 @@ function Stat({ label, value, hint, warn = false }: { label: string; value: stri
       {value === null ? (
         <Skeleton className="mt-2 h-7 w-24" />
       ) : (
-        <p className="mt-1 truncate text-xl font-semibold tracking-tight tabular-nums" title={value}>
+        <p className="mt-1 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
           {value}
         </p>
       )}

@@ -36,7 +36,7 @@ export function GoalsProgressCard() {
   return (
     <Card className="shadow-none">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-foreground">Goals</CardTitle>
+        <CardTitle>Goals</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {failed && <p className="text-sm text-muted-foreground">Your goals couldn&apos;t be loaded right now.</p>}

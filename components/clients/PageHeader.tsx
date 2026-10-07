@@ -19,7 +19,7 @@ export function PageHeader({ backHref, backLabel, title, children }: PageHeaderP
         {backLabel}
       </Link>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+        <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
         {children && <div className="flex items-center gap-2">{children}</div>}
       </div>
     </div>

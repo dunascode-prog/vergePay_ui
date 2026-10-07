@@ -35,7 +35,7 @@ export function ClientLeaderboardTable({ clients }: ClientLeaderboardTableProps)
   return (
     <Card className="shadow-none">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-foreground">Client leaderboard</CardTitle>
+        <CardTitle>Client leaderboard</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         {sorted.length === 0 ? (

@@ -31,12 +31,12 @@ export function HealthScoreCard({ currentScore, history, factors }: HealthScoreC
   return (
     <Card className="shadow-none">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-foreground">Freelancer Health Score</CardTitle>
+        <CardTitle>Freelancer Health Score</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-4xl font-semibold text-foreground">{currentScore}</p>
+            <p className="text-3xl font-semibold text-foreground">{currentScore}</p>
             <p
               className={cn(
                 "text-xs font-medium mt-1",

@@ -109,7 +109,7 @@ export function LoansPage() {
 
       {(active.length > 0 || approved.length > 0) && (
         <section className="space-y-3">
-          <h2 className="text-sm font-medium text-muted-foreground">Active</h2>
+          <h2 className="text-sm font-semibold">Active</h2>
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
             {approved.map((l) => (
               <ApprovedCard key={l.loan_id} loan={l} />
@@ -123,7 +123,7 @@ export function LoansPage() {
 
       {closed.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-sm font-medium text-muted-foreground">Paid off</h2>
+          <h2 className="text-sm font-semibold">Paid off</h2>
           <ul className="divide-y rounded-xl border bg-card">
             {closed.map((l) => (
               <li key={l.loan_id}>
@@ -156,7 +156,7 @@ function Tile({ icon: Icon, label, value, sub, warn = false, className }: { icon
         <p className="text-xs text-muted-foreground">{label}</p>
         <Icon className="size-4 text-muted-foreground" />
       </div>
-      <p className="mt-1.5 truncate text-xl font-semibold tracking-tight tabular-nums" title={value}>
+      <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
         {value}
       </p>
       <p className={cn("mt-0.5 truncate text-xs", warn ? "text-red-600 dark:text-red-400" : "text-muted-foreground")} title={sub}>
