@@ -94,7 +94,7 @@ export function AppSidebar() {
                   render={
                     <SidebarMenuButton
                       aria-label="Create"
-                      className="h-9 justify-center bg-emerald-700 font-medium text-white hover:bg-emerald-800 hover:text-white data-open:bg-emerald-800 data-open:text-white group-data-[collapsible=icon]:size-8!"
+                      className="h-9 justify-center bg-emerald-700 text-[13px] font-medium text-white hover:bg-emerald-800 hover:text-white data-open:bg-emerald-800 data-open:text-white group-data-[collapsible=icon]:size-8!"
                     >
                       <Plus />
                       <span className="group-data-[collapsible=icon]:hidden">Create</span>
@@ -135,7 +135,7 @@ export function AppSidebar() {
                             isActive={active}
                             tooltip={link.title}
                             className={cn(
-                              "h-8 text-muted-foreground hover:text-foreground data-active:text-foreground",
+                              "h-8 text-[13px] text-muted-foreground hover:text-foreground data-active:text-foreground",
                               active && "[&_svg]:text-emerald-700 dark:[&_svg]:text-emerald-400",
                             )}
                             render={<Link href={link.url} onClick={closeOnPhone} aria-current={active ? "page" : undefined} />}
