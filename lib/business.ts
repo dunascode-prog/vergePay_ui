@@ -18,8 +18,8 @@ import { ApiRecurringPlan } from "@/types/recurring";
 
 const DAY = 86_400_000;
 
-/** Money others paid in: invoice payments, transfers and bank deposits (not your own card top-ups). */
-const REVENUE_TYPES = new Set(["invoice_payment", "transfer", "bank_deposit"]);
+/** Money others paid in: invoice payments, transfers, bank deposits and payroll (not your own card top-ups). */
+const REVENUE_TYPES = new Set(["invoice_payment", "transfer", "bank_deposit", "payroll_payment"]);
 
 const moved = (l: ScopedTransaction) => l.status === "settled" || l.status === "reversed";
 const fromOutside = (l: ScopedTransaction, own: Set<string>) => !l.counterparty_account_id || !own.has(l.counterparty_account_id);

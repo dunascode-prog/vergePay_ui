@@ -28,7 +28,8 @@ type Section =
   | "clients"
   | "business"
   | "loans"
-  | "goals";
+  | "goals"
+  | "payroll";
 
 interface HeaderAction {
   label: string;
@@ -109,6 +110,14 @@ const SECTION_CONFIG: Record<Section, SectionConfig> = {
     showAccountScope: false,
     // "New goal" sits on the page, where it can turn off at the goal limit
   },
+  payroll: {
+    basePath: "/dashboard/payroll",
+    title: "Payroll",
+    description: "Pay your team in one go",
+    // a run picks its own wallet, so the Personal / Business toggle doesn't apply
+    showAccountScope: false,
+    // "Add payee" and "Run payroll" sit on the page, next to the payees they act on
+  },
   clients: {
     basePath: "/dashboard/clients",
     title: "Clients",
@@ -141,6 +150,7 @@ function resolveSection(pathname: string): Section {
   if (pathname.startsWith("/dashboard/business")) return "business";
   if (pathname.startsWith("/dashboard/loans")) return "loans";
   if (pathname.startsWith("/dashboard/goals")) return "goals";
+  if (pathname.startsWith("/dashboard/payroll")) return "payroll";
 
   return "dashboard";
 }
