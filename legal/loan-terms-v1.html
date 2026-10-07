@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>VergePay Loan Terms and Conditions (loan-terms-v1)</title>
+<!--
+  The source of public/legal/vergepay-loan-terms-v1.pdf. To change the loan
+  terms: copy this file to the next version, edit it, regenerate the PDF
+  (see legal/README.md), and bump LOAN_TERMS_VERSION in the API
+  (services/loanTerms.js). Applications must name the current version.
+-->
+<style>
+  @page { size: A4; margin: 22mm 20mm; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: #1f2933; font-size: 10.5pt; line-height: 1.55; }
+  header { border-bottom: 2px solid #047857; padding-bottom: 10px; margin-bottom: 18px; }
+  .brand { color: #047857; font-weight: 700; font-size: 13pt; letter-spacing: -0.2px; }
+  h1 { font-size: 17pt; margin: 6px 0 2px; }
+  .meta { color: #52606d; font-size: 9.5pt; }
+  h2 { font-size: 11.5pt; margin: 18px 0 6px; color: #064e3b; }
+  p, li { margin: 0 0 6px; }
+  ul { margin: 0 0 6px; padding-left: 18px; }
+  .summary { background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 6px; padding: 10px 14px; margin-bottom: 14px; }
+  .summary h2 { margin-top: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 6px 0 8px; font-size: 10pt; }
+  td, th { border: 1px solid #cbd2d9; padding: 6px 8px; text-align: left; vertical-align: top; }
+  th { background: #f5f7fa; width: 34%; }
+  footer { margin-top: 22px; border-top: 1px solid #cbd2d9; padding-top: 8px; color: #52606d; font-size: 9pt; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">VergePay</div>
+  <h1>Loan Terms and Conditions</h1>
+  <div class="meta">Version loan-terms-v1 · Effective 7 October 2026 · Applies to loan applications made on or after this date</div>
+</header>
+
+<div class="summary">
+  <h2>The short version</h2>
+  <ul>
+    <li>If your loan is approved, it is paid into your VergePay wallet and you repay it in equal monthly instalments, with interest at a fixed rate.</li>
+    <li>Repayments are collected automatically from that wallet on each due date. You can switch this off in the app.</li>
+    <li>If an instalment is more than 3 days late, a one-off late fee of 5% of that instalment (at least ₦500) is added.</li>
+    <li>If a payment is more than 90 days overdue, your loan is in default and you cannot take another loan until you catch up.</li>
+    <li>You can pay early, pay more, or pay the whole loan off at any time. Paying off early, you only pay interest up to that day.</li>
+  </ul>
+</div>
+
+<h2>1. About these terms</h2>
+<p>These terms apply to a loan you apply for through the VergePay app ("we", "us"). By ticking the box when you apply, you agree to them, including automatic repayments (section 5). We keep a record of the version you agreed to and when. Please read them, and download a copy for your records.</p>
+
+<h2>2. Who can apply</h2>
+<ul>
+  <li>You must have verified your identity with VergePay (your BVN).</li>
+  <li>You can have one application under review at a time.</li>
+  <li>You cannot apply while another of your VergePay loans is in default (section 8).</li>
+</ul>
+
+<h2>3. Applying and approval</h2>
+<ul>
+  <li>You choose the amount, the term (in months), the type of loan and the wallet it is paid into. The loan is in that wallet's currency.</li>
+  <li>We review every application. We may approve it, approve a smaller amount or a different term, or decline it. If we decline it, we tell you in the app.</li>
+  <li>If it is approved, we set a fixed annual interest rate, pay the loan into your chosen wallet, and show you the rate, your repayment schedule and each instalment in the app.</li>
+</ul>
+
+<h2>4. Interest and your repayment schedule</h2>
+<ul>
+  <li>The interest rate is fixed for the life of the loan.</li>
+  <li>You repay in equal monthly instalments. Each one covers interest for the month and part of what you borrowed. The first falls due one month after the loan is paid out.</li>
+  <li>Your full schedule, with each instalment's date, amount and its split between interest and principal, is shown in the app from the day the loan is paid out.</li>
+</ul>
+
+<h2>5. Automatic repayments</h2>
+<ul>
+  <li>You authorise us to take each amount due from the wallet your loan was paid into, on its due date.</li>
+  <li>We only take the whole amount due. If your wallet does not have enough, we take nothing and try again each day until it is paid. We tell you when a collection fails, at most once every 3 days.</li>
+  <li>You can switch automatic repayments off, and on again, from your loan in the app. If they are off, you must pay each instalment yourself by its due date.</li>
+</ul>
+
+<h2>6. Paying in part, paying more, paying off</h2>
+<ul>
+  <li>You can pay any amount from ₦100, from any of your wallets in the loan's currency.</li>
+  <li>A payment goes first to any late fees, then to overdue instalments (oldest first, interest before principal), then to your next instalment.</li>
+  <li>If you pay more than that, the extra pays down the last instalments of your loan. Your monthly instalment stays the same, your loan ends sooner, and you do not pay the interest on the part paid early.</li>
+  <li>You can pay off the whole loan at any time. The app shows the exact amount: what you still owe of the amount borrowed, anything overdue, and interest only up to that day. You do not pay interest for the months you no longer need.</li>
+</ul>
+
+<h2>7. Late payments</h2>
+<table>
+  <tr><th>Grace period</th><td>3 days after a due date</td></tr>
+  <tr><th>Late fee</th><td>5% of the late instalment, at least ₦500. Charged once per late instalment; it does not grow or compound.</td></tr>
+  <tr><th>When</th><td>Added to what you owe if the instalment is still unpaid after the grace period</td></tr>
+</table>
+
+<h2>8. Default</h2>
+<ul>
+  <li>If any instalment is more than 90 days overdue, your loan is in default. We tell you in the app.</li>
+  <li>While a loan is in default, you cannot apply for another VergePay loan. You still owe the full amount, and automatic repayments (if on) continue.</li>
+  <li>As soon as you have paid everything that is overdue, your loan is back in good standing.</li>
+</ul>
+
+<h2>9. Your information</h2>
+<p>We use the information you have given us, including your verified identity and how you use VergePay, to assess your application and to manage your loan.</p>
+
+<h2>10. Changes to these terms</h2>
+<p>We may update these terms. A new version applies to applications made after it is published. A loan you already have keeps the terms you agreed to when you applied.</p>
+
+<h2>11. Contact us</h2>
+<p>Questions about these terms or your loan: hello@vergepay.com.</p>
+
+<footer>VergePay · Loan Terms and Conditions · loan-terms-v1 · Effective 7 October 2026</footer>
+</body>
+</html>

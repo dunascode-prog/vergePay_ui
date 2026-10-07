@@ -23,6 +23,11 @@ export const LOAN_TYPE_HINT: Record<LoanType, string> = {
 export const LOAN_TYPES: LoanType[] = ["personal", "cash_advance", "asset_finance", "mortgage"];
 
 /** The API's bounds: ₦1,000 to ₦100,000,000 (the same in minor units of other currencies). */
+/** The downloadable terms for each version (legal/README.md says how to add one). */
+export const LOAN_TERMS_PDF: Record<string, string> = {
+  "loan-terms-v1": "/legal/vergepay-loan-terms-v1.pdf",
+};
+
 export const MIN_LOAN_MINOR = 100_000;
 export const MAX_LOAN_MINOR = 10_000_000_000;
 

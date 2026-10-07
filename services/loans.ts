@@ -1,7 +1,10 @@
 import { api } from "@/lib/api";
-import { Installment, Loan, LoanApplication, NewLoanApplication, Repayment } from "@/types/loan";
+import { Installment, Loan, LoanApplication, LoanTerms, NewLoanApplication, Repayment } from "@/types/loan";
 
 const json = (body: unknown): RequestInit => ({ body: JSON.stringify(body) });
+
+/** The loan terms a borrower agrees to before applying. */
+export const getLoanTerms = () => api<LoanTerms>("/v1/loans/terms");
 
 export const listLoanApplications = () => api<{ data: LoanApplication[] }>("/v1/loans/applications").then((r) => r.data);
 
