@@ -80,9 +80,9 @@ export function UserNav({ compact = false }: { compact?: boolean }) {
 
                 {user ? (
                   <div className="min-w-0">
-                    <p className="truncate text-[13px] leading-tight font-medium">{displayName(user)}</p>
+                    <p className="truncate text-sm leading-tight font-medium">{displayName(user)}</p>
 
-                    <p className="truncate text-xs text-muted-foreground">
+                    <p className="truncate text-[13px] text-muted-foreground">
                       {user.email}
                     </p>
                   </div>
