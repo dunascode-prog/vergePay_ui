@@ -41,6 +41,8 @@ interface SigninFormProps extends React.HTMLAttributes<HTMLDivElement> {
   /** "code" when arriving with a password-only session (proxy.ts sends 2FA users here). */
   initialStep: Step;
   justRegistered?: boolean;
+  /** Just reset their password on /forgot-password. */
+  passwordReset?: boolean;
 }
 
 function messageFor(err: unknown): string {
@@ -56,12 +58,17 @@ export function LoginForm({
   next,
   initialStep,
   justRegistered = false,
+  passwordReset = false,
   ...props
 }: SigninFormProps) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(initialStep);
   const [notice, setNotice] = useState<string | null>(
-    justRegistered ? "Account created. Sign in to continue." : null,
+    justRegistered
+      ? "Account created. Sign in to continue."
+      : passwordReset
+        ? "Password changed. Sign in with your new password."
+        : null,
   );
 
   const {
@@ -131,7 +138,12 @@ export function LoginForm({
           </Field>
 
           <Field data-invalid={Boolean(errors.password)}>
-            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <div className="flex items-center justify-between gap-2">
+              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <Link href="/forgot-password" className={cn(authLinkClass, "text-sm")}>
+                Forgot password?
+              </Link>
+            </div>
             <PasswordInput
               id="password"
               autoComplete="current-password"

@@ -54,6 +54,7 @@ The sidebar groups the app the way a small-business owner thinks about their mon
 | Screen | Route | What it shows |
 |---|---|---|
 | **Sign in** | `/signin` | A split layout in the style of fintech sign-in pages: a focused form on the left, and a brand panel on the right that disappears on phones. Email and password with a show/hide toggle; a **two-factor code step** for accounts with 2FA on; clear inline errors; and a return to the page you were trying to open |
+| **Forgot password** | `/forgot-password` | Linked from sign-in. Enter your email and get a 6-digit code (the same reply whether or not the address has an account). Then enter the code and a new password, with the same live checklist as sign-up, the tries left after a wrong code, and a resend that counts down 60 seconds. A reset signs you out on every device and ends on sign-in with a "Password changed" note |
 | **Sign up** | `/signup` | The same split layout. Username, email and password, with a **live password checklist** (12+ characters, upper and lowercase, a number, a special character) that ticks off as you type. Server errors such as "username already exists" show on the field they belong to |
 | **Create your wallet** | `/onboarding` | Right after sign-up: choose a Personal or a Business wallet, and NGN or USD. The dashboard stays locked until the first wallet exists, and the other can be added later |
 
@@ -107,7 +108,7 @@ The API issues the session as **HttpOnly, `SameSite=Strict` cookies**, so no scr
 - **`proxy.ts`** (Next.js 16's replacement for middleware) runs before any `/dashboard` route renders. It does a fast cookie check and never contacts the API:
   - no session → `/signin?next=…`
   - password accepted but 2FA code not yet entered → the code step
-  - already signed in → `/signin` and `/signup` redirect to the app
+  - already signed in → `/signin`, `/signup` and `/forgot-password` redirect to the app
 
   It reads the token's claims **without verifying them**, because the UI deliberately doesn't hold the API's signing key. That's safe because the proxy only decides where to send someone. Every piece of data is still authorised by the API itself.
 - **No open redirects.** `?next=` only accepts same-site paths, so `?next=//evil.example` goes to `/dashboard`.

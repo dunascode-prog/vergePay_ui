@@ -13,7 +13,7 @@ import {
   AuthNotice,
   PasswordChecklist,
   PasswordInput,
-  PasswordRule,
+  PASSWORD_RULES,
   authInputClass,
   authLinkClass,
   authSubmitClass,
@@ -26,14 +26,6 @@ import { useForm, useWatch } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-// The API's password rules (vergePay_api signUp), shown live as a checklist.
-const PASSWORD_RULES: PasswordRule[] = [
-  { label: "At least 12 characters", test: (v) => v.length >= 12 },
-  { label: "Upper and lowercase letters", test: (v) => /[A-Z]/.test(v) && /[a-z]/.test(v) },
-  { label: "A number", test: (v) => /[0-9]/.test(v) },
-  { label: "A special character", test: (v) => /[!@#$%^&*(),.?":{}|<>_\-+=/\\[\]';`~]/.test(v) },
-];
 
 const signupSchema = z
   .object({
