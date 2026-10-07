@@ -37,7 +37,8 @@ export type TransactionType =
   | "bank_deposit"
   | "goal_contribution"
   | "goal_withdrawal"
-  | "payroll_payment";
+  | "payroll_payment"
+  | "withdrawal";
 
 export type TransactionStatus = "pending" | "settled" | "failed" | "reversed";
 

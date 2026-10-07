@@ -13,7 +13,11 @@ const dateFormat = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "sh
 function otherSide(line: ScopedTransaction, byId: Map<string, Account>): string | null {
   const own = line.counterparty_account_id ? byId.get(line.counterparty_account_id) : undefined;
   if (own) return accountName(own);
-  if (line.counterparty_account_number?.startsWith("SYS-")) return line.direction === "credit" ? "Funding" : "VergePay";
+  // top-ups come from the funding and card/bank-transfer accounts; anything
+  // else on VergePay's side (withdrawals, fees, their refunds) is VergePay
+  const sys = line.counterparty_account_number;
+  if (sys?.startsWith("SYS-FUND-") || sys?.startsWith("SYS-FLW-")) return line.direction === "credit" ? "Funding" : "VergePay";
+  if (sys?.startsWith("SYS-")) return "VergePay";
   return line.counterparty_account_number;
 }
 
