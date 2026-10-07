@@ -14,7 +14,8 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const cookieStore = await cookies();
-  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
+  // expanded unless the person collapsed it (the choice is kept in a cookie)
+  const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
   return (
     <div suppressHydrationWarning className="min-h-screen flex flex-row">
       <ThemeProvider
@@ -29,8 +30,8 @@ export default async function DashboardLayout({
           <Toaster position="bottom-right" />
           <SidebarProvider defaultOpen={defaultOpen}>
             <AppSidebar />
-            <div className="w-full">
-              <Navbar className="sticky top-0 z-40 border-b bg-background" />
+            <div className="w-full min-w-0">
+              <Navbar className="sticky top-0 z-40" />
               <main className="overflow-y-auto px-3 py-3 sm:px-4 md:py-4 lg:px-4 lg:py-4">
                 <RequireWallet>{children}</RequireWallet>
               </main>

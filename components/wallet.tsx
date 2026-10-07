@@ -6,6 +6,9 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAccountScope, useAppData } from "@/components/app-data";
@@ -16,78 +19,79 @@ import { cn } from "@/lib/utils";
 const LABEL = { personal: "Personal", business: "Business" } as const;
 
 /**
- * The sidebar's wallets: one slim row each (name, the last digits of the
- * account number, balance), opening that wallet's view of the dashboard.
+ * The sidebar's wallets: one row each (name, the last digits of the account
+ * number, balance), opening that wallet's view of Home. Collapsed, just the
+ * icons, with the balance in the tooltip.
  */
-export function WalletsSidebarGroup() {
+export function WalletsSidebarGroup({ collapsed = false, onNavigate }: { collapsed?: boolean; onNavigate?: () => void }) {
   const { accounts, accountsState } = useAppData();
   const [scope] = useAccountScope();
   const wallets = walletsOf(accounts);
 
   return (
-    <SidebarGroup className="px-2">
-      <SidebarGroupLabel className="px-2 text-[11px] tracking-widest uppercase">Wallets</SidebarGroupLabel>
-
+    <SidebarGroup className="py-1.5">
+      <SidebarGroupLabel className="h-7 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">Wallets</SidebarGroupLabel>
       <SidebarGroupContent>
-        {accountsState === "loading" && (
+        {accountsState === "loading" && !collapsed && (
           <div className="space-y-1 px-2">
             <Skeleton className="h-9 w-full rounded-lg" />
             <Skeleton className="h-9 w-full rounded-lg" />
           </div>
         )}
-
-        {accountsState === "error" && <p className="px-2 text-xs text-muted-foreground">Couldn&apos;t load your wallets.</p>}
+        {accountsState === "error" && !collapsed && <p className="px-2 text-xs text-muted-foreground">Couldn&apos;t load your wallets.</p>}
 
         {accountsState === "ready" && (
-          <ul className="space-y-0.5">
+          <SidebarMenu>
             {(["personal", "business"] as const).map((purpose) => {
               const wallet = wallets[purpose];
               const Icon = purpose === "business" ? Building2 : Wallet;
               if (!wallet) {
+                if (collapsed) return null;
                 return (
-                  <li key={purpose}>
+                  <SidebarMenuItem key={purpose}>
                     <AddWalletDialog
                       purpose={purpose}
                       trigger={
-                        <button
-                          type="button"
-                          className="flex h-9 w-full items-center gap-2.5 rounded-lg px-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
-                        >
-                          <CirclePlus className="size-4 shrink-0" />
-                          Add a {walletName(purpose).toLowerCase()}
-                        </button>
+                        <SidebarMenuButton className="h-9 text-muted-foreground hover:text-foreground">
+                          <CirclePlus />
+                          <span>Add a {walletName(purpose).toLowerCase()}</span>
+                        </SidebarMenuButton>
                       }
                     />
-                  </li>
+                  </SidebarMenuItem>
                 );
               }
               const active = scope === purpose;
               const frozen = wallet.account_status === "frozen";
+              const balance = formatMinor(wallet.balance_minor, wallet.currency_code, { compact: true });
               return (
-                <li key={purpose}>
-                  <Link
-                    href={`/dashboard?scope=${purpose}`}
-                    aria-current={active ? "page" : undefined}
-                    title={`${walletName(purpose)} · ${wallet.account_number}${frozen ? " · frozen" : ""}`}
-                    className={cn(
-                      "flex h-9 items-center gap-2.5 rounded-lg px-2 text-sm transition-colors hover:bg-sidebar-accent",
-                      active && "bg-sidebar-accent font-medium",
-                    )}
+                <SidebarMenuItem key={purpose}>
+                  <SidebarMenuButton
+                    isActive={active}
+                    tooltip={`${walletName(purpose)} · ${balance}`}
+                    className="h-9 text-muted-foreground hover:text-foreground data-active:text-foreground"
+                    render={
+                      <Link
+                        href={`/dashboard?scope=${purpose}`}
+                        onClick={onNavigate}
+                        title={`${walletName(purpose)} · ${wallet.account_number}${frozen ? " · frozen" : ""}`}
+                      />
+                    }
                   >
-                    <Icon className={cn("size-4 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
-                    <span className="truncate">{LABEL[purpose]}</span>
-                    <span className="text-xs text-muted-foreground tabular-nums">
-                      ••{wallet.account_number.slice(-4)}
-                      {frozen && " · frozen"}
+                    <Icon className={cn(active && "text-emerald-700 dark:text-emerald-400")} />
+                    <span className="flex min-w-0 flex-1 items-center gap-1.5">
+                      <span className="truncate">{LABEL[purpose]}</span>
+                      <span className="text-xs text-muted-foreground tabular-nums">
+                        ••{wallet.account_number.slice(-4)}
+                        {frozen && " · frozen"}
+                      </span>
+                      <span className="ml-auto text-xs font-medium text-foreground tabular-nums">{balance}</span>
                     </span>
-                    <span className="ml-auto text-xs font-medium tabular-nums">
-                      {formatMinor(wallet.balance_minor, wallet.currency_code, { compact: true })}
-                    </span>
-                  </Link>
-                </li>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               );
             })}
-          </ul>
+          </SidebarMenu>
         )}
       </SidebarGroupContent>
     </SidebarGroup>

@@ -50,8 +50,8 @@ export function UserNav({ compact = false }: { compact?: boolean }) {
   };
 
   const avatar = (
-    <Avatar className={compact ? "h-9 w-9" : "h-10 w-10"}>
-      <AvatarFallback>{user ? initials(user) : ""}</AvatarFallback>
+    <Avatar className="h-8 w-8">
+      <AvatarFallback className="bg-emerald-100 text-xs font-semibold text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100">{user ? initials(user) : ""}</AvatarFallback>
 
       <AvatarBadge className="bg-emerald-500" />
     </Avatar>
@@ -62,7 +62,7 @@ export function UserNav({ compact = false }: { compact?: boolean }) {
       {compact ? (
         <DropdownMenuTrigger
           aria-label={user ? `Account menu for ${displayName(user)}` : "Account menu"}
-          className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+          className="mx-auto rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
         >
           {avatar}
         </DropdownMenuTrigger>
@@ -72,7 +72,7 @@ export function UserNav({ compact = false }: { compact?: boolean }) {
         nativeButton={false}
         render={
         <SidebarMenuButton
-          className="h-auto rounded-xl p-3 transition-colors hover:bg-sidebar-accent"
+          className="h-auto rounded-lg p-2 transition-colors hover:bg-sidebar-accent"
           render={
             <div className="flex w-full items-center justify-between">
               <div className="flex min-w-0 items-center gap-3">
@@ -80,7 +80,7 @@ export function UserNav({ compact = false }: { compact?: boolean }) {
 
                 {user ? (
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold">{displayName(user)}</p>
+                    <p className="truncate text-sm font-medium">{displayName(user)}</p>
 
                     <p className="truncate text-xs text-muted-foreground">
                       {user.email}

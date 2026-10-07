@@ -56,7 +56,7 @@ export function NotificationBell() {
     >
       <Popover.Trigger
         render={
-          <Button variant="secondary" size="icon" className="relative rounded-full" aria-label={label}>
+          <Button variant="ghost" size="icon" className="relative size-9 text-muted-foreground hover:text-foreground" aria-label={label}>
             <Bell className="size-4" />
             {unreadCount > 0 && (
               <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-white tabular-nums ring-2 ring-background">

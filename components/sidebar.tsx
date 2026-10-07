@@ -1,216 +1,124 @@
 "use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { FileText, Landmark, Plus, Repeat } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
-
-import { useSidebar } from "@/components/ui/sidebar";
-
-import {
-  Home,
-  ChartColumn,
-  FileText,
-  Repeat,
-  Users,
-  Briefcase,
-  Wallet,
-  Banknote,
-  Target,
-  Mail,
-  CreditCard,
-  Landmark,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { UserNav } from "./user_nav";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { isActivePath, NAV } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
+import { UserNav } from "./user_nav";
 import { WalletsSidebarGroup } from "./wallet";
 
-const sidebarMenu = {
-  main: {
-    title: "Main",
-    items: [
-      {
-        title: "Home",
-        url: "/dashboard",
-        icon: Home,
-      },
-      {
-        title: "Analytics",
-        url: "/dashboard/analytics",
-        icon: ChartColumn,
-      },
-    ],
-  },
+// What "Create" offers: things that have their own page to start from.
+const CREATE = [
+  { title: "New invoice", url: "/dashboard/invoices/new", icon: FileText },
+  { title: "New recurring plan", url: "/dashboard/recurring/new", icon: Repeat },
+  { title: "Apply for a loan", url: "/dashboard/loans/apply", icon: Landmark },
+];
 
-  payments: {
-    title: "Payments",
-    items: [
-      {
-        title: "Invoices",
-        url: "/dashboard/invoices",
-        icon: FileText,
-        badge: 4,
-      },
-      {
-        title: "Recurring billing",
-        url: "/dashboard/recurring",
-        icon: Repeat,
-      },
-      {
-        title: "Clients",
-        url: "/dashboard/clients",
-        icon: Users,
-      },
-    ],
-  },
-
-  business: {
-    title: "Business",
-    items: [
-      {
-        title: "Business overview",
-        url: "/dashboard/business",
-        icon: Briefcase,
-      },
-      {
-        title: "Expenses",
-        url: "/dashboard/expenses",
-        icon: Wallet,
-      },
-      {
-        title: "Payroll",
-        url: "/dashboard/payroll",
-        icon: Banknote,
-      },
-    ],
-  },
-
-  wealth: {
-    title: "Wealth",
-    items: [
-      {
-        title: "Goals",
-        url: "/dashboard/goals",
-        icon: Target,
-      },
-      {
-        title: "Envelopes",
-        url: "/dashboard/envelopes",
-        icon: Mail,
-      },
-      {
-        title: "Loans",
-        url: "/dashboard/loans",
-        icon: Landmark,
-      },
-    ],
-  },
-};
+/**
+ * The app's sidebar: expanded by default, collapsible to icons (the top
+ * bar's button, the rail on its edge, or Ctrl/⌘ B), and a sheet on phones
+ * that closes when a page is picked.
+ */
 export function AppSidebar() {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
+  const pathname = usePathname();
+  const { state, isMobile, setOpenMobile } = useSidebar();
+  const collapsed = state === "collapsed" && !isMobile;
+  const closeOnPhone = () => isMobile && setOpenMobile(false);
+
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b px-2 py-3">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              render={
-                <Link
-                  href="/dashboard"
-                  className="relative flex items-center justify-center gap-3"
-                >
-                  <Image
-                    src="/final_vergepay_logoc.svg"
-                    alt="VergePay"
-                    width={34}
-                    height={34}
-                    priority
-                    className={cn(
-                      "rounded-lg transition-opacity duration-150",
-                      collapsed
-                        ? "opacity-100"
-                        : "absolute opacity-0 pointer-events-none",
-                    )}
-                  />
-                  <Image
-                    src="/final_vergepay_logo.svg"
-                    alt="VergePay"
-                    width={154}
-                    height={154}
-                    priority
-                    className={cn(
-                      "rounded-lg transition-opacity duration-150",
-                      collapsed
-                        ? "absolute opacity-0 pointer-events-none"
-                        : "opacity-100",
-                    )}
-                  />
-                </Link>
-              }
-            />
-          </SidebarMenuItem>
-        </SidebarMenu>
+      <SidebarHeader className="h-14 flex-row items-center border-b px-4 py-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+        <Link href="/dashboard" onClick={closeOnPhone} className="flex min-w-0 items-center gap-2.5 rounded-md focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none" aria-label="VergePay home">
+          <Image src="/final_vergepay_logoc.svg" alt="" width={28} height={28} priority className="size-7 shrink-0" />
+          {!collapsed && <span className="truncate text-[15px] font-semibold tracking-tight">VergePay</span>}
+        </Link>
       </SidebarHeader>
 
-      <SidebarContent className={collapsed ? "" : "px-2 py-4"}>
-        {Object.values(sidebarMenu).map((section) => (
-          <SidebarGroup key={section.title} className="mb-5">
-            <SidebarGroupLabel className="px-2 text-[11px] uppercase tracking-widest text-muted-foreground">
-              {section.title}
-            </SidebarGroupLabel>
+      <SidebarContent className="gap-0 py-2">
+        <SidebarGroup className="pb-1">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <SidebarMenuButton
+                      aria-label="Create"
+                      className="h-9 justify-center bg-emerald-700 font-medium text-white hover:bg-emerald-800 hover:text-white data-open:bg-emerald-800 data-open:text-white group-data-[collapsible=icon]:size-8!"
+                    >
+                      <Plus />
+                      <span className="group-data-[collapsible=icon]:hidden">Create</span>
+                    </SidebarMenuButton>
+                  }
+                />
+                <DropdownMenuContent align="start" side={collapsed ? "right" : "bottom"} className="w-56">
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel className="text-xs text-muted-foreground">Create</DropdownMenuLabel>
+                    {CREATE.map((item) => (
+                      <DropdownMenuItem key={item.url} render={<Link href={item.url} onClick={closeOnPhone} />}>
+                        <item.icon className="mr-2 size-4" />
+                        {item.title}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
 
-            <SidebarMenu>
-              {section.items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    render={
-                      <Link href={item.url} className="flex items-center gap-3">
-                        <item.icon className="size-4" />
-                        <span>{item.title}</span>
-                      </Link>
-                    }
-                  />
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+        {NAV.map((group) => (
+          <SidebarGroup key={group.title} className="py-1.5">
+            <SidebarGroupLabel className="h-7 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">{group.title}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.links.map((link) => {
+                  const active = isActivePath(pathname, link.url);
+                  return (
+                    <SidebarMenuItem key={link.url}>
+                      <SidebarMenuButton
+                        isActive={active}
+                        tooltip={link.title}
+                        className={cn(
+                          "h-9 text-muted-foreground hover:text-foreground data-active:text-foreground",
+                          active && "[&_svg]:text-emerald-700 dark:[&_svg]:text-emerald-400",
+                        )}
+                        render={<Link href={link.url} onClick={closeOnPhone} aria-current={active ? "page" : undefined} />}
+                      >
+                        <link.icon />
+                        <span>{link.title}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
           </SidebarGroup>
         ))}
-        {collapsed ? (
-          <SidebarGroup>
-            <SidebarMenu className="flex items-center">
-              <SidebarMenuButton
-                render={
-                  <Link href="/dashboard" aria-label="Wallets">
-                    <CreditCard className="size-4" />
-                  </Link>
-                }
-              />
-            </SidebarMenu>
-          </SidebarGroup>
-        ) : (
-          <WalletsSidebarGroup />
-        )}
+
+        <WalletsSidebarGroup collapsed={collapsed} onNavigate={closeOnPhone} />
       </SidebarContent>
 
-      {collapsed ? (
-        <SidebarFooter className="flex items-center pb-2">
-          <UserNav compact />
-        </SidebarFooter>
-      ) : (
-        <SidebarFooter className="border-t px-2 py-3">
-          <UserNav />
-        </SidebarFooter>
-      )}
+      <SidebarFooter className="border-t p-2">
+        <UserNav compact={collapsed} />
+      </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }
