@@ -21,7 +21,8 @@ import {
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { LogOut, MoreHorizontal } from "lucide-react";
+import Link from "next/link";
+import { LogOut, MoreHorizontal, UserRound } from "lucide-react";
 
 import { signout } from "@/services/auth";
 import { useAppData } from "@/components/app-data";
@@ -114,7 +115,11 @@ export function UserNav({ compact = false }: { compact?: boolean }) {
           </DropdownMenuLabel>
         </DropdownMenuGroup>
 
-        {/* Profile and settings pages come later; only what exists is linked. */}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem render={<Link href="/dashboard/profile" />}>
+          <UserRound className="mr-2 size-4" />
+          Profile and security
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
