@@ -41,8 +41,24 @@ export interface UserProfile {
   email: string;
   first_name: string | null;
   last_name: string | null;
-  kyc_status: string;
+  /** "YYYY-MM-DD" */
+  date_of_birth: string | null;
+  present_address: string | null;
+  permanent_address: string | null;
+  city: string | null;
+  postal_code: string | null;
+  country_code: string | null;
+  timezone: string | null;
+  kyc_status: "unverified" | "pending" | "verified" | "rejected";
   two_factor_enabled: boolean;
   default_currency_code: string | null;
+  /** An email change waiting for the code sent to this address, or null. */
+  pending_email: string | null;
   created_at: string;
+  updated_at: string;
 }
+
+/** What PATCH /v1/users/me accepts (name and date of birth lock once KYC starts). */
+export type ProfileUpdate = Partial<
+  Pick<UserProfile, "first_name" | "last_name" | "date_of_birth" | "present_address" | "permanent_address" | "city" | "postal_code">
+>;

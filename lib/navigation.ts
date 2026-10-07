@@ -10,6 +10,7 @@ import {
   Landmark,
   Repeat,
   Target,
+  UserRound,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -61,10 +62,22 @@ export const NAV: NavGroup[] = [
   },
 ];
 
+/** Pages reached from the account menu (not the sidebar), still in search and the top bar. */
+export const ACCOUNT_PAGES: NavLink[] = [
+  {
+    title: "Profile",
+    url: "/dashboard/profile",
+    icon: UserRound,
+    description: "Your details, email and sign-in security",
+    keywords: "account settings personal details email two-factor 2fa security",
+  },
+];
+
 /** Every page, flattened, with the group it sits in. */
-export const ALL_PAGES: (NavLink & { group: string })[] = NAV.flatMap((group) =>
-  group.links.map((link) => ({ ...link, group: group.title })),
-);
+export const ALL_PAGES: (NavLink & { group: string })[] = [
+  ...NAV.flatMap((group) => group.links.map((link) => ({ ...link, group: group.title }))),
+  ...ACCOUNT_PAGES.map((link) => ({ ...link, group: "Account" })),
+];
 
 /** Home matches only itself; every other page also covers its sub-pages (e.g. /invoices/123). */
 export function isActivePath(pathname: string, url: string) {
