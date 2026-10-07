@@ -63,7 +63,7 @@ export function WalletsSidebarGroup({
                     <AddWalletDialog
                       purpose={purpose}
                       trigger={
-                        <SidebarMenuButton className="h-8 text-[13px] text-muted-foreground hover:text-foreground">
+                        <SidebarMenuButton className="h-8 text-sm text-muted-foreground hover:text-foreground">
                           <CirclePlus />
                           <span>Add a {walletName(purpose).toLowerCase()}</span>
                         </SidebarMenuButton>
@@ -80,7 +80,7 @@ export function WalletsSidebarGroup({
                   <SidebarMenuButton
                     isActive={active}
                     tooltip={`${walletName(purpose)} · ${balance}`}
-                    className="h-8 text-[13px] text-muted-foreground hover:text-foreground data-active:text-foreground"
+                    className="h-8 text-sm text-muted-foreground hover:text-foreground data-active:text-foreground"
                     render={
                       <Link
                         href={`/dashboard?scope=${purpose}`}
@@ -92,7 +92,7 @@ export function WalletsSidebarGroup({
                     <Icon className={cn(active && "text-emerald-700 dark:text-emerald-400")} />
                     <span className="flex min-w-0 flex-1 items-center gap-1.5">
                       <span className="truncate">{LABEL[purpose]}</span>
-                      <span className="text-xs text-muted-foreground tabular-nums">
+                      <span className="text-[13px] text-muted-foreground tabular-nums">
                         ••{wallet.account_number.slice(-4)}
                         {frozen && " · frozen"}
                       </span>

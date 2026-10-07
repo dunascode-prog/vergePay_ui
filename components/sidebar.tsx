@@ -19,7 +19,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { BrandMark } from "@/components/landing/BrandMark";
 import { isActivePath, NAV } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import { GroupToggle } from "./sidebar-group-toggle";
@@ -75,12 +74,17 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="h-14 flex-row items-center border-b px-4 py-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
-        <Link href="/dashboard" onClick={closeOnPhone} className="flex min-w-0 items-center rounded-md focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none" aria-label="VergePay home">
+      {/* The logo is centred both ways in the header. The wordmark sits in the
+          middle of its square file, so a centred frame centres the wordmark;
+          the frame is 40px tall and clips the file's empty top and bottom. */}
+      <SidebarHeader className="h-14 flex-row items-center justify-center border-b p-0">
+        <Link href="/dashboard" onClick={closeOnPhone} className="flex items-center justify-center rounded-md focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none" aria-label="VergePay home">
           {collapsed ? (
             <Image src="/final_vergepay_logoc.svg" alt="" width={28} height={28} priority className="size-7" />
           ) : (
-            <BrandMark className="dark:brightness-125" />
+            <span className="flex h-10 w-40 items-center justify-center overflow-hidden">
+              <Image src="/final_vergepay_logo.svg" alt="" width={160} height={160} priority className="max-w-none dark:brightness-125" />
+            </span>
           )}
         </Link>
       </SidebarHeader>
@@ -94,7 +98,7 @@ export function AppSidebar() {
                   render={
                     <SidebarMenuButton
                       aria-label="Create"
-                      className="h-9 justify-center bg-emerald-700 text-[13px] font-medium text-white hover:bg-emerald-800 hover:text-white data-open:bg-emerald-800 data-open:text-white group-data-[collapsible=icon]:size-8!"
+                      className="h-9 justify-center bg-emerald-700 text-sm font-medium text-white hover:bg-emerald-800 hover:text-white data-open:bg-emerald-800 data-open:text-white group-data-[collapsible=icon]:size-8!"
                     >
                       <Plus />
                       <span className="group-data-[collapsible=icon]:hidden">Create</span>
@@ -135,7 +139,7 @@ export function AppSidebar() {
                             isActive={active}
                             tooltip={link.title}
                             className={cn(
-                              "h-8 text-[13px] text-muted-foreground hover:text-foreground data-active:text-foreground",
+                              "h-8 text-sm text-muted-foreground hover:text-foreground data-active:text-foreground",
                               active && "[&_svg]:text-emerald-700 dark:[&_svg]:text-emerald-400",
                             )}
                             render={<Link href={link.url} onClick={closeOnPhone} aria-current={active ? "page" : undefined} />}
