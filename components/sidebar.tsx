@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { FileText, Landmark, Plus, Repeat } from "lucide-react";
 import {
   Sidebar,
@@ -10,7 +11,6 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -19,8 +19,10 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { BrandMark } from "@/components/landing/BrandMark";
 import { isActivePath, NAV } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
+import { GroupToggle } from "./sidebar-group-toggle";
 import { UserNav } from "./user_nav";
 import { WalletsSidebarGroup } from "./wallet";
 
@@ -31,28 +33,60 @@ const CREATE = [
   { title: "Apply for a loan", url: "/dashboard/loans/apply", icon: Landmark },
 ];
 
+// Which groups the person closed, remembered in this browser only.
+const CLOSED_KEY = "vergepay.sidebar.closed";
+
+function useClosedGroups() {
+  const [closed, setClosed] = useState<string[]>([]);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(CLOSED_KEY) ?? "[]");
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reading the saved choice once, after hydration
+      if (Array.isArray(saved)) setClosed(saved.filter((x) => typeof x === "string"));
+    } catch {
+      // storage blocked or corrupt: every group starts open
+    }
+  }, []);
+  const toggle = (title: string) =>
+    setClosed((prev) => {
+      const next = prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title];
+      try {
+        localStorage.setItem(CLOSED_KEY, JSON.stringify(next));
+      } catch {
+        // not saved; it still works for this visit
+      }
+      return next;
+    });
+  return { closed, toggle };
+}
+
 /**
  * The app's sidebar: expanded by default, collapsible to icons (the top
  * bar's button, the rail on its edge, or Ctrl/⌘ B), and a sheet on phones
- * that closes when a page is picked.
+ * that closes when a page is picked. Each group opens and closes on its
+ * label; the group holding the current page is always open.
  */
 export function AppSidebar() {
   const pathname = usePathname();
   const { state, isMobile, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed" && !isMobile;
   const closeOnPhone = () => isMobile && setOpenMobile(false);
+  const { closed, toggle } = useClosedGroups();
 
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="h-14 flex-row items-center border-b px-4 py-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
-        <Link href="/dashboard" onClick={closeOnPhone} className="flex min-w-0 items-center gap-2.5 rounded-md focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none" aria-label="VergePay home">
-          <Image src="/final_vergepay_logoc.svg" alt="" width={28} height={28} priority className="size-7 shrink-0" />
-          {!collapsed && <span className="truncate text-[15px] font-semibold tracking-tight">VergePay</span>}
+        <Link href="/dashboard" onClick={closeOnPhone} className="flex min-w-0 items-center rounded-md focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none" aria-label="VergePay home">
+          {collapsed ? (
+            <Image src="/final_vergepay_logoc.svg" alt="" width={28} height={28} priority className="size-7" />
+          ) : (
+            <BrandMark className="dark:brightness-125" />
+          )}
         </Link>
       </SidebarHeader>
 
       <SidebarContent className="gap-0 py-2">
-        <SidebarGroup className="pb-1">
+        <SidebarGroup className="pb-2">
           <SidebarMenu>
             <SidebarMenuItem>
               <DropdownMenu>
@@ -83,36 +117,48 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
 
-        {NAV.map((group) => (
-          <SidebarGroup key={group.title} className="py-1.5">
-            <SidebarGroupLabel className="h-7 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">{group.title}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {group.links.map((link) => {
-                  const active = isActivePath(pathname, link.url);
-                  return (
-                    <SidebarMenuItem key={link.url}>
-                      <SidebarMenuButton
-                        isActive={active}
-                        tooltip={link.title}
-                        className={cn(
-                          "h-9 text-muted-foreground hover:text-foreground data-active:text-foreground",
-                          active && "[&_svg]:text-emerald-700 dark:[&_svg]:text-emerald-400",
-                        )}
-                        render={<Link href={link.url} onClick={closeOnPhone} aria-current={active ? "page" : undefined} />}
-                      >
-                        <link.icon />
-                        <span>{link.title}</span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+        {NAV.map((group) => {
+          const holdsCurrent = group.links.some((link) => isActivePath(pathname, link.url));
+          // collapsed to icons, every page shows; otherwise as the person left it
+          const open = collapsed || holdsCurrent || !closed.includes(group.title);
+          return (
+            <SidebarGroup key={group.title} className="py-0.5">
+              <GroupToggle title={group.title} open={open} onToggle={() => toggle(group.title)} />
+              {open && (
+                <SidebarGroupContent className="mt-0.5">
+                  <SidebarMenu className="gap-0.5">
+                    {group.links.map((link) => {
+                      const active = isActivePath(pathname, link.url);
+                      return (
+                        <SidebarMenuItem key={link.url}>
+                          <SidebarMenuButton
+                            isActive={active}
+                            tooltip={link.title}
+                            className={cn(
+                              "h-8 text-muted-foreground hover:text-foreground data-active:text-foreground",
+                              active && "[&_svg]:text-emerald-700 dark:[&_svg]:text-emerald-400",
+                            )}
+                            render={<Link href={link.url} onClick={closeOnPhone} aria-current={active ? "page" : undefined} />}
+                          >
+                            <link.icon />
+                            <span>{link.title}</span>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              )}
+            </SidebarGroup>
+          );
+        })}
 
-        <WalletsSidebarGroup collapsed={collapsed} onNavigate={closeOnPhone} />
+        <WalletsSidebarGroup
+          collapsed={collapsed}
+          onNavigate={closeOnPhone}
+          open={collapsed || !closed.includes("Wallets")}
+          onToggle={() => toggle("Wallets")}
+        />
       </SidebarContent>
 
       <SidebarFooter className="border-t p-2">

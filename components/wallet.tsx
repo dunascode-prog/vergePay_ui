@@ -5,7 +5,6 @@ import { Building2, CirclePlus, Wallet } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -15,6 +14,7 @@ import { useAccountScope, useAppData } from "@/components/app-data";
 import { AddWalletDialog } from "@/components/accounts/AddWalletDialog";
 import { formatMinor, walletName, walletsOf } from "@/lib/ledger";
 import { cn } from "@/lib/utils";
+import { GroupToggle } from "./sidebar-group-toggle";
 
 const LABEL = { personal: "Personal", business: "Business" } as const;
 
@@ -23,25 +23,36 @@ const LABEL = { personal: "Personal", business: "Business" } as const;
  * number, balance), opening that wallet's view of Home. Collapsed, just the
  * icons, with the balance in the tooltip.
  */
-export function WalletsSidebarGroup({ collapsed = false, onNavigate }: { collapsed?: boolean; onNavigate?: () => void }) {
+export function WalletsSidebarGroup({
+  collapsed = false,
+  onNavigate,
+  open = true,
+  onToggle,
+}: {
+  collapsed?: boolean;
+  onNavigate?: () => void;
+  open?: boolean;
+  onToggle?: () => void;
+}) {
   const { accounts, accountsState } = useAppData();
   const [scope] = useAccountScope();
   const wallets = walletsOf(accounts);
 
   return (
-    <SidebarGroup className="py-1.5">
-      <SidebarGroupLabel className="h-7 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">Wallets</SidebarGroupLabel>
-      <SidebarGroupContent>
+    <SidebarGroup className="py-0.5">
+      <GroupToggle title="Wallets" open={open} onToggle={() => onToggle?.()} />
+      {open && (
+      <SidebarGroupContent className="mt-0.5">
         {accountsState === "loading" && !collapsed && (
           <div className="space-y-1 px-2">
-            <Skeleton className="h-9 w-full rounded-lg" />
-            <Skeleton className="h-9 w-full rounded-lg" />
+            <Skeleton className="h-8 w-full rounded-lg" />
+            <Skeleton className="h-8 w-full rounded-lg" />
           </div>
         )}
         {accountsState === "error" && !collapsed && <p className="px-2 text-xs text-muted-foreground">Couldn&apos;t load your wallets.</p>}
 
         {accountsState === "ready" && (
-          <SidebarMenu>
+          <SidebarMenu className="gap-0.5">
             {(["personal", "business"] as const).map((purpose) => {
               const wallet = wallets[purpose];
               const Icon = purpose === "business" ? Building2 : Wallet;
@@ -52,7 +63,7 @@ export function WalletsSidebarGroup({ collapsed = false, onNavigate }: { collaps
                     <AddWalletDialog
                       purpose={purpose}
                       trigger={
-                        <SidebarMenuButton className="h-9 text-muted-foreground hover:text-foreground">
+                        <SidebarMenuButton className="h-8 text-muted-foreground hover:text-foreground">
                           <CirclePlus />
                           <span>Add a {walletName(purpose).toLowerCase()}</span>
                         </SidebarMenuButton>
@@ -69,7 +80,7 @@ export function WalletsSidebarGroup({ collapsed = false, onNavigate }: { collaps
                   <SidebarMenuButton
                     isActive={active}
                     tooltip={`${walletName(purpose)} · ${balance}`}
-                    className="h-9 text-muted-foreground hover:text-foreground data-active:text-foreground"
+                    className="h-8 text-muted-foreground hover:text-foreground data-active:text-foreground"
                     render={
                       <Link
                         href={`/dashboard?scope=${purpose}`}
@@ -94,6 +105,7 @@ export function WalletsSidebarGroup({ collapsed = false, onNavigate }: { collaps
           </SidebarMenu>
         )}
       </SidebarGroupContent>
+      )}
     </SidebarGroup>
   );
 }
