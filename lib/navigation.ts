@@ -1,5 +1,6 @@
-// The app's pages, for the ⌘K search in the top bar (components/CommandPalette.tsx).
-// Keep it in step with the sidebar's menu (components/sidebar.tsx).
+// The app's pages: one list for the sidebar (components/sidebar.tsx), the
+// top bar's titles (components/NavbarCl.tsx) and the ⌘K search
+// (components/CommandPalette.tsx), so the three can't drift apart.
 import {
   Banknote,
   Briefcase,
@@ -7,12 +8,9 @@ import {
   FileText,
   Home,
   Landmark,
-  Mail,
-  Receipt,
   Repeat,
   Target,
   Users,
-  Wallet,
   type LucideIcon,
 } from "lucide-react";
 
@@ -20,54 +18,60 @@ export interface NavLink {
   title: string;
   url: string;
   icon: LucideIcon;
-  /** Extra words the search matches (e.g. "budget" finds Envelopes). */
+  /** The line under the title in the top bar. */
+  description: string;
+  /** Extra words the search matches (e.g. "salary" finds Payroll). */
   keywords?: string;
 }
 
-/** A top-level entry: a page, or a group that opens to show its pages. */
-export type NavEntry = NavLink | { title: string; icon: LucideIcon; children: NavLink[] };
+export interface NavGroup {
+  title: string;
+  links: NavLink[];
+}
 
-export const NAV: NavEntry[] = [
-  { title: "Home", url: "/dashboard", icon: Home, keywords: "dashboard overview wallets balance" },
-  { title: "Analytics", url: "/dashboard/analytics", icon: ChartColumn, keywords: "reports insights trends" },
+export const NAV: NavGroup[] = [
+  {
+    title: "Overview",
+    links: [
+      { title: "Home", url: "/dashboard", icon: Home, description: "Your money at a glance", keywords: "dashboard overview wallets balance" },
+      { title: "Analytics", url: "/dashboard/analytics", icon: ChartColumn, description: "Financial health and habits", keywords: "reports insights trends" },
+    ],
+  },
   {
     title: "Get paid",
-    icon: Wallet,
-    children: [
-      { title: "Invoices", url: "/dashboard/invoices", icon: FileText, keywords: "bill payment" },
-      { title: "Recurring billing", url: "/dashboard/recurring", icon: Repeat, keywords: "retainer subscription plan" },
-      { title: "Clients", url: "/dashboard/clients", icon: Users, keywords: "customers" },
+    links: [
+      { title: "Invoices", url: "/dashboard/invoices", icon: FileText, description: "Bill clients and get paid", keywords: "bill payment" },
+      { title: "Recurring billing", url: "/dashboard/recurring", icon: Repeat, description: "Plans that invoice on a schedule", keywords: "retainer subscription plan" },
+      { title: "Clients", url: "/dashboard/clients", icon: Users, description: "Who you bill, and how they pay", keywords: "customers" },
     ],
   },
   {
     title: "Business",
-    icon: Briefcase,
-    children: [
-      { title: "Business overview", url: "/dashboard/business", icon: Briefcase, keywords: "health ledger" },
-      { title: "Expenses", url: "/dashboard/expenses", icon: Receipt, keywords: "spending costs receipts" },
-      { title: "Payroll", url: "/dashboard/payroll", icon: Banknote, keywords: "salary staff payees" },
+    links: [
+      { title: "Business overview", url: "/dashboard/business", icon: Briefcase, description: "How your business is doing", keywords: "health ledger" },
+      { title: "Payroll", url: "/dashboard/payroll", icon: Banknote, description: "Pay your team in one go", keywords: "salary staff payees" },
     ],
   },
   {
     title: "Wealth",
-    icon: Target,
-    children: [
-      { title: "Goals", url: "/dashboard/goals", icon: Target, keywords: "savings" },
-      { title: "Envelopes", url: "/dashboard/envelopes", icon: Mail, keywords: "budget budgets" },
-      { title: "Loans", url: "/dashboard/loans", icon: Landmark, keywords: "borrow credit repay installment" },
+    links: [
+      { title: "Goals", url: "/dashboard/goals", icon: Target, description: "Save towards what matters", keywords: "savings" },
+      { title: "Loans", url: "/dashboard/loans", icon: Landmark, description: "Borrow and repay", keywords: "borrow credit repay installment" },
     ],
   },
 ];
 
-export const isGroup = (entry: NavEntry): entry is Extract<NavEntry, { children: NavLink[] }> =>
-  "children" in entry;
-
 /** Every page, flattened, with the group it sits in. */
-export const ALL_PAGES: (NavLink & { group?: string })[] = NAV.flatMap((entry) =>
-  isGroup(entry) ? entry.children.map((c) => ({ ...c, group: entry.title })) : [entry],
+export const ALL_PAGES: (NavLink & { group: string })[] = NAV.flatMap((group) =>
+  group.links.map((link) => ({ ...link, group: group.title })),
 );
 
 /** Home matches only itself; every other page also covers its sub-pages (e.g. /invoices/123). */
 export function isActivePath(pathname: string, url: string) {
   return url === "/dashboard" ? pathname === url : pathname === url || pathname.startsWith(`${url}/`);
+}
+
+/** The page a path belongs to (the closest match), or Home. */
+export function pageFor(pathname: string): NavLink & { group: string } {
+  return ALL_PAGES.filter((p) => isActivePath(pathname, p.url)).sort((a, b) => b.url.length - a.url.length)[0] ?? ALL_PAGES[0];
 }

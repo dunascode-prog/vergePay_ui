@@ -1,159 +1,41 @@
 "use client";
-import { Monitor, Moon, Plus, Search, Sun } from "lucide-react";
-import { useCallback, useState } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
-import { useTheme } from "next-themes";
-
-import { SidebarTrigger } from "./ui/sidebar";
-import { cn } from "@/lib/utils";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "./ui/button";
+import { useCallback, useState } from "react";
+import { Monitor, Moon, Plus, Search, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { AccountScopeToggle } from "./AccountScopeToggle";
 import { useAppData } from "./app-data";
-import Link from "next/link";
-import { NotificationBell } from "./notifications/NotificationBell";
 import { CommandPalette, useCommandShortcut } from "./CommandPalette";
-
-type PageTitle = {
-  title: string;
-  description: string;
-};
-
-type Section =
-  | "dashboard"
-  | "analytics"
-  | "invoices"
-  | "recurring"
-  | "clients"
-  | "business"
-  | "loans"
-  | "goals"
-  | "payroll";
-
-interface HeaderAction {
-  label: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-}
-
-interface SectionConfig extends PageTitle {
-  /** Base path for this section — used to gate the header action to the list view only, not sub-routes like [id]/edit. */
-  basePath: string;
-  /** Whether the Personal/Business/Combined toggle applies to this section (and all its sub-routes). */
-  showAccountScope: boolean;
-  /** Only rendered when the current pathname is exactly `basePath` — not on detail/edit/new sub-routes. */
-  headerAction?: HeaderAction;
-}
-
-const SECTION_CONFIG: Record<Section, SectionConfig> = {
-  dashboard: {
-    basePath: "/dashboard",
-    title: "Dashboard",
-    // replaced by <Greeting /> (time of day + the user's name) when rendered
-    description: "Welcome back",
-    showAccountScope: true,
-    // "Add Money" comes back with funding (Step 3); it had nowhere to go yet.
-  },
-  analytics: {
-    basePath: "/dashboard/analytics",
-    title: "Analytics",
-    description: "Financial health & habits",
-    // real data now: follows the Personal / Business / Combined view
-    showAccountScope: true,
-    // An "Export report" button comes back once there's an export to link to.
-  },
-  invoices: {
-    basePath: "/dashboard/invoices",
-    title: "Invoices",
-    description: "Manage client invoices in one place.",
-    // the invoice list covers both wallets, so the Personal/Business toggle doesn't apply
-    showAccountScope: false,
-    headerAction: {
-      label: "New Invoice",
-      href: "/dashboard/invoices/new",
-      icon: Plus,
-    },
-  },
-  recurring: {
-    basePath: "/dashboard/recurring",
-    title: "Recurring Billing",
-    description: "Manage Recurrent Billings Here",
-    showAccountScope: false,
-    headerAction: {
-      label: "New Plan",
-      href: "/dashboard/recurring/new",
-      icon: Plus,
-    },
-  },
-  business: {
-    basePath: "/dashboard/business",
-    title: "Business overview",
-    description: "How your business is doing",
-    // real data now: follows the Personal / Business / Combined view
-    showAccountScope: true,
-    // headerAction: { label: "New Plan", href: "/dashboard/recurring/new", icon: Plus },
-  },
-  loans: {
-    basePath: "/dashboard/loans",
-    title: "Loans",
-    description: "Borrow and repay",
-    // each loan is in one wallet's currency and shown on its own
-    showAccountScope: false,
-    // "Apply for a loan" sits on the page, where it can hide while an application is in review
-  },
-  goals: {
-    basePath: "/dashboard/goals",
-    title: "Goals",
-    description: "Save towards what matters",
-    // each goal is in its own currency and holds its own money, apart from the wallets
-    showAccountScope: false,
-    // "New goal" sits on the page, where it can turn off at the goal limit
-  },
-  payroll: {
-    basePath: "/dashboard/payroll",
-    title: "Payroll",
-    description: "Pay your team in one go",
-    // a run picks its own wallet, so the Personal / Business toggle doesn't apply
-    showAccountScope: false,
-    // "Add payee" and "Run payroll" sit on the page, next to the payees they act on
-  },
-  clients: {
-    basePath: "/dashboard/clients",
-    title: "Clients",
-    description: "Your client relationships, in one place.",
-    showAccountScope: false,
-    // No header action here on purpose — the Clients page has its own
-    // "Add client" trigger inline (opens a dialog, not a route). Wiring that
-    // same dialog to a navbar button too would mean lifting its open state
-    // out of the page and into shared context — a reasonable follow-up, but
-    // out of scope for this pass.
-  },
-};
+import { NotificationBell } from "./notifications/NotificationBell";
+import { Button, buttonVariants } from "./ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { SidebarTrigger } from "./ui/sidebar";
+import { pageFor } from "@/lib/navigation";
+import { cn } from "@/lib/utils";
 
 /**
- * Single source of truth for "what section is this route in." Every other
- * piece of route-dependent UI (title, account-scope toggle, header action)
- * reads from this instead of running its own separate pathname check — that
- * duplication is exactly how the title/toggle/button drifted out of sync
- * with each other in the first place.
- *
- * Prefix matching (not exact-match) is deliberate: it's what makes the
- * section stay correct on nested routes like /dashboard/invoices/[id]/edit,
- * not just on the bare list page.
+ * What the top bar does on each section, beyond its title (which comes from
+ * lib/navigation.ts). The Personal / Business / Combined switch only shows
+ * where the page follows it; a section's main action only on its own page,
+ * not on its sub-pages (no "New invoice" while editing one).
  */
-function resolveSection(pathname: string): Section {
-  if (pathname.startsWith("/dashboard/analytics")) return "analytics";
-  if (pathname.startsWith("/dashboard/invoices")) return "invoices";
-  if (pathname.startsWith("/dashboard/recurring")) return "recurring";
-  if (pathname.startsWith("/dashboard/clients")) return "clients";
-  if (pathname.startsWith("/dashboard/business")) return "business";
-  if (pathname.startsWith("/dashboard/loans")) return "loans";
-  if (pathname.startsWith("/dashboard/goals")) return "goals";
-  if (pathname.startsWith("/dashboard/payroll")) return "payroll";
+const SECTION_EXTRAS: Record<string, { scope?: boolean; action?: { label: string; href: string } }> = {
+  "/dashboard": { scope: true },
+  "/dashboard/analytics": { scope: true },
+  "/dashboard/business": { scope: true },
+  "/dashboard/invoices": { action: { label: "New invoice", href: "/dashboard/invoices/new" } },
+  "/dashboard/recurring": { action: { label: "New plan", href: "/dashboard/recurring/new" } },
+};
 
-  return "dashboard";
-}
+// pages reachable by link but not in the sidebar
+const OTHER_TITLES: Record<string, { title: string; description: string }> = {
+  "/dashboard/expenses": { title: "Expenses", description: "Sample data" },
+  "/dashboard/envelopes": { title: "Envelopes", description: "Sample data" },
+  "/dashboard/investments": { title: "Investments", description: "Your linked brokerage" },
+  "/dashboard/payments": { title: "Payment", description: "Finishing your payment" },
+};
 
 function Greeting() {
   const { user } = useAppData();
@@ -164,84 +46,95 @@ function Greeting() {
   return <span suppressHydrationWarning>{name ? `${part}, ${name}` : part}</span>;
 }
 
-const Navbar = ({ className }: React.ComponentProps<"div">) => {
+function ThemeMenu() {
   const { setTheme } = useTheme();
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <Button variant="ghost" size="icon" className="relative size-9 text-muted-foreground hover:text-foreground" aria-label="Theme">
+            <Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+            <Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+          </Button>
+        }
+      />
+      <DropdownMenuContent align="end" sideOffset={8}>
+        <DropdownMenuItem onClick={() => setTheme("light")}>
+          <Sun className="mr-2 size-4" /> Light
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark")}>
+          <Moon className="mr-2 size-4" /> Dark
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("system")}>
+          <Monitor className="mr-2 size-4" /> System
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+/**
+ * The top bar: the sidebar button and where you are on the left; search,
+ * the account switch and the page's main action, then alerts and theme on
+ * the right. 56px tall, the same as the sidebar's header, so their borders meet.
+ */
+const Navbar = ({ className }: React.ComponentProps<"header">) => {
   const pathname = usePathname();
   const [searchOpen, setSearchOpen] = useState(false);
   const openSearch = useCallback(() => setSearchOpen(true), []);
   useCommandShortcut(openSearch);
 
-  const section = resolveSection(pathname);
-  const config = SECTION_CONFIG[section];
-  const isSectionRoot = pathname === config.basePath;
+  const other = Object.entries(OTHER_TITLES).find(([url]) => pathname.startsWith(url))?.[1];
+  const page = pageFor(pathname);
+  const title = other?.title ?? page.title;
+  const extras = other ? {} : (SECTION_EXTRAS[page.url] ?? {});
+  const onSectionRoot = pathname === page.url;
+  const isHome = !other && page.url === "/dashboard";
 
   return (
-    <div className={cn("flex flex-row items-center justify-between gap-2 px-3 py-3", className)}>
-      <div className="flex min-w-0 flex-row items-center gap-1">
-        <SidebarTrigger />
-        <div className="min-w-0">
-          <p className="-mb-1 hidden lg:flex">{section === "dashboard" ? <Greeting /> : config.description}</p>
-          <h6 className="truncate">{config.title}</h6>
-        </div>
+    <header className={cn("flex h-14 items-center gap-2 border-b bg-background/85 px-3 backdrop-blur supports-backdrop-filter:bg-background/70 sm:px-4", className)}>
+      <SidebarTrigger className="size-9 text-muted-foreground hover:text-foreground" />
+      <div className="mx-1 hidden h-5 w-px bg-border sm:block" aria-hidden />
+      <div className="min-w-0 flex-1">
+        <h1 className="truncate text-sm leading-tight font-semibold">{title}</h1>
+        <p className="hidden truncate text-xs text-muted-foreground sm:block">
+          {isHome ? <Greeting /> : (other?.description ?? page.description)}
+        </p>
       </div>
 
-      <div className="flex flex-row items-center gap-2">
-        {/* tools first: search, alerts, theme; always shown, whatever the sidebar's state */}
-        <div className="flex items-center gap-1.5">
-          <Button
-            variant="secondary"
-            size="icon"
-            className="rounded-full"
-            onClick={openSearch}
-            aria-label="Search pages (Ctrl+K)"
-            title="Search pages (Ctrl+K)"
-          >
-            <Search className="size-4" />
-          </Button>
-          <NotificationBell />
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button variant="secondary" size="icon" className="relative rounded-full" aria-label="Theme">
-                  <Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                  <Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-                </Button>
-              }
-            />
-            <DropdownMenuContent align="end" sideOffset={10}>
-              <DropdownMenuItem onClick={() => setTheme("light")}>
-                <Sun className="mr-2 size-4" /> Light
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")}>
-                <Moon className="mr-2 size-4" /> Dark
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")}>
-                <Monitor className="mr-2 size-4" /> System
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+      <div className="flex items-center gap-1.5 sm:gap-2">
+        <button
+          type="button"
+          onClick={openSearch}
+          aria-label="Search pages (Ctrl+K)"
+          className="hidden h-9 w-56 items-center gap-2 rounded-lg border bg-muted/40 px-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:flex"
+        >
+          <Search className="size-4" />
+          <span className="flex-1 text-left">Search…</span>
+          <kbd className="rounded border bg-background px-1.5 font-mono text-[10px]" suppressHydrationWarning>
+            {typeof navigator !== "undefined" && /Mac/i.test(navigator.platform) ? "⌘K" : "Ctrl K"}
+          </kbd>
+        </button>
+        <Button variant="ghost" size="icon" className="size-9 text-muted-foreground hover:text-foreground lg:hidden" onClick={openSearch} aria-label="Search pages">
+          <Search className="size-4" />
+        </Button>
 
-        {config.showAccountScope && <AccountScopeToggle />}
+        {extras.scope && <AccountScopeToggle />}
 
-        {/*
-          Only rendered on the section's own root route (e.g. /dashboard/invoices),
-          not on its sub-routes (e.g. /dashboard/invoices/[id]/edit): "New Invoice"
-          floating in the navbar while you're editing an existing invoice would be
-          misleading.
-        */}
-        {isSectionRoot && config.headerAction && (
-          <Link href={config.headerAction.href}>
-            <Button className="bg-emerald-700 hover:bg-emerald-800">
-              <config.headerAction.icon className="h-4 w-4" />
-              <span className="hidden sm:inline">{config.headerAction.label}</span>
-            </Button>
+        {onSectionRoot && extras.action && (
+          <Link href={extras.action.href} className={cn(buttonVariants(), "h-9 bg-emerald-700 text-white hover:bg-emerald-800")} aria-label={extras.action.label}>
+            <Plus className="size-4" />
+            <span className="hidden sm:inline">{extras.action.label}</span>
           </Link>
         )}
+
+        <div className="mx-0.5 hidden h-5 w-px bg-border sm:block" aria-hidden />
+        <NotificationBell />
+        <ThemeMenu />
       </div>
 
       <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
-    </div>
+    </header>
   );
 };
 

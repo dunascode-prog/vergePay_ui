@@ -1,216 +1,170 @@
 "use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FileText, Landmark, Plus, Repeat } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
+  SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
-
-import { useSidebar } from "@/components/ui/sidebar";
-
-import {
-  Home,
-  ChartColumn,
-  FileText,
-  Repeat,
-  Users,
-  Briefcase,
-  Wallet,
-  Banknote,
-  Target,
-  Mail,
-  CreditCard,
-  Landmark,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { UserNav } from "./user_nav";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { BrandMark } from "@/components/landing/BrandMark";
+import { isActivePath, NAV } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
+import { GroupToggle } from "./sidebar-group-toggle";
+import { UserNav } from "./user_nav";
 import { WalletsSidebarGroup } from "./wallet";
 
-const sidebarMenu = {
-  main: {
-    title: "Main",
-    items: [
-      {
-        title: "Home",
-        url: "/dashboard",
-        icon: Home,
-      },
-      {
-        title: "Analytics",
-        url: "/dashboard/analytics",
-        icon: ChartColumn,
-      },
-    ],
-  },
+// What "Create" offers: things that have their own page to start from.
+const CREATE = [
+  { title: "New invoice", url: "/dashboard/invoices/new", icon: FileText },
+  { title: "New recurring plan", url: "/dashboard/recurring/new", icon: Repeat },
+  { title: "Apply for a loan", url: "/dashboard/loans/apply", icon: Landmark },
+];
 
-  payments: {
-    title: "Payments",
-    items: [
-      {
-        title: "Invoices",
-        url: "/dashboard/invoices",
-        icon: FileText,
-        badge: 4,
-      },
-      {
-        title: "Recurring billing",
-        url: "/dashboard/recurring",
-        icon: Repeat,
-      },
-      {
-        title: "Clients",
-        url: "/dashboard/clients",
-        icon: Users,
-      },
-    ],
-  },
+// Which groups the person closed, remembered in this browser only.
+const CLOSED_KEY = "vergepay.sidebar.closed";
 
-  business: {
-    title: "Business",
-    items: [
-      {
-        title: "Business overview",
-        url: "/dashboard/business",
-        icon: Briefcase,
-      },
-      {
-        title: "Expenses",
-        url: "/dashboard/expenses",
-        icon: Wallet,
-      },
-      {
-        title: "Payroll",
-        url: "/dashboard/payroll",
-        icon: Banknote,
-      },
-    ],
-  },
+function useClosedGroups() {
+  const [closed, setClosed] = useState<string[]>([]);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(CLOSED_KEY) ?? "[]");
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reading the saved choice once, after hydration
+      if (Array.isArray(saved)) setClosed(saved.filter((x) => typeof x === "string"));
+    } catch {
+      // storage blocked or corrupt: every group starts open
+    }
+  }, []);
+  const toggle = (title: string) =>
+    setClosed((prev) => {
+      const next = prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title];
+      try {
+        localStorage.setItem(CLOSED_KEY, JSON.stringify(next));
+      } catch {
+        // not saved; it still works for this visit
+      }
+      return next;
+    });
+  return { closed, toggle };
+}
 
-  wealth: {
-    title: "Wealth",
-    items: [
-      {
-        title: "Goals",
-        url: "/dashboard/goals",
-        icon: Target,
-      },
-      {
-        title: "Envelopes",
-        url: "/dashboard/envelopes",
-        icon: Mail,
-      },
-      {
-        title: "Loans",
-        url: "/dashboard/loans",
-        icon: Landmark,
-      },
-    ],
-  },
-};
+/**
+ * The app's sidebar: expanded by default, collapsible to icons (the top
+ * bar's button, the rail on its edge, or Ctrl/⌘ B), and a sheet on phones
+ * that closes when a page is picked. Each group opens and closes on its
+ * label; the group holding the current page is always open.
+ */
 export function AppSidebar() {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
+  const pathname = usePathname();
+  const { state, isMobile, setOpenMobile } = useSidebar();
+  const collapsed = state === "collapsed" && !isMobile;
+  const closeOnPhone = () => isMobile && setOpenMobile(false);
+  const { closed, toggle } = useClosedGroups();
+
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b px-2 py-3">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              render={
-                <Link
-                  href="/dashboard"
-                  className="relative flex items-center justify-center gap-3"
-                >
-                  <Image
-                    src="/final_vergepay_logoc.svg"
-                    alt="VergePay"
-                    width={34}
-                    height={34}
-                    priority
-                    className={cn(
-                      "rounded-lg transition-opacity duration-150",
-                      collapsed
-                        ? "opacity-100"
-                        : "absolute opacity-0 pointer-events-none",
-                    )}
-                  />
-                  <Image
-                    src="/final_vergepay_logo.svg"
-                    alt="VergePay"
-                    width={154}
-                    height={154}
-                    priority
-                    className={cn(
-                      "rounded-lg transition-opacity duration-150",
-                      collapsed
-                        ? "absolute opacity-0 pointer-events-none"
-                        : "opacity-100",
-                    )}
-                  />
-                </Link>
-              }
-            />
-          </SidebarMenuItem>
-        </SidebarMenu>
+      <SidebarHeader className="h-14 flex-row items-center border-b px-4 py-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+        <Link href="/dashboard" onClick={closeOnPhone} className="flex min-w-0 items-center rounded-md focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none" aria-label="VergePay home">
+          {collapsed ? (
+            <Image src="/final_vergepay_logoc.svg" alt="" width={28} height={28} priority className="size-7" />
+          ) : (
+            <BrandMark className="dark:brightness-125" />
+          )}
+        </Link>
       </SidebarHeader>
 
-      <SidebarContent className={collapsed ? "" : "px-2 py-4"}>
-        {Object.values(sidebarMenu).map((section) => (
-          <SidebarGroup key={section.title} className="mb-5">
-            <SidebarGroupLabel className="px-2 text-[11px] uppercase tracking-widest text-muted-foreground">
-              {section.title}
-            </SidebarGroupLabel>
+      <SidebarContent className="gap-0 py-2">
+        <SidebarGroup className="pb-2">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <SidebarMenuButton
+                      aria-label="Create"
+                      className="h-9 justify-center bg-emerald-700 text-[13px] font-medium text-white hover:bg-emerald-800 hover:text-white data-open:bg-emerald-800 data-open:text-white group-data-[collapsible=icon]:size-8!"
+                    >
+                      <Plus />
+                      <span className="group-data-[collapsible=icon]:hidden">Create</span>
+                    </SidebarMenuButton>
+                  }
+                />
+                <DropdownMenuContent align="start" side={collapsed ? "right" : "bottom"} className="w-56">
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel className="text-xs text-muted-foreground">Create</DropdownMenuLabel>
+                    {CREATE.map((item) => (
+                      <DropdownMenuItem key={item.url} render={<Link href={item.url} onClick={closeOnPhone} />}>
+                        <item.icon className="mr-2 size-4" />
+                        {item.title}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
 
-            <SidebarMenu>
-              {section.items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    render={
-                      <Link href={item.url} className="flex items-center gap-3">
-                        <item.icon className="size-4" />
-                        <span>{item.title}</span>
-                      </Link>
-                    }
-                  />
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroup>
-        ))}
-        {collapsed ? (
-          <SidebarGroup>
-            <SidebarMenu className="flex items-center">
-              <SidebarMenuButton
-                render={
-                  <Link href="/dashboard" aria-label="Wallets">
-                    <CreditCard className="size-4" />
-                  </Link>
-                }
-              />
-            </SidebarMenu>
-          </SidebarGroup>
-        ) : (
-          <WalletsSidebarGroup />
-        )}
+        {NAV.map((group) => {
+          const holdsCurrent = group.links.some((link) => isActivePath(pathname, link.url));
+          // collapsed to icons, every page shows; otherwise as the person left it
+          const open = collapsed || holdsCurrent || !closed.includes(group.title);
+          return (
+            <SidebarGroup key={group.title} className="py-0.5">
+              <GroupToggle title={group.title} open={open} onToggle={() => toggle(group.title)} />
+              {open && (
+                <SidebarGroupContent className="mt-0.5">
+                  <SidebarMenu className="gap-0.5">
+                    {group.links.map((link) => {
+                      const active = isActivePath(pathname, link.url);
+                      return (
+                        <SidebarMenuItem key={link.url}>
+                          <SidebarMenuButton
+                            isActive={active}
+                            tooltip={link.title}
+                            className={cn(
+                              "h-8 text-[13px] text-muted-foreground hover:text-foreground data-active:text-foreground",
+                              active && "[&_svg]:text-emerald-700 dark:[&_svg]:text-emerald-400",
+                            )}
+                            render={<Link href={link.url} onClick={closeOnPhone} aria-current={active ? "page" : undefined} />}
+                          >
+                            <link.icon />
+                            <span>{link.title}</span>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              )}
+            </SidebarGroup>
+          );
+        })}
+
+        <WalletsSidebarGroup
+          collapsed={collapsed}
+          onNavigate={closeOnPhone}
+          open={collapsed || !closed.includes("Wallets")}
+          onToggle={() => toggle("Wallets")}
+        />
       </SidebarContent>
 
-      {collapsed ? (
-        <SidebarFooter className="flex items-center pb-2">
-          <UserNav compact />
-        </SidebarFooter>
-      ) : (
-        <SidebarFooter className="border-t px-2 py-3">
-          <UserNav />
-        </SidebarFooter>
-      )}
+      <SidebarFooter className="border-t p-2">
+        <UserNav compact={collapsed} />
+      </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }

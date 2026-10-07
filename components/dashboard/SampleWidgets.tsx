@@ -4,7 +4,7 @@
 // always tagged "Sample data", and follow the Personal / Business toggle:
 // client health, billing and invoices are business; budgets personal.
 import Link from "next/link";
-import { ArrowRight, PiggyBank, Receipt, Repeat, TrendingDown, UserPlus, Wallet } from "lucide-react";
+import { ArrowRight, Banknote, Landmark, PiggyBank, Receipt, Repeat, UserPlus } from "lucide-react";
 import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -123,11 +123,11 @@ const ACTIONS = {
     { label: "New invoice", href: "/dashboard/invoices/new", Icon: Receipt },
     { label: "New recurring plan", href: "/dashboard/recurring/new", Icon: Repeat },
     { label: "Add a client", href: "/dashboard/clients", Icon: UserPlus },
-    { label: "Log an expense", href: "/dashboard/expenses", Icon: TrendingDown },
+    { label: "Run payroll", href: "/dashboard/payroll", Icon: Banknote },
   ],
   personal: [
     { label: "Add a goal", href: "/dashboard/goals", Icon: PiggyBank },
-    { label: "Set a budget", href: "/dashboard/envelopes", Icon: Wallet },
+    { label: "Apply for a loan", href: "/dashboard/loans/apply", Icon: Landmark },
   ],
 };
 
