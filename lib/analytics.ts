@@ -92,10 +92,10 @@ const internal = (l: ScopedTransaction, scoped: Set<string>) =>
   isGoalMove(l) || (!!l.counterparty_account_id && scoped.has(l.counterparty_account_id));
 
 /**
- * Revenue: money others paid in (invoice payments, transfers, bank deposits).
+ * Revenue: money others paid in (invoice payments, transfers, bank deposits, payroll).
  * Your own card top-ups, loan payouts and refunds aren't revenue.
  */
-const REVENUE_TYPES = new Set(["invoice_payment", "transfer", "bank_deposit"]);
+const REVENUE_TYPES = new Set(["invoice_payment", "transfer", "bank_deposit", "payroll_payment"]);
 
 export function revenueTrend(lines: ScopedTransaction[], scoped: Set<string>, buckets: TrendBucket[]): RevenuePoint[] {
   const points = buckets.map((b) => ({ month: b.label, ngn: 0, usdRaw: 0, usdInNgnEquivalent: 0 }));
@@ -116,6 +116,7 @@ const SPEND_LABEL: Record<string, string> = {
   transfer: "Sent to others",
   invoice_payment: "Invoices you paid",
   loan_repayment: "Loan repayments",
+  payroll_payment: "Payroll",
   fee: "Fees",
   refund: "Refunds you gave",
 };

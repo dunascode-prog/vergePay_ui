@@ -20,7 +20,7 @@ Built by **[Seyitan Omodara](https://github.com/dunascode-prog)** · Backend: [v
 | | |
 |---|---|
 | **What it is** | A dashboard for freelancers and small businesses to run personal and business money in one place |
-| **Screens** | 20 routes in 11 sections: overview, analytics, invoices (list, new, detail, edit, and the public pay page), recurring billing, clients, business overview, expenses, payroll, goals, envelopes, loans |
+| **Screens** | 21 routes in 11 sections: overview, analytics, invoices (list, new, detail, edit, and the public pay page), recurring billing, clients, business overview, expenses, payroll, goals, envelopes, loans |
 | **Stack** | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui on Base UI, Recharts, React Hook Form + Zod |
 | **Rendering** | Server Components by default. Client Components only where there's interaction. Server Actions for forms |
 | **Money** | Naira and US dollars kept separate and never blended at an invented exchange rate. Formatted per locale with `Intl.NumberFormat` |
@@ -79,7 +79,7 @@ The sidebar groups the app the way a small-business owner thinks about their mon
 |---|---|---|
 | **Business overview** | `/dashboard/business` | **Live.** Follows the Personal / Business / Combined toggle. Revenue, money out and net this year (per currency, and moves between your own wallets don't count), what clients owe and how much is overdue, revenue and money out over six months, and a **business health score** worked out from five checks shown under it: paying on time, overdue invoices, how much rests on one client, how many months your cash covers, and revenue against the previous 90 days. A **"needs attention"** list links straight to each problem: overdue invoices, plans that couldn't send, late-paying clients, paused plans and unsent drafts. Also top clients, recurring revenue with the next invoice, wallet balances and where money went |
 | **Expenses** | `/dashboard/expenses` | Expense table with category breakdown and trend. Flags recurring expenses and **missing receipts** |
-| **Payroll** | `/dashboard/payroll` | Payees (salary or contract), pay frequency and bank details (masked). A payroll run shows gross, PAYE, pension and net, and writes each payment to Expenses automatically |
+| **Payroll** | `/dashboard/payroll`, `/[id]` | **Live, paying real VergePay wallets.** Add a payee by their account number (you see whose wallet it is before saving), with their role, pay type (retainer, per project, hourly), how often (monthly, every two weeks, one-off) and usual amount. Each payee shows what they were last paid and when they're next due; filter by due, type or inactive, or search. **Run payroll** pays everyone ticked from one wallet in one go, each at their usual amount or another, with a note they see: all or nothing, and safe to retry. Recent runs are listed, and each payee has a page with every payment, editing, and making them inactive |
 
 ### Wealth
 | Screen | Route | What it shows |
@@ -218,7 +218,8 @@ The screens were designed first, using sample data shaped like the real domain. 
 | Recurring billing | `/dashboard/recurring/*` | `/v1/recurring-plans` (create, list, get, edit, `/pause`, `/resume`, `/cancel`), `/v1/clients` | ✅ Connected |
 | Clients | `/dashboard/clients` | `/v1/clients` (list with stats and health, get with invoices, create, edit, archive, `/restore`) | ✅ Connected |
 | Business overview | `/dashboard/business` | `/v1/accounts` and `/:id/transactions`, `/v1/invoices`, `/v1/recurring-plans`, `/v1/clients` | ✅ Connected |
-| Expenses, payroll, envelopes | their pages | none yet; the backend doesn't have these features | 🎨 Designed, sample data |
+| Payroll | `/dashboard/payroll`, `/[id]` | `/v1/payees` (add, list, get with payments, edit), `/v1/payroll/runs` (pay, list), `/v1/accounts/lookup` | ✅ Connected |
+| Expenses, envelopes | their pages | none yet; the backend doesn't have these features | 🎨 Designed, sample data |
 
 ---
 
@@ -308,6 +309,7 @@ Open [http://localhost:3000](http://localhost:3000) for the landing page, create
 - [x] Investments: link Alpaca (with 2FA set up on the way), synced holdings, a reminder until linked
 - [x] Loans: apply, view the repayment schedule, repay
 - [x] Savings goals with real money: add, withdraw, pace, activity, edit and close
+- [x] Payroll to VergePay wallets: payees, who's due, all-or-nothing pay runs, payment history
 - [ ] Remove leftover sample data and unused components
 - [ ] Deployment
 

@@ -205,6 +205,7 @@ export const TRANSACTION_LABEL: Record<string, string> = {
   bank_deposit: "Bank transfer in",
   goal_contribution: "Saved to a goal",
   goal_withdrawal: "Withdrawn from a goal",
+  payroll_payment: "Payroll",
 };
 
 /** Money moved between a wallet and one of your savings goals: saving, not spending or income. */
