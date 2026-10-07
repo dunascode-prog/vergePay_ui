@@ -48,7 +48,7 @@ export function RevenueTrendChart({ data, periodLabel }: RevenueTrendChartProps)
     <Card className="shadow-none">
       <CardHeader className="pb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <CardTitle className="text-sm font-medium text-foreground">Revenue trend</CardTitle>
+          <CardTitle>Revenue trend</CardTitle>
           {periodLabel && (
             <p className="mt-1 text-xs text-muted-foreground">
               <span className="text-base font-medium text-foreground tabular-nums">{formatMoney(totalNgn, "NGN")}</span>

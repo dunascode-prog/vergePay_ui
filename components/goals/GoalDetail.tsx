@@ -144,7 +144,7 @@ export function GoalDetail({ goalId }: { goalId: string }) {
       </section>
 
       <section className="mt-5 space-y-2">
-        <h2 className="text-sm font-medium text-muted-foreground">Activity</h2>
+        <h2 className="text-sm font-semibold">Activity</h2>
         {goal.activity.length === 0 ? (
           <p className="rounded-xl border bg-card px-4 py-8 text-center text-sm text-muted-foreground">Nothing added yet.</p>
         ) : (

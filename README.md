@@ -156,6 +156,20 @@ Calculations live in small, pure modules in `lib/` rather than inside JSX:
 - `expense-category.ts`: category totals from line items, with colours shared across Analytics, Business and Expenses so a category looks the same everywhere
 - `format.ts`: currency formatting and per-currency sums
 
+### One type scale
+Every screen uses the same handful of sizes, each for one job, so the app reads as one product:
+
+| Size | Used for |
+|---|---|
+| 12px | captions, meta, stat labels, badges, table headers (normal case, never capitals) |
+| 14px | body text, descriptions, buttons, tabs, form labels; section headings in semibold |
+| 16px | card titles (semibold, set once in `components/ui/card.tsx`) |
+| 20px | page headings |
+| 24px | stat numbers in tiles and overviews |
+| 30px | the one hero number on a screen (a wallet balance, the amount in a money dialog) |
+
+The sidebar is chrome and runs a step smaller: 13px rows and 12px labels. The landing and sign-in pages keep their larger marketing headlines.
+
 ### Accessible components, dark mode
 The UI is built on **shadcn/ui over Base UI** primitives, so dialogs, dropdowns, sheets, tabs and tooltips handle focus, keyboard navigation and ARIA roles properly. The theme is made of CSS variables in Tailwind 4, with light and dark modes via `next-themes`. The sidebar collapses, remembers its state in a cookie, and becomes a sheet on mobile.
 

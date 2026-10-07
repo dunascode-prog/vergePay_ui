@@ -52,7 +52,7 @@ export function ExpenseTrendChart({ expenses }: ExpenseTrendChartProps) {
   return (
     <Card className="lg:col-span-6 border-gray-200 shadow-none">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-gray-700">
+        <CardTitle>
           Monthly spend
         </CardTitle>
       </CardHeader>

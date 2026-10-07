@@ -262,7 +262,7 @@ export function ExpenseTable({ expenses: initialExpenses }: ExpenseTableProps) {
                       <TableRow className="hover:bg-transparent">
                         <TableCell colSpan={7} className="p-0">
                           <div className="bg-gray-50/60 px-4 py-3">
-                            <p className="text-xs font-medium uppercase tracking-wide text-gray-400 mb-2">
+                            <p className="text-xs font-medium text-gray-400 mb-2">
                               Ledger posting
                             </p>
                             <div className="space-y-1.5">

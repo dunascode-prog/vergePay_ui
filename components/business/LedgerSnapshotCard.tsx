@@ -18,7 +18,7 @@ export function LedgerSnapshotCard({ ledger }: LedgerSnapshotCardProps) {
   return (
     <Card className="border-gray-200 shadow-none">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-gray-700">Ledger snapshot</CardTitle>
+        <CardTitle>Ledger snapshot</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2.5">
         {rows.map((row) => (

@@ -18,7 +18,7 @@ export default function Metric({
 }: MetricCardProps) {
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+      <p className="text-xs font-medium text-muted-foreground">
         {title}
       </p>
 

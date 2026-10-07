@@ -67,7 +67,7 @@ export function AIInsightCard({
           <div className="space-y-2">
             <h3
               className={cn(
-                "text-sm font-semibold uppercase tracking-wide",
+                "text-sm font-semibold",
                 styles.title,
               )}
             >

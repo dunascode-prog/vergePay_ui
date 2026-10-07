@@ -18,7 +18,7 @@ export function ClientCard({ client, onClick }: { client: ApiClient; onClick: ()
       type="button"
       onClick={onClick}
       className={cn(
-        "flex w-full flex-col rounded-xl border bg-card p-4 text-left transition-colors hover:border-emerald-300 hover:bg-emerald-50/30 focus-visible:ring-3 focus-visible:ring-emerald-600/20 focus-visible:outline-none dark:hover:border-emerald-800 dark:hover:bg-emerald-950/20",
+        "flex w-full flex-col rounded-xl border bg-card p-4 text-left text-sm transition-colors hover:border-emerald-300 hover:bg-emerald-50/30 focus-visible:ring-3 focus-visible:ring-emerald-600/20 focus-visible:outline-none dark:hover:border-emerald-800 dark:hover:bg-emerald-950/20",
         client.archived_at && "opacity-70",
       )}
     >

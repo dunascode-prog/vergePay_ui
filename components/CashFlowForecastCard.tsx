@@ -25,7 +25,7 @@ export function CashFlowForecastCard({ buckets }: CashFlowForecastCardProps) {
   return (
     <Card className="shadow-none">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-foreground flex items-center gap-1.5">
+        <CardTitle className="flex items-center gap-1.5">
           <LuTrendingUp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           Expected cash flow
         </CardTitle>

@@ -32,7 +32,7 @@ export function MonthlySummaryCard() {
   return (
     <Card className="rounded-2xl shadow-sm">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold">
+        <CardTitle>
           📊 This Month Summary
         </CardTitle>
       </CardHeader>
@@ -63,7 +63,7 @@ export function MonthlySummaryCard() {
         <div className="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-3 dark:bg-emerald-950/30">
           <span className="font-semibold">Net Profit</span>
 
-          <span className="text-lg font-bold tabular-nums text-emerald-600">
+          <span className="text-2xl font-semibold tabular-nums text-emerald-600">
             +₦160,000
           </span>
         </div>

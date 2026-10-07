@@ -16,7 +16,7 @@ export function ExpenseBreakdownCard({ categories }: ExpenseBreakdownCardProps) 
   return (
     <Card className="border-gray-200 shadow-none">
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm font-medium text-gray-700">Expenses by category</CardTitle>
+        <CardTitle>Expenses by category</CardTitle>
         <span className="text-sm font-semibold text-gray-900">{formatMoney(total, currency)}</span>
       </CardHeader>
       <CardContent>

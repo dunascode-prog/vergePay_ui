@@ -156,7 +156,7 @@ export function InvoiceForm({ invoiceId }: { invoiceId?: string }) {
       <Link href={invoiceId ? `/dashboard/invoices/${invoiceId}` : "/dashboard/invoices"} className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="size-4" /> {invoiceId ? "Back to invoice" : "Invoices"}
       </Link>
-      <h1 className="mb-5 text-2xl font-semibold tracking-tight">{invoiceId ? "Edit draft" : "New invoice"}</h1>
+      <h1 className="mb-5 text-xl font-semibold tracking-tight">{invoiceId ? "Edit draft" : "New invoice"}</h1>
 
       <div className="grid gap-5 lg:grid-cols-[1fr_20rem] lg:items-start">
         <div className="space-y-5">
@@ -203,7 +203,7 @@ export function InvoiceForm({ invoiceId }: { invoiceId?: string }) {
                       onClick={() => setDueDate(isoDay(days))}
                       aria-pressed={dueDate === isoDay(days)}
                       className={cn(
-                        "rounded-full border px-2.5 py-0.5 text-xs text-muted-foreground hover:text-foreground",
+                        "rounded-full border px-2.5 py-0.5 text-sm text-muted-foreground hover:text-foreground",
                         dueDate === isoDay(days) && "border-emerald-700 text-emerald-800 dark:text-emerald-300",
                       )}
                     >

@@ -29,7 +29,7 @@ export function KeyMetricsCard() {
   return (
     <Card className="rounded-2xl shadow-sm">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold">Key Metrics</CardTitle>
+        <CardTitle>Key Metrics</CardTitle>
       </CardHeader>
 
       <CardContent className="pt-0">

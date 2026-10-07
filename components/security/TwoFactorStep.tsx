@@ -123,7 +123,7 @@ export function TwoFactorStep({
         <span className="flex size-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
           <ShieldCheck className="size-5" />
         </span>
-        <DialogTitle className="text-lg font-semibold">{setup ? "Turn on two-factor authentication" : "Confirm it's you"}</DialogTitle>
+        <DialogTitle className="text-base font-semibold">{setup ? "Turn on two-factor authentication" : "Confirm it's you"}</DialogTitle>
         <p className="text-sm text-muted-foreground">
           {setup
             ? `To ${action}, add VergePay to an authenticator app (Google Authenticator, Authy, 1Password) and enter the 6-digit code it shows. From now on, signing in will ask for a code too.`
@@ -133,7 +133,7 @@ export function TwoFactorStep({
 
       {setup && (
         <div className="space-y-3 rounded-xl border bg-muted/40 p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Setup key</p>
+          <p className="text-xs font-medium text-muted-foreground">Setup key</p>
           <div className="flex items-center justify-between gap-2">
             <code className="break-all font-mono text-sm tracking-wider">{grouped(setup.secret)}</code>
             <Button

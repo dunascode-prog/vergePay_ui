@@ -104,7 +104,7 @@ export function RecurringPlanDetail({ planId }: { planId: string }) {
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex items-center gap-2.5">
-            <h1 className="truncate text-2xl font-semibold tracking-tight">{plan.description}</h1>
+            <h1 className="truncate text-xl font-semibold tracking-tight">{plan.description}</h1>
             <RecurringStatusBadge status={plan.plan_status} />
           </div>
           <p className="mt-1 text-sm text-muted-foreground">

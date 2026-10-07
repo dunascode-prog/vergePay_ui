@@ -127,7 +127,7 @@ export function MonthlyCashFlowA() {
   return (
     <Card className="rounded-2xl shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <CardTitle>
           Monthly Cash Flow — 6 Months
         </CardTitle>
       </CardHeader>
@@ -197,7 +197,7 @@ export function MonthlyCashFlow() {
   return (
     <Card className="rounded-2xl shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <CardTitle>
           Detailed Monthly Cash Flow — 6 Months
         </CardTitle>
       </CardHeader>

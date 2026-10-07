@@ -132,7 +132,7 @@ export function RecurringPlanForm() {
       <Link href="/dashboard/recurring" className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="size-4" /> Recurring billing
       </Link>
-      <h1 className="mb-5 text-2xl font-semibold tracking-tight">New plan</h1>
+      <h1 className="mb-5 text-xl font-semibold tracking-tight">New plan</h1>
 
       <div className="grid gap-5 lg:grid-cols-[1fr_20rem] lg:items-start">
         <div className="space-y-5">
@@ -263,7 +263,7 @@ export function RecurringPlanForm() {
                       onClick={() => setStartDate(p.value)}
                       aria-pressed={startDate === p.value}
                       className={cn(
-                        "rounded-full border px-2.5 py-0.5 text-xs text-muted-foreground hover:text-foreground",
+                        "rounded-full border px-2.5 py-0.5 text-sm text-muted-foreground hover:text-foreground",
                         startDate === p.value && "border-emerald-700 text-emerald-800 dark:text-emerald-300",
                       )}
                     >

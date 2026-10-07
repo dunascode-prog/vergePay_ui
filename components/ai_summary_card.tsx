@@ -67,7 +67,7 @@ export function AISummaryCard2() {
           </div>
 
           <div>
-            <CardTitle className="text-base">AI Monthly Report</CardTitle>
+            <CardTitle>AI Monthly Report</CardTitle>
 
             <p className="text-sm text-muted-foreground">November 2024</p>
           </div>

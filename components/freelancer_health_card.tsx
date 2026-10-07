@@ -101,7 +101,7 @@ export default function FreelancerHealthCard() {
   return (
     <Card className="rounded-2xl shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        <CardTitle>
           Freelancer Health Score
         </CardTitle>
       </CardHeader>

@@ -21,7 +21,7 @@ export function InvoiceBehaviorCard({ reminders, latePayments }: InvoiceBehavior
   return (
     <Card className="shadow-none">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-foreground">Invoice behavior</CardTitle>
+        <CardTitle>Invoice behavior</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
         <div>
@@ -38,19 +38,19 @@ export function InvoiceBehaviorCard({ reminders, latePayments }: InvoiceBehavior
           ) : (
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="rounded-md bg-emerald-50 dark:bg-emerald-950/40 py-2">
-              <p className="text-lg font-semibold text-emerald-700 dark:text-emerald-400">
+              <p className="text-2xl font-semibold text-emerald-700 dark:text-emerald-400">
                 {reminders.paidWithin48h}
               </p>
               <p className="text-xs text-emerald-600 dark:text-emerald-400/80">Paid within 48h</p>
             </div>
             <div className="rounded-md bg-amber-50 dark:bg-amber-950/40 py-2">
-              <p className="text-lg font-semibold text-amber-700 dark:text-amber-400">
+              <p className="text-2xl font-semibold text-amber-700 dark:text-amber-400">
                 {reminders.paidLater}
               </p>
               <p className="text-xs text-amber-600 dark:text-amber-400/80">Paid later</p>
             </div>
             <div className="rounded-md bg-red-50 dark:bg-red-950/40 py-2">
-              <p className="text-lg font-semibold text-red-700 dark:text-red-400">
+              <p className="text-2xl font-semibold text-red-700 dark:text-red-400">
                 {reminders.stillUnpaid}
               </p>
               <p className="text-xs text-red-600 dark:text-red-400/80">Still unpaid</p>

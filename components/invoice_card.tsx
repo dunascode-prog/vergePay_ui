@@ -10,7 +10,7 @@ export default function OutstandingInvoiceCard() {
   return (
     <Card className="rounded-2xl">
       <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <CardTitle className="flex items-center gap-2 text-base font-semibold">
+        <CardTitle className="flex items-center gap-2">
           Outstanding invoices
           <SampleBadge />
         </CardTitle>

@@ -127,7 +127,7 @@ export function GoalsPage() {
 
       {active.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-sm font-medium text-muted-foreground">Active</h2>
+          <h2 className="text-sm font-semibold">Active</h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {active.map((g) => (
               <GoalCard key={g.goal_id} goal={g} onChanged={reload} />
@@ -138,7 +138,7 @@ export function GoalsPage() {
 
       {closed.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-sm font-medium text-muted-foreground">Closed</h2>
+          <h2 className="text-sm font-semibold">Closed</h2>
           <ul className="divide-y rounded-xl border bg-card">
             {closed.map((g) => (
               <li key={g.goal_id}>
@@ -167,7 +167,7 @@ function Tile({ icon: Icon, label, value, sub, warn = false, className }: { icon
         <p className="text-xs text-muted-foreground">{label}</p>
         <Icon className="size-4 text-muted-foreground" />
       </div>
-      <p className="mt-1.5 truncate text-xl font-semibold tracking-tight tabular-nums" title={value}>
+      <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
         {value}
       </p>
       <p className={cn("mt-0.5 truncate text-xs", warn ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground")} title={sub}>

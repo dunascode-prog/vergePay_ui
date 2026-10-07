@@ -103,7 +103,7 @@ export function LoanDetail({ loanId }: { loanId: string }) {
         <div className="min-w-0 space-y-5">
           <section className="rounded-xl border bg-card p-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-lg font-semibold">{LOAN_TYPE_LABEL[loan.loan_type]}</h1>
+              <h1 className="text-xl font-semibold tracking-tight">{LOAN_TYPE_LABEL[loan.loan_type]}</h1>
               <span
                 className={cn(
                   "rounded-full px-2 py-0.5 text-xs font-medium",

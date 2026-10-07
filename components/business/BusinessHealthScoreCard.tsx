@@ -30,7 +30,7 @@ export function BusinessHealthScoreCard({ health }: { health: BusinessHealth }) 
         ) : (
           <>
             <div className="flex items-baseline gap-2">
-              <p className="text-4xl font-semibold tracking-tight tabular-nums">{health.score}</p>
+              <p className="text-3xl font-semibold tracking-tight tabular-nums">{health.score}</p>
               <p className="text-sm text-muted-foreground">/ 100 · {health.label}</p>
             </div>
             <div

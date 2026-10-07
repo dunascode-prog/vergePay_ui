@@ -17,7 +17,7 @@ export function TaxSetAsideCard() {
   return (
     <Card className="rounded-2xl shadow-sm">
       <CardHeader>
-        <CardTitle className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+        <CardTitle>
           Tax Set-Aside Tracker
         </CardTitle>
       </CardHeader>
@@ -29,7 +29,7 @@ export function TaxSetAsideCard() {
               Suggested reserve
             </span>
 
-            <span className="text-xl font-bold">₦505,500</span>
+            <span className="text-2xl font-semibold">₦505,500</span>
           </div>
 
           <Progress value={percent} className="h-2" />

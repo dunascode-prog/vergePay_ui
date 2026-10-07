@@ -15,7 +15,7 @@ export function ClientPortfolioAISummary({ clients }: { clients: ApiClient[] }) 
   if (!clients.length) return null;
   return (
     <section className="rounded-xl border bg-card p-4">
-      <h2 className="mb-2.5 text-sm font-medium">
+      <h2 className="mb-2.5 text-sm font-semibold">
         Client insights <span className="font-normal text-muted-foreground">· from your invoices</span>
       </h2>
       {insights.length === 0 ? (

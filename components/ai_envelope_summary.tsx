@@ -50,12 +50,12 @@ export function AIEnvelopeSummary() {
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2 text-base">
+            <CardTitle className="flex items-center gap-2">
               <Brain className="h-4 w-4 text-primary" />
               AI Summary
             </CardTitle>
 
-            <CardDescription className="mt-1 text-xs">
+            <CardDescription className="mt-1">
               Great allocation. You&apos;re prioritizing essentials.
             </CardDescription>
           </div>

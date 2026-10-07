@@ -19,7 +19,7 @@ export function LedgerBreakdown({ invoice }: LedgerBreakdownProps) {
 
   return (
     <div className="bg-gray-50/60 px-4 py-4">
-      <p className="text-xs font-medium uppercase tracking-wide text-gray-400 mb-3">
+      <p className="text-xs font-medium text-gray-400 mb-3">
         Ledger postings
       </p>
       <div className="space-y-2">
@@ -42,7 +42,7 @@ export function LedgerBreakdown({ invoice }: LedgerBreakdownProps) {
               </div>
             </div>
             <div className="text-right shrink-0 pl-3">
-              <p className="text-xs uppercase text-gray-400">{entry.type}</p>
+              <p className="text-xs text-gray-400">{entry.type}</p>
               <p className="text-sm font-medium text-gray-900">
                 {formatMoney(entry.amount, invoice.currency)}
               </p>

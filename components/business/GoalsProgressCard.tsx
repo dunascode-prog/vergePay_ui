@@ -11,7 +11,7 @@ export function GoalsProgressCard({ goals }: GoalsProgressCardProps) {
   return (
     <Card className="border-gray-200 shadow-none">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-gray-700">Goals</CardTitle>
+        <CardTitle>Goals</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {goals.map((goal) => {

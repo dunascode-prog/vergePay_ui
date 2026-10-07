@@ -145,7 +145,7 @@ function InvoiceCard({ link, token, returned, onRetry }: { link: PayLink; token:
 
       <div className="mt-6">
         <p className="text-sm text-muted-foreground">{link.invoice_status === "paid" ? "Amount paid" : "Amount due"}</p>
-        <p className="text-4xl font-bold tracking-tight tabular-nums">{total}</p>
+        <p className="text-3xl font-bold tracking-tight tabular-nums">{total}</p>
         {payable && (
           <p className={cn("mt-1 text-sm", link.invoice_status === "overdue" ? "text-amber-700 dark:text-amber-300" : "text-muted-foreground")}>
             {link.invoice_status === "overdue" ? `Was due ${formatDay(link.due_date)}` : `Due ${formatDay(link.due_date)}`}

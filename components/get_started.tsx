@@ -39,7 +39,7 @@ export function SignupForm({
               </div>
               <span className="sr-only">vergePay</span>
             </Link>
-            <h1 className="text-xl font-bold">Welcome to VergePay</h1>
+            <h1 className="text-xl font-semibold">Welcome to VergePay</h1>
             <FieldDescription>
               Already have an account? <Link href="/signin">Sign in</Link>
             </FieldDescription>

@@ -30,7 +30,7 @@ export function IncomeStabilityCard() {
   return (
     <Card className="rounded-2xl shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+        <CardTitle>
           Income Stability — 12 Months
         </CardTitle>
       </CardHeader>

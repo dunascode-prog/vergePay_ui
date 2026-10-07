@@ -71,7 +71,7 @@ export function ClientConcentrationCard() {
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+            <CardTitle>
               Income by Client — Concentration Risk
             </CardTitle>
 
