@@ -7,7 +7,6 @@ import {
   ReminderEffectiveness,
   LatePaymentBucket,
   ExpenseCategory,
-  Goal,
   AIInsight,
 } from "@/types/analytics";
 
@@ -151,25 +150,6 @@ export const expenseCategories: ExpenseCategory[] = [
   { category: "Marketing", amount: 38000, currency: "NGN", colorClass: "bg-amber-500" },
   { category: "Internet & utilities", amount: 27000, currency: "NGN", colorClass: "bg-violet-500" },
   { category: "Other", amount: 18000, currency: "NGN", colorClass: "bg-gray-400" },
-];
-
-export const goals: Goal[] = [
-  {
-    id: "goal_emergency",
-    name: "Emergency fund (3 months expenses)",
-    target: 900000,
-    current: 540000,
-    currency: "NGN",
-    deadline: "2025-03-01",
-  },
-  {
-    id: "goal_equipment",
-    name: "New MacBook for client work",
-    target: 1600,
-    current: 620,
-    currency: "USD",
-    deadline: "2025-01-15",
-  },
 ];
 
 export const aiInsights: AIInsight[] = [

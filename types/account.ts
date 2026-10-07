@@ -34,7 +34,9 @@ export type TransactionType =
   | "fee"
   | "refund"
   | "invoice_payment"
-  | "bank_deposit";
+  | "bank_deposit"
+  | "goal_contribution"
+  | "goal_withdrawal";
 
 export type TransactionStatus = "pending" | "settled" | "failed" | "reversed";
 

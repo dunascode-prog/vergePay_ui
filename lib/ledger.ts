@@ -1,6 +1,6 @@
 // Pure helpers that turn API accounts and ledger lines into what the
 // dashboard shows. No fetching here, so it's easy to reason about (and test).
-import { Account, AccountPurpose, AccountType, ScopedTransaction } from "@/types/account";
+import { Account, AccountPurpose, AccountTransaction, AccountType, ScopedTransaction } from "@/types/account";
 
 export type AccountScope = AccountPurpose | "combined";
 
@@ -22,6 +22,7 @@ export const purposeLabel = (purpose: AccountPurpose) => PURPOSE_LABEL[purpose];
 /** "Personal wallet", "Business wallet", "Investment wallet". */
 export function accountName(account: Account): string {
   if (account.account_type === "current") return walletName(account.purpose);
+  if (account.account_type === "savings") return "Savings goal";
   return TYPE_LABEL[account.account_type] + (account.account_type === "loan_holding" ? " account" : "");
 }
 
@@ -130,7 +131,8 @@ export interface MonthFlow extends MonthKey {
 /**
  * Income and spending per month for the accounts in scope, in one currency.
  * A move between two accounts that are both in scope (e.g. personal → business
- * while viewing Combined) is neither income nor spending, so it's left out.
+ * while viewing Combined) is neither income nor spending, so it's left out,
+ * and so is money put into or taken out of a savings goal.
  */
 export function monthlyFlows(
   lines: ScopedTransaction[],
@@ -140,7 +142,7 @@ export function monthlyFlows(
 ): MonthFlow[] {
   const byKey = new Map(months.map((m) => [m.key, { ...m, income: 0, spent: 0, net: 0 }]));
   for (const line of lines) {
-    if (!moved(line) || line.currency_code !== currency) continue;
+    if (!moved(line) || line.currency_code !== currency || isGoalMove(line)) continue;
     if (!scopedAccountIds.has(line.account_id)) continue;
     if (line.counterparty_account_id && scopedAccountIds.has(line.counterparty_account_id)) continue;
     const month = byKey.get(keyOf(new Date(line.created_at)));
@@ -201,4 +203,10 @@ export const TRANSACTION_LABEL: Record<string, string> = {
   refund: "Refund",
   invoice_payment: "Invoice payment",
   bank_deposit: "Bank transfer in",
+  goal_contribution: "Saved to a goal",
+  goal_withdrawal: "Withdrawn from a goal",
 };
+
+/** Money moved between a wallet and one of your savings goals: saving, not spending or income. */
+export const isGoalMove = (line: Pick<AccountTransaction, "transaction_type">) =>
+  line.transaction_type === "goal_contribution" || line.transaction_type === "goal_withdrawal";

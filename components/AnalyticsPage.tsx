@@ -35,13 +35,13 @@ import { HealthScoreCard } from "./HealthScoreCard";
 import { InvoiceBehaviorCard } from "./InvoiceBehaviorCard";
 import { PeriodSelector } from "./PeriodSelector";
 import { RevenueTrendChart } from "./RevenueTrendChart";
-// no backend for these two yet: shown as sample data, and tagged so
-import { currentHealthScore, goals, healthScoreFactors, healthScoreHistory } from "@/data/mock-analytics";
+// no backend for the health score yet: shown as sample data, and tagged so
+import { currentHealthScore, healthScoreFactors, healthScoreHistory } from "@/data/mock-analytics";
 
 /**
  * /dashboard/analytics: everything here comes from your ledger and invoices,
- * for the period picked and the Personal / Business / Combined view, except
- * the health score and goals, which are tagged sample data.
+ * for the period picked and the Personal / Business / Combined view (goals
+ * from your savings goals), except the health score, which is tagged sample data.
  */
 export function AnalyticsPage() {
   const { accounts, accountsState, dataVersion } = useAppData();
@@ -159,10 +159,7 @@ export function AnalyticsPage() {
               <SampleBadge className="absolute top-4 right-4 z-10" />
               <HealthScoreCard currentScore={currentHealthScore} history={healthScoreHistory} factors={healthScoreFactors} />
             </div>
-            <div className="relative">
-              <SampleBadge className="absolute top-4 right-4 z-10" />
-              <GoalsProgressCard goals={goals} />
-            </div>
+            <GoalsProgressCard />
           </div>
         </>
       )}
