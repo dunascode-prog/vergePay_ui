@@ -2,9 +2,9 @@
 
 // Dashboard widgets whose features have no API yet. They show example data,
 // always tagged "Sample data", and follow the Personal / Business toggle:
-// client health, billing and invoices are business; goals and budgets personal.
+// client health, billing and invoices are business; budgets personal.
 import Link from "next/link";
-import { ArrowRight, PiggyBank, Receipt, Repeat, Target, TrendingDown, UserPlus, Wallet } from "lucide-react";
+import { ArrowRight, PiggyBank, Receipt, Repeat, TrendingDown, UserPlus, Wallet } from "lucide-react";
 import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -112,53 +112,6 @@ export function UpcomingBillingCard() {
         <UpcomingBillButton title="Adobe Creative Cloud" subtitle="Dec 1 · Auto-debit" amount="₦15.4k" status="warning" />
         <Link href="/dashboard/recurring" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "mt-1 w-full text-emerald-700")}>
           See recurring billing <ArrowRight className="ml-1 size-4" />
-        </Link>
-      </CardContent>
-    </Card>
-  );
-}
-
-const GOALS = [
-  { name: "Emergency fund", progress: 51, current: "₦10k", target: "₦90k" },
-  { name: "MacBook Pro", progress: 21, current: "₦20k", target: "₦60k" },
-];
-
-export function GoalsCard() {
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
-        <div>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="size-4 text-emerald-700" aria-hidden />
-            Goals
-          </CardTitle>
-          <CardDescription>What you&apos;re saving towards</CardDescription>
-        </div>
-        <SampleBadge />
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {GOALS.map((goal) => (
-          <div key={goal.name} className="space-y-1.5">
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-medium">{goal.name}</span>
-              <span className="text-xs text-muted-foreground tabular-nums">
-                {goal.current} of {goal.target} · {goal.progress}%
-              </span>
-            </div>
-            <div
-              className="h-1.5 overflow-hidden rounded-full bg-muted"
-              role="progressbar"
-              aria-label={goal.name}
-              aria-valuenow={goal.progress}
-              aria-valuemin={0}
-              aria-valuemax={100}
-            >
-              <div className="h-full rounded-full bg-emerald-700" style={{ width: `${goal.progress}%` }} />
-            </div>
-          </div>
-        ))}
-        <Link href="/dashboard/goals" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full text-emerald-700")}>
-          Manage goals <ArrowRight className="ml-1 size-4" />
         </Link>
       </CardContent>
     </Card>

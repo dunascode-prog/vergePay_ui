@@ -13,9 +13,9 @@ import { CashFlowChart } from "@/components/dashboard/CashFlowChart";
 import { PerformanceOverview } from "@/components/dashboard/PerformanceOverview";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { WalletCards } from "@/components/dashboard/WalletCards";
+import { GoalsCard } from "@/components/dashboard/GoalsCard";
 import {
   ClientHealthCard,
-  GoalsCard,
   QuickActions,
   UpcomingBillingCard,
 } from "@/components/dashboard/SampleWidgets";

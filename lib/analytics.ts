@@ -4,6 +4,7 @@
 // dollars), which is what the analytics cards display.
 
 import { formatDay } from "@/lib/invoicing";
+import { isGoalMove } from "@/lib/ledger";
 import { ScopedTransaction } from "@/types/account";
 import {
   AIInsight,
@@ -85,9 +86,10 @@ export function earliestNeeded(period: Period, now = new Date()): string {
 }
 
 const settled = (l: ScopedTransaction) => l.status === "settled" || l.status === "reversed";
-// money that moved between two wallets both in view is neither in nor out
+// money that moved between two wallets both in view is neither in nor out,
+// and neither is money put into or taken out of a savings goal
 const internal = (l: ScopedTransaction, scoped: Set<string>) =>
-  !!l.counterparty_account_id && scoped.has(l.counterparty_account_id);
+  isGoalMove(l) || (!!l.counterparty_account_id && scoped.has(l.counterparty_account_id));
 
 /**
  * Revenue: money others paid in (invoice payments, transfers, bank deposits).

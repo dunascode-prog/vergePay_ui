@@ -20,7 +20,7 @@ Built by **[Seyitan Omodara](https://github.com/dunascode-prog)** · Backend: [v
 | | |
 |---|---|
 | **What it is** | A dashboard for freelancers and small businesses to run personal and business money in one place |
-| **Screens** | 19 routes in 11 sections: overview, analytics, invoices (list, new, detail, edit, and the public pay page), recurring billing, clients, business overview, expenses, payroll, goals, envelopes, loans |
+| **Screens** | 20 routes in 11 sections: overview, analytics, invoices (list, new, detail, edit, and the public pay page), recurring billing, clients, business overview, expenses, payroll, goals, envelopes, loans |
 | **Stack** | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui on Base UI, Recharts, React Hook Form + Zod |
 | **Rendering** | Server Components by default. Client Components only where there's interaction. Server Actions for forms |
 | **Money** | Naira and US dollars kept separate and never blended at an invented exchange rate. Formatted per locale with `Intl.NumberFormat` |
@@ -60,9 +60,9 @@ The sidebar groups the app the way a small-business owner thinks about their mon
 ### Main
 | Screen | Route | What it shows |
 |---|---|---|
-| **Overview** | `/dashboard` | **Live from the ledger.** Every customer has up to two wallets, a **Personal** and a **Business** one, and the **Personal / Business / Combined** toggle shows one, the other, or both. A performance card (income, spent and net this month, and the balance, each compared with last month, with six-month sparklines), the wallet cards (balance, currency, copyable account number, or "Add a business wallet" if it's missing), a six-month income-vs-spending chart and the latest transactions (*Personal wallet → Business wallet*). An **Investments** card links Alpaca and then shows synced holdings. A reminder to link comes back every 3 days until they do. Widgets whose features aren't connected yet (AI insight, client health, upcoming billing, outstanding invoices, goals, budgets) follow the toggle and are tagged **Sample data** |
+| **Overview** | `/dashboard` | **Live from the ledger.** Every customer has up to two wallets, a **Personal** and a **Business** one, and the **Personal / Business / Combined** toggle shows one, the other, or both. A performance card (income, spent and net this month, and the balance, each compared with last month, with six-month sparklines), the wallet cards (balance, currency, copyable account number, or "Add a business wallet" if it's missing), a six-month income-vs-spending chart and the latest transactions (*Personal wallet → Business wallet*). An **Investments** card links Alpaca and then shows synced holdings. A reminder to link comes back every 3 days until they do. The **Goals** card shows your real savings goals, due soonest first. Widgets whose features aren't connected yet (AI insight, client health, upcoming billing, outstanding invoices, budgets) follow the toggle and are tagged **Sample data**. Money moved into or out of a goal is saving, so it never counts as income or spending |
 | **Move money** | wallet card actions | **Add money** by bank transfer (a permanent account number for the wallet) or debit card (linked once through Flutterwave's hosted checkout, then one-tap top-ups, with 3-D Secure handled). **Send** to any VergePay wallet after a name check ("Ada Obi"), with a review screen and receipt. **Transfer** between your own personal and business wallets. The first time money moves, a one-time **identity check** (BVN, legal name, date of birth) runs inside the same dialog, and 2FA is turned on when linking a card needs it |
-| **Analytics** | `/dashboard/analytics` | **Live from your invoices and ledger**, following the Personal / Business / Combined toggle and a this month / last 3 months / this year filter. Insights written from your own numbers (overdue invoices, money due this week, one client carrying most of your revenue, revenue up or down), the revenue trend (NGN and USD apart), a cash-flow forecast from unpaid invoices (overdue, next 7 days, 8–30 days, later), collection metrics, client concentration, late-payment ageing, how often reminders led to payment, a client leaderboard and where money went (sent to others, invoices you paid, loan repayments, fees, refunds). The health score and goals cards are still tagged **Sample data** |
+| **Analytics** | `/dashboard/analytics` | **Live from your invoices and ledger**, following the Personal / Business / Combined toggle and a this month / last 3 months / this year filter. Insights written from your own numbers (overdue invoices, money due this week, one client carrying most of your revenue, revenue up or down), the revenue trend (NGN and USD apart), a cash-flow forecast from unpaid invoices (overdue, next 7 days, 8–30 days, later), collection metrics, client concentration, late-payment ageing, how often reminders led to payment, a client leaderboard and where money went (sent to others, invoices you paid, loan repayments, fees, refunds). The goals card shows your real savings goals and whether each is on pace. The health score is still tagged **Sample data** |
 
 ### Payments
 | Screen | Route | What it shows |
@@ -84,7 +84,7 @@ The sidebar groups the app the way a small-business owner thinks about their mon
 ### Wealth
 | Screen | Route | What it shows |
 |---|---|---|
-| **Goals** | `/dashboard/goals` | Savings goals with progress, contributions, and a **pace check** that says whether you'll hit the deadline at your current rate |
+| **Goals** | `/dashboard/goals`, `/[id]` | **Live, with real money.** Each goal is a savings pot with its own account: **Add money** moves it from a wallet into the goal, **Withdraw** moves it back, both instantly and safe to retry. A goal shows what it holds against its target, the date, a **pace check** (on track, behind, funded or past its date, against a straight line from the day it was made) and how much to save each month to make it. The detail page lists every move in and out with the running balance, and lets you edit the goal or close it, which returns whatever is left to a wallet. Closed goals stay listed with what they saved |
 | **Envelopes** | `/dashboard/envelopes` | Budget envelopes that you fund from and withdraw back into your wallets, with spent and remaining amounts for each |
 | **Loans** | `/dashboard/loans`, `/apply`, `/[id]` | **Live.** Apply for a personal loan, cash advance, asset finance or mortgage: amount, term, the wallet it's paid into and what it's for, with the one-time identity check in the same flow. An application in review shows its details until it's decided, and a turned-down one shows the reason. Active loans show what's still owed (interest included), progress through the installments and the next payment, with overdue ones flagged. Each loan has its full schedule (principal and interest per month, and paid, due soon, overdue or upcoming) and a one-tap **Pay** for the next installment from either wallet. In development builds an under-review application has Approve and Reject buttons, using the API's `/v1/dev` helpers |
 
@@ -213,11 +213,12 @@ The screens were designed first, using sample data shaped like the real domain. 
 | Pay links | `/pay/[token]` (public) | `/v1/pay/:token`, `/checkout`, `/sync`, `/wallet` | ✅ Connected |
 | Investments | dashboard Investments card, link reminder, `/dashboard/investments/linked` | `POST`/`GET /v1/brokerage-links` (opens the investment wallet), `/v1/holdings`, `/v1/auth/2fa/enable` + `/verify` | ✅ Connected |
 | Loans | `/dashboard/loans`, `/apply`, `/[id]` | `/v1/loans/applications` (apply, list), `/v1/loans`, `/:id`, `/:id/schedule`, `/:id/repayments` | ✅ Connected |
-| Analytics | `/dashboard/analytics` | `/v1/invoices` (with `reminders_sent`, `last_reminder_at`), `/v1/accounts/:id/transactions` | ✅ Connected (health score and goals still sample) |
+| Analytics | `/dashboard/analytics` | `/v1/invoices` (with `reminders_sent`, `last_reminder_at`), `/v1/accounts/:id/transactions`, `/v1/goals` | ✅ Connected (health score still sample) |
+| Goals | `/dashboard/goals`, `/[id]`, the Home goals card | `/v1/goals` (create, list, get with activity, edit, `/contributions`, `/withdrawals`, `/close`) | ✅ Connected |
 | Recurring billing | `/dashboard/recurring/*` | `/v1/recurring-plans` (create, list, get, edit, `/pause`, `/resume`, `/cancel`), `/v1/clients` | ✅ Connected |
 | Clients | `/dashboard/clients` | `/v1/clients` (list with stats and health, get with invoices, create, edit, archive, `/restore`) | ✅ Connected |
 | Business overview | `/dashboard/business` | `/v1/accounts` and `/:id/transactions`, `/v1/invoices`, `/v1/recurring-plans`, `/v1/clients` | ✅ Connected |
-| Expenses, payroll, goals, envelopes | their pages | none yet; the backend doesn't have these features | 🎨 Designed, sample data |
+| Expenses, payroll, envelopes | their pages | none yet; the backend doesn't have these features | 🎨 Designed, sample data |
 
 ---
 
@@ -305,7 +306,8 @@ Open [http://localhost:3000](http://localhost:3000) for the landing page, create
 - [x] Live dashboard: balances update the moment money moves, a notification bell, and toasts for money in
 - [x] Invoices on the real API: clients, drafts with line items, send and email, pay links clients pay by card or bank transfer, reminders, cancel and refund
 - [x] Investments: link Alpaca (with 2FA set up on the way), synced holdings, a reminder until linked
-- [ ] Loans: apply, view the repayment schedule, repay
+- [x] Loans: apply, view the repayment schedule, repay
+- [x] Savings goals with real money: add, withdraw, pace, activity, edit and close
 - [ ] Remove leftover sample data and unused components
 - [ ] Deployment
 
