@@ -50,7 +50,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // /signin and /signup: someone already fully signed in goes to the app.
+  // /signin, /signup and /forgot-password: someone already fully signed in goes to the app.
   if (fullSession) {
     return NextResponse.redirect(new URL(safeNext(searchParams.get("next")), request.url));
   }
@@ -58,5 +58,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/onboarding", "/signin", "/signup"],
+  matcher: ["/dashboard/:path*", "/onboarding", "/signin", "/signup", "/forgot-password"],
 };

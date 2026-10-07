@@ -35,6 +35,22 @@ export function signout() {
   return api<{ success: boolean }>("/v1/auth/logout", { method: "POST" });
 }
 
+/** Emails a 6-digit reset code if the address has an account. Always the same answer. */
+export function requestPasswordReset(email: string) {
+  return api<{ message: string }>("/v1/auth/password/forgot", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+/** Sets a new password with the emailed code. Signs the account out everywhere. */
+export function resetPassword(data: { email: string; code: string; password: string; confirmPassword: string }) {
+  return api<{ message: string }>("/v1/auth/password/reset", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
 export function getMe() {
   return api<UserProfile>("/v1/users/me");
 }

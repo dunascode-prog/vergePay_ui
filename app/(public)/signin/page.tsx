@@ -18,6 +18,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/signin">) 
         next={params.registered === "1" ? "/onboarding" : safeNext(params.next)}
         initialStep={params.step === "2fa" ? "code" : "credentials"}
         justRegistered={params.registered === "1"}
+        passwordReset={params.reset === "1"}
       />
     </AuthShell>
   );
