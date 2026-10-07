@@ -19,6 +19,7 @@ import { walletName, walletsOf } from "@/lib/ledger";
 import { LOAN_TYPE_HINT, LOAN_TYPE_LABEL, LOAN_TYPES, MAX_LOAN_MINOR, MIN_LOAN_MINOR, termLabel } from "@/lib/loans";
 import { cn } from "@/lib/utils";
 import { applyForLoan, listLoanApplications } from "@/services/loans";
+import { LoanTermsDialog } from "./LoanTermsDialog";
 import { LoanType } from "@/types/loan";
 
 const TERMS = [3, 6, 12, 24, 36];
@@ -42,6 +43,10 @@ export function LoanApplyForm() {
   const [formError, setFormError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [verifyOpen, setVerifyOpen] = useState(false);
+  // the loan terms pop-up: opened before anything is sent; new key per opening
+  const [termsOpen, setTermsOpen] = useState(false);
+  const [termsKey, setTermsKey] = useState(0);
+  const [termsError, setTermsError] = useState<string | null>(null);
   const [hasPending, setHasPending] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -71,14 +76,26 @@ export function LoanApplyForm() {
     return e;
   };
 
+  const openTerms = () => {
+    setTermsError(null);
+    setTermsKey((k) => k + 1);
+    setTermsOpen(true);
+  };
+
   // justVerified: the identity check just passed (the profile hasn't reloaded yet)
-  const submit = async (justVerified = false) => {
+  const submit = (justVerified = false) => {
     const e = check();
     setErrors(e);
     setFormError(null);
     if (Object.keys(e).length) return;
     if (!verified && !justVerified) return setVerifyOpen(true);
+    // nothing is sent until they've read and agreed to the loan terms
+    openTerms();
+  };
+
+  const send = async (termsVersion: string) => {
     setBusy(true);
+    setTermsError(null);
     try {
       await applyForLoan({
         account_id: wallet!.account_id,
@@ -87,15 +104,25 @@ export function LoanApplyForm() {
         currency_code: currency,
         term_months: months,
         ...(purpose.trim() ? { purpose: purpose.trim() } : {}),
+        auto_debit_consent: true,
+        terms_version: termsVersion,
       });
+      setTermsOpen(false);
       router.push("/dashboard/loans");
     } catch (err) {
+      setBusy(false);
+      // the terms changed while they were reading: show the new ones
+      if (err instanceof ApiError && err.field === "terms_version") {
+        setTermsKey((k) => k + 1);
+        setTermsError("The loan terms were just updated. Please read and agree to the current version.");
+        return;
+      }
       if (err instanceof ApiError) {
         const f = err.fieldErrors();
         setErrors({ amount: f.requested_amount_minor, term: f.term_months, wallet: f.account_id ?? f.currency_code, purpose: f.purpose });
       }
+      setTermsOpen(false);
       setFormError(err instanceof ApiError ? err.message : "Couldn't send your application. Please try again.");
-      setBusy(false);
     }
   };
 
@@ -262,6 +289,7 @@ export function LoanApplyForm() {
             <li>The rate is set when your application is reviewed. You&apos;ll see it with the monthly payment before you pay anything.</li>
             <li>If it&apos;s approved, the money goes straight into your wallet. You repay one fixed installment a month, starting a month after.</li>
             <li>You can have one application in review at a time.</li>
+            <li>Before it&apos;s sent you&apos;ll read the loan terms, including automatic repayments, and can download a copy.</li>
           </ul>
           {!verified && (
             <p className="flex items-start gap-2 text-xs text-muted-foreground">
@@ -270,10 +298,20 @@ export function LoanApplyForm() {
           )}
           {formError && <ErrorNote>{formError}</ErrorNote>}
           <Button onClick={() => submit()} disabled={busy || !wallet} className="h-11 w-full rounded-lg bg-emerald-700 text-white hover:bg-emerald-800">
-            {busy ? "Sending…" : verified ? "Send application" : "Verify identity and apply"}
+            {busy ? "Sending…" : verified ? "Review terms and apply" : "Verify identity and apply"}
           </Button>
         </aside>
       </div>
+
+      <LoanTermsDialog
+        key={termsKey}
+        open={termsOpen}
+        onOpenChange={(v) => !busy && setTermsOpen(v)}
+        currency={currency}
+        busy={busy}
+        error={termsError}
+        onAgree={send}
+      />
 
       <Dialog open={verifyOpen} onOpenChange={setVerifyOpen}>
         <DialogContent className="sm:max-w-md">
@@ -281,7 +319,7 @@ export function LoanApplyForm() {
             <VerifyIdentityStep
               onVerified={() => {
                 setVerifyOpen(false);
-                void submit(true);
+                submit(true);
               }}
             />
           )}

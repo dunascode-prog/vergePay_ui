@@ -29,6 +29,21 @@ export interface NewLoanApplication {
   currency_code: string;
   term_months: number;
   purpose?: string;
+  /** The borrower ticked the terms box, which includes automatic repayments. */
+  auto_debit_consent: true;
+  /** The version of the loan terms they read and agreed to (GET /v1/loans/terms). */
+  terms_version: string;
+}
+
+/** GET /v1/loans/terms: the current terms and the numbers they quote. */
+export interface LoanTerms {
+  version: string;
+  effective_date: string;
+  grace_days: number;
+  late_fee_bps: number;
+  late_fee_min_minor: number;
+  default_after_days: number;
+  min_repayment_minor: number;
 }
 
 /** approved: terms set, not paid out yet · active: being repaid */
