@@ -160,7 +160,7 @@ Calculations live in small, pure modules in `lib/` rather than inside JSX:
 
 ### Money in more than one currency
 
-Amounts in different currencies are never added together or converted. A headline figure (`components/money/CurrencyAmounts.tsx`) shows the main currency, naira first, as the big number, with any others as small tags under it (`$44,400.00 USD`). In a sentence they read "₦65,050.10 and $2,000.00" (`moneyByCurrency`).
+Amounts in different currencies are never added together or converted. A headline figure (`components/money/CurrencyAmounts.tsx`) shows the main currency, naira first, as the big number, with any others in a quiet line under it (`$44,400.00`). Every summary row uses one card, `components/StatCard.tsx`: a label, the number, and a hint only when it adds something (a count, a warning), with no corner icons. In a sentence they read "₦65,050.10 and $2,000.00" (`moneyByCurrency`).
 
 ### One type scale
 Every screen uses the same handful of sizes, each for one job, so the app reads as one product:

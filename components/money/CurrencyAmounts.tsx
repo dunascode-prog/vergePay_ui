@@ -8,7 +8,7 @@ export function byCurrency(totals: Map<string, number>): [string, number][] {
 
 /**
  * A headline money figure that may span currencies (never converted). The
- * main currency is the big number; any others sit under it as small tags,
+ * main currency is the big number; any others sit quietly under it,
  * instead of one long "₦417,210.42 + $44,400.00".
  */
 export function CurrencyAmounts({
@@ -19,11 +19,11 @@ export function CurrencyAmounts({
   totals: Map<string, number>;
   /** Shown when there's nothing in any currency. */
   empty?: string;
-  /** Classes for the big number (its size and spacing). */
+  /** Classes for the big number. */
   className?: string;
 }) {
   const entries = byCurrency(totals);
-  const big = cn("truncate text-2xl font-semibold tracking-tight tabular-nums", className);
+  const big = cn("truncate text-xl font-semibold tracking-tight tabular-nums sm:text-2xl", className);
   if (!entries.length) return <p className={big}>{empty}</p>;
 
   const [[mainCurrency, mainMinor], ...others] = entries;
@@ -32,14 +32,9 @@ export function CurrencyAmounts({
     <div className="min-w-0" title={all}>
       <p className={big}>{formatMinor(mainMinor, mainCurrency)}</p>
       {others.length > 0 && (
-        <ul className="mt-1 flex flex-wrap gap-1" aria-label="In other currencies">
-          {others.map(([currency, minor]) => (
-            <li key={currency} className="inline-flex items-baseline gap-1 rounded-md bg-muted px-1.5 py-0.5 text-xs font-medium tabular-nums text-foreground/80">
-              {formatMinor(minor, currency)}
-              <span className="text-[10px] font-normal text-muted-foreground">{currency}</span>
-            </li>
-          ))}
-        </ul>
+        <p className="mt-0.5 truncate text-sm text-muted-foreground tabular-nums">
+          {others.map(([currency, minor]) => formatMinor(minor, currency)).join(" · ")}
+        </p>
       )}
     </div>
   );

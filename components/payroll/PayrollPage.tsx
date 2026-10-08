@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Banknote, CalendarClock, Search, UserPlus, Users } from "lucide-react";
+import { ArrowRight, Banknote, Search, UserPlus, Users } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppData } from "@/components/app-data";
 import { ErrorNote } from "@/components/money/parts";
@@ -19,6 +19,7 @@ import { PayeeAvatar } from "./PayeeAvatar";
 import { PayeeFormDialog } from "./PayeeFormDialog";
 import { RunPayrollDialog } from "./RunPayrollDialog";
 import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
+import { StatCard, StatGrid } from "@/components/StatCard";
 
 const primary = "bg-emerald-700 text-white hover:bg-emerald-800";
 
@@ -135,11 +136,21 @@ export function PayrollPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-        <Tile icon={CalendarClock} label="Due now" value={due.length ? <CurrencyAmounts totals={dueTotals(due)} className="mt-1.5" /> : "Nobody"} sub={due.length ? `${due.length} payee${due.length === 1 ? "" : "s"} at their usual amount` : "Everyone's paid up"} warn={due.length > 0} />
-        <Tile icon={Banknote} label="Paid this month" value={<CurrencyAmounts totals={paidThisMonth} empty="Nothing yet" className="mt-1.5" />} sub={`${runsThisMonth} run${runsThisMonth === 1 ? "" : "s"} this month`} />
-        <Tile className="col-span-2 lg:col-span-1" icon={Users} label="Payees" value={String(active.length)} sub={payees.length > active.length ? `${payees.length - active.length} inactive` : "All active"} />
-      </div>
+      <StatGrid columns={3}>
+        <StatCard
+          label="Due now"
+          value={due.length ? <CurrencyAmounts totals={dueTotals(due)} /> : "Nobody"}
+          hint={due.length ? `${due.length} payee${due.length === 1 ? "" : "s"}` : null}
+          tone="warn"
+        />
+        <StatCard label="Paid this month" value={<CurrencyAmounts totals={paidThisMonth} empty="Nothing yet" />} hint={runsThisMonth ? `${runsThisMonth} run${runsThisMonth === 1 ? "" : "s"}` : null} />
+        <StatCard
+          className="col-span-2 lg:col-span-1"
+          label="Payees"
+          value={String(active.length)}
+          hint={payees.length > active.length ? `${payees.length - active.length} inactive` : null}
+        />
+      </StatGrid>
 
       <section className="space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -204,26 +215,6 @@ export function PayrollPage() {
   );
 }
 
-function Tile({ icon: Icon, label, value, sub, warn = false, className }: { icon: React.ComponentType<{ className?: string }>; label: string; value: React.ReactNode; sub: string; warn?: boolean; className?: string }) {
-  return (
-    <div className={cn("rounded-xl border bg-card p-4", className)}>
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <Icon className="size-4 text-muted-foreground" />
-      </div>
-      {typeof value === "string" ? (
-        <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
-          {value}
-        </p>
-      ) : (
-        value
-      )}
-      <p className={cn("mt-0.5 truncate text-xs", warn ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground")} title={sub}>
-        {sub}
-      </p>
-    </div>
-  );
-}
 
 function PayeeCard({ payee, payees, onChanged }: { payee: Payee; payees: Payee[]; onChanged: () => void }) {
   const money = (minor: number) => formatMinor(minor, payee.currency_code);

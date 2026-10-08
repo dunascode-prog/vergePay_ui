@@ -14,6 +14,7 @@ import { listAllInvoices } from "@/services/invoices";
 import { ApiInvoice, InvoiceStatus } from "@/types/invoicing";
 import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
 import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
+import { StatCard, StatGrid } from "@/components/StatCard";
 
 type Tab = "issued" | "received";
 type Filter = "all" | InvoiceStatus;
@@ -88,17 +89,25 @@ export function InvoicesPage() {
   return (
     <div className="space-y-5">
       {/* summary */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label="Outstanding" value={issued ? <CurrencyAmounts totals={stats.outstanding} empty={money(0, "NGN")} className="mt-1" /> : null} hint={`${stats.outstandingCount} unpaid`} />
-        <Stat
-          label="Overdue"
-          value={issued ? <CurrencyAmounts totals={stats.overdue} empty={money(0, "NGN")} className="mt-1" /> : null}
-          hint={stats.overdueCount ? `${stats.overdueCount} past due` : "Nothing late"}
-          warn={stats.overdueCount > 0}
-        />
-        <Stat label="Paid, last 30 days" value={issued ? <CurrencyAmounts totals={stats.paid} empty={money(0, "NGN")} className="mt-1" /> : null} hint="Into your wallets" />
-        <Stat label="Drafts" value={issued ? String(stats.drafts) : null} hint="Not sent yet" />
-      </div>
+      {issued ? (
+        <StatGrid>
+          <StatCard label="Outstanding" value={<CurrencyAmounts totals={stats.outstanding} empty={money(0, "NGN")} />} hint={stats.outstandingCount ? `${stats.outstandingCount} unpaid` : null} />
+          <StatCard
+            label="Overdue"
+            value={<CurrencyAmounts totals={stats.overdue} empty={money(0, "NGN")} />}
+            hint={stats.overdueCount ? `${stats.overdueCount} past due` : null}
+            tone="warn"
+          />
+          <StatCard label="Paid, last 30 days" value={<CurrencyAmounts totals={stats.paid} empty={money(0, "NGN")} />} />
+          <StatCard label="Drafts" value={String(stats.drafts)} />
+        </StatGrid>
+      ) : (
+        <StatGrid>
+          {[0, 1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-[104px] rounded-xl" />
+          ))}
+        </StatGrid>
+      )}
 
       <div className="rounded-xl border bg-card">
         {/* tabs and filters */}
@@ -217,23 +226,6 @@ export function InvoicesPage() {
   );
 }
 
-function Stat({ label, value, hint, warn = false }: { label: string; value: React.ReactNode | null; hint: string; warn?: boolean }) {
-  return (
-    <div className="rounded-xl border bg-card p-4">
-      <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      {value === null ? (
-        <Skeleton className="mt-2 h-7 w-24" />
-      ) : typeof value === "string" ? (
-        <p className="mt-1 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
-          {value}
-        </p>
-      ) : (
-        value
-      )}
-      <p className={cn("mt-0.5 text-xs text-muted-foreground", warn && "text-amber-700 dark:text-amber-300")}>{hint}</p>
-    </div>
-  );
-}
 
 function Empty({ tab, filtered }: { tab: Tab; filtered: boolean }) {
   if (filtered) return <p className="px-4 py-12 text-center text-sm text-muted-foreground">No invoices with this status.</p>;

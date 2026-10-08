@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CalendarClock, CircleCheck, Laptop, Minus, PiggyBank, Plus, ShieldCheck, Target, TrendingUp } from "lucide-react";
+import { ArrowRight, Laptop, Minus, PiggyBank, Plus, ShieldCheck, Target, TrendingUp } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useAppData } from "@/components/app-data";
 import { ErrorNote } from "@/components/money/parts";
@@ -17,6 +17,7 @@ import { Goal, GoalCategory } from "@/types/goal";
 import { GoalFormDialog } from "./GoalFormDialog";
 import { GoalMoneyDialog } from "./GoalMoneyDialog";
 import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
+import { StatCard, StatGrid } from "@/components/StatCard";
 
 const primary = "bg-emerald-700 text-white hover:bg-emerald-800";
 
@@ -112,18 +113,17 @@ export function GoalsPage() {
       </div>
 
       {active.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-          <Tile icon={PiggyBank} label="Saved in goals" value={<CurrencyAmounts totals={saved} className="mt-1.5" />} sub={`Across ${active.length} goal${active.length === 1 ? "" : "s"}`} />
-          <Tile icon={CircleCheck} label="Fully funded" value={`${funded} of ${active.length}`} sub={funded ? "Target reached" : "None yet"} />
-          <Tile
+        <StatGrid columns={3}>
+          <StatCard label="Saved in goals" value={<CurrencyAmounts totals={saved} />} />
+          <StatCard label="Fully funded" value={`${funded} of ${active.length}`} />
+          <StatCard
             className="col-span-2 lg:col-span-1"
-            icon={CalendarClock}
             label="Need attention"
             value={String(behind)}
-            sub={behind ? "Behind pace or past their date" : "Every goal is on pace"}
-            warn={behind > 0}
+            hint={behind ? "Behind pace or past their date" : null}
+            tone="warn"
           />
-        </div>
+        </StatGrid>
       )}
 
       {active.length > 0 && (
@@ -161,26 +161,6 @@ export function GoalsPage() {
   );
 }
 
-function Tile({ icon: Icon, label, value, sub, warn = false, className }: { icon: React.ComponentType<{ className?: string }>; label: string; value: React.ReactNode; sub: string; warn?: boolean; className?: string }) {
-  return (
-    <div className={cn("rounded-xl border bg-card p-4", className)}>
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <Icon className="size-4 text-muted-foreground" />
-      </div>
-      {typeof value === "string" ? (
-        <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
-          {value}
-        </p>
-      ) : (
-        value
-      )}
-      <p className={cn("mt-0.5 truncate text-xs", warn ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground")} title={sub}>
-        {sub}
-      </p>
-    </div>
-  );
-}
 
 export function GoalProgress({ goal, className }: { goal: Goal; className?: string }) {
   return (

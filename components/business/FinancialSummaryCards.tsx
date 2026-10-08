@@ -1,7 +1,7 @@
-import { ArrowDownLeft, ArrowUpRight, HandCoins, Scale } from "lucide-react";
-import { moneyByCurrency } from "@/lib/invoicing";
-import { YearTotals } from "@/lib/business";
 import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
+import { StatCard, StatGrid } from "@/components/StatCard";
+import { YearTotals } from "@/lib/business";
+import { moneyByCurrency } from "@/lib/invoicing";
 
 /** Four headline numbers for the year so far, per currency (never converted). */
 export function FinancialSummaryCards({
@@ -13,42 +13,24 @@ export function FinancialSummaryCards({
   owed: Map<string, number>;
   overdue: Map<string, number>;
 }) {
-  const shown = (m: Map<string, number>) => <CurrencyAmounts totals={m} className="mt-1.5" />;
   const loss = [...totals.net.values()].some((v) => v < 0);
 
-  const tiles = [
-    { label: "Revenue this year", value: shown(totals.revenue), sub: "Paid to you since 1 January", icon: ArrowDownLeft },
-    { label: "Money out this year", value: shown(totals.moneyOut), sub: "Payments, transfers out and fees", icon: ArrowUpRight },
-    {
-      label: "Net this year",
-      value: shown(totals.net),
-      sub: loss ? "More went out than came in" : "Revenue minus money out",
-      icon: Scale,
-      warn: loss,
-    },
-    {
-      label: "Owed to you",
-      value: shown(owed),
-      sub: overdue.size ? `${moneyByCurrency(overdue)} of it overdue` : owed.size ? "Nothing overdue" : "No unpaid invoices",
-      icon: HandCoins,
-      warn: overdue.size > 0,
-    },
-  ];
-
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-      {tiles.map((t) => (
-        <div key={t.label} className="rounded-xl border bg-card p-4">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs text-muted-foreground">{t.label}</p>
-            <t.icon className="size-4 text-muted-foreground" aria-hidden />
-          </div>
-          {t.value}
-          <p className={t.warn ? "mt-0.5 truncate text-xs text-amber-700 dark:text-amber-300" : "mt-0.5 truncate text-xs text-muted-foreground"} title={t.sub}>
-            {t.sub}
-          </p>
-        </div>
-      ))}
-    </div>
+    <StatGrid>
+      <StatCard label="Revenue this year" value={<CurrencyAmounts totals={totals.revenue} />} />
+      <StatCard label="Money out this year" value={<CurrencyAmounts totals={totals.moneyOut} />} />
+      <StatCard
+        label="Net this year"
+        value={<CurrencyAmounts totals={totals.net} />}
+        hint={loss ? "More went out than came in" : null}
+        tone="warn"
+      />
+      <StatCard
+        label="Owed to you"
+        value={<CurrencyAmounts totals={owed} />}
+        hint={overdue.size ? `${moneyByCurrency(overdue)} overdue` : null}
+        tone="warn"
+      />
+    </StatGrid>
   );
 }
