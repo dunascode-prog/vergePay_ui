@@ -1,4 +1,5 @@
 import { AppDataProvider } from "@/components/app-data";
+import { AssistantProvider } from "@/components/assistant/AssistantProvider";
 import { RequireWallet } from "@/components/RequireWallet";
 import { LiveUpdatesProvider } from "@/components/realtime/LiveUpdates";
 import { Toaster } from "@/components/ui/sonner";
@@ -26,6 +27,7 @@ export default async function DashboardLayout({
       >
         <AppDataProvider>
           <LiveUpdatesProvider>
+          <AssistantProvider>
           {/* bottom, so a toast never covers the bell or the scope toggle */}
           <Toaster position="bottom-right" />
           <SidebarProvider defaultOpen={defaultOpen}>
@@ -37,6 +39,7 @@ export default async function DashboardLayout({
               </main>
             </div>
           </SidebarProvider>
+          </AssistantProvider>
           </LiveUpdatesProvider>
         </AppDataProvider>
       </ThemeProvider>

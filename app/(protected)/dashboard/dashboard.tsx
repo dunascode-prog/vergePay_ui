@@ -19,7 +19,7 @@ import {
   QuickActions,
   UpcomingBillingCard,
 } from "@/components/dashboard/SampleWidgets";
-import AiSummaryCard from "@/components/ai_component_card";
+import { NextStepsCard } from "@/components/assistant/NextStepsCard";
 import { AIEnvelopeSummary } from "@/components/ai_envelope_summary";
 import OutstandingInvoiceCard from "@/components/invoice_card";
 import { InvestmentsCard } from "@/components/investments/InvestmentsCard";
@@ -153,6 +153,8 @@ export default function Dashboard() {
             <WalletCards wallets={wallets} scope={scope} />
           </section>
 
+          <NextStepsCard />
+
           {hasWalletInView && ledger.state === "ready" && (
             <>
               <CashFlowChart flows={flows} currency={currency} />
@@ -160,7 +162,6 @@ export default function Dashboard() {
             </>
           )}
 
-          <AiSummaryCard />
         </div>
 
         {/* Side rail: investments, then the sample widgets for this view */}
