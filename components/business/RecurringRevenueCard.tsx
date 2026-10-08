@@ -2,10 +2,11 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
-import { formatDay, money, moneyByCurrency } from "@/lib/invoicing";
+import { formatDay, money } from "@/lib/invoicing";
 import { monthlyRecurring } from "@/lib/recurring";
 import { nextBilling } from "@/lib/business";
 import { ApiRecurringPlan } from "@/types/recurring";
+import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
 
 /** Monthly recurring revenue of the plans paid into the wallets in view. */
 export function RecurringRevenueCard({ plans }: { plans: ApiRecurringPlan[] }) {
@@ -35,7 +36,7 @@ export function RecurringRevenueCard({ plans }: { plans: ApiRecurringPlan[] }) {
           </p>
         ) : (
           <>
-            <p className="text-2xl font-semibold tracking-tight tabular-nums">{mrr.size ? moneyByCurrency(mrr) : "—"}</p>
+            <CurrencyAmounts totals={mrr} />
             <p className="mt-1 text-sm text-muted-foreground">
               {active} active{paused ? <span className="text-amber-700 dark:text-amber-300"> · {paused} paused</span> : null}
             </p>

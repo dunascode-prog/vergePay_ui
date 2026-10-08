@@ -1,49 +1,47 @@
-import { AlertTriangle, HandCoins, Star, Users } from "lucide-react";
+import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
+import { StatCard, StatGrid } from "@/components/StatCard";
 import { totalBy } from "@/lib/clients";
 import { moneyByCurrency } from "@/lib/invoicing";
-import { ApiClient } from "@/types/invoicing";
+import { balanceTrend, clientsAt, invoiceBalanceAt, mainCurrency, paidByAt, unpaidAt } from "@/lib/trends";
+import { ApiClient, ApiInvoice } from "@/types/invoicing";
 
 /** Four headline numbers over the active client book. */
-export function ClientSummaryCards({ clients }: { clients: ApiClient[] }) {
+export function ClientSummaryCards({
+  clients,
+  allClients,
+  invoices,
+}: {
+  clients: ApiClient[];
+  /** Archived ones too, to know who was on the books before. */
+  allClients: ApiClient[];
+  /** The issued invoices, for the trends (null while loading: no trends yet). */
+  invoices: ApiInvoice[] | null;
+}) {
   const vip = clients.filter((c) => c.is_vip).length;
   const paid = totalBy(clients, (c) => c.revenue);
   const owed = totalBy(clients, (c) => c.outstanding);
   const overdue = totalBy(clients, (c) => c.overdue);
   const attention = clients.filter((c) => c.health.label === "at_risk" || c.overdue_count > 0);
-
-  const tiles = [
-    { label: "Clients", value: String(clients.length), sub: vip ? `${vip} marked VIP` : "None marked VIP yet", icon: Users },
-    { label: "Paid to you, all time", value: paid.size ? moneyByCurrency(paid) : "—", sub: "Invoices your clients have paid", icon: Star },
-    {
-      label: "Owed to you",
-      value: owed.size ? moneyByCurrency(owed) : "—",
-      sub: overdue.size ? `${moneyByCurrency(overdue)} of it overdue` : "Nothing overdue",
-      icon: HandCoins,
-      warn: overdue.size > 0,
-    },
-    {
-      label: "Need attention",
-      value: String(attention.length),
-      sub: attention.length ? attention.map((c) => c.name).join(", ") : "Everyone's paying on time",
-      icon: AlertTriangle,
-      warn: attention.length > 0,
-    },
-  ];
+  // only invoices to the clients counted here, so the line ends at the card's number
+  const ids = new Set(clients.map((c) => c.client_id));
+  const theirs = (invoices ?? []).filter((i) => i.client && ids.has(i.client.client_id));
+  const trends = invoices && {
+    clients: balanceTrend(clientsAt(allClients), "up"),
+    paid: balanceTrend(paidByAt(theirs, mainCurrency(paid)), "up"),
+    owed: balanceTrend(invoiceBalanceAt(theirs, mainCurrency(owed), unpaidAt), "down"),
+  };
 
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-      {tiles.map((t) => (
-        <div key={t.label} className="rounded-xl border bg-card p-4">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs text-muted-foreground">{t.label}</p>
-            <t.icon className="size-4 text-muted-foreground" aria-hidden />
-          </div>
-          <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums">{t.value}</p>
-          <p className={t.warn ? "mt-0.5 truncate text-xs text-amber-700 dark:text-amber-300" : "mt-0.5 truncate text-xs text-muted-foreground"} title={t.sub}>
-            {t.sub}
-          </p>
-        </div>
-      ))}
-    </div>
+    <StatGrid>
+      <StatCard label="Clients" trend={trends?.clients} value={String(clients.length)} hint={vip ? `${vip} VIP` : null} />
+      <StatCard label="Paid to you, all time" trend={trends?.paid} value={<CurrencyAmounts totals={paid} />} />
+      <StatCard label="Owed to you" trend={trends?.owed} value={<CurrencyAmounts totals={owed} />} hint={overdue.size ? `${moneyByCurrency(overdue)} overdue` : null} tone="warn" />
+      <StatCard
+        label="Need attention"
+        value={String(attention.length)}
+        hint={attention.length ? attention.map((c) => c.name).join(", ") : null}
+        tone="warn"
+      />
+    </StatGrid>
   );
 }

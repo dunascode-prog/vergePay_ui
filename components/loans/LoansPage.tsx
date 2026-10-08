@@ -1,20 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CalendarClock, CircleCheck, Clock, HandCoins, Landmark, Plus, XCircle } from "lucide-react";
+import { ArrowRight, CircleCheck, Clock, Landmark, Plus, XCircle } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppData } from "@/components/app-data";
 import { ErrorNote } from "@/components/money/parts";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError } from "@/lib/api";
-import { formatDay, moneyByCurrency } from "@/lib/invoicing";
+import { formatDay } from "@/lib/invoicing";
 import { formatMinor, walletName } from "@/lib/ledger";
 import { applicationToShow, dueIn, isOverdue, LOAN_TYPE_LABEL, nextPayment, owedByCurrency, rateLabel, termLabel } from "@/lib/loans";
 import { cn } from "@/lib/utils";
 import { devDecideApplication, listLoanApplications, listLoans } from "@/services/loans";
 import { Loan, LoanApplication } from "@/types/loan";
 import { RepayDialog } from "./RepayDialog";
+import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
+import { StatCard, StatGrid } from "@/components/StatCard";
 
 const primary = "bg-emerald-700 text-white hover:bg-emerald-800";
 
@@ -94,17 +96,16 @@ export function LoansPage() {
       {shown && <ApplicationNotice application={shown} onDecided={reload} />}
 
       {loans.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-          <Tile icon={HandCoins} label="You owe" value={owed.size ? moneyByCurrency(owed) : "Nothing"} sub={`Across ${active.length} active loan${active.length === 1 ? "" : "s"}, interest included`} />
-          <Tile
-            icon={CalendarClock}
+        <StatGrid columns={3}>
+          <StatCard label="You owe" value={<CurrencyAmounts totals={owed} empty="Nothing" />} hint={active.length ? "Interest included" : null} />
+          <StatCard
             label="Next payment"
             value={next?.next_installment ? formatMinor(next.next_installment.installment_amount_minor, next.currency_code) : "—"}
-            sub={next?.next_installment ? `${dueIn(next.next_installment.due_date)} · ${formatDay(next.next_installment.due_date)}` : "Nothing due"}
-            warn={!!next && isOverdue(next)}
+            hint={next?.next_installment ? `${dueIn(next.next_installment.due_date)} · ${formatDay(next.next_installment.due_date)}` : null}
+            tone={!!next && isOverdue(next) ? "bad" : undefined}
           />
-          <Tile className="col-span-2 lg:col-span-1" icon={CircleCheck} label="Paid off" value={String(closed.filter((l) => l.loan_status === "repaid").length)} sub={closed.length ? "Loans fully repaid" : "None yet"} />
-        </div>
+          <StatCard className="col-span-2 lg:col-span-1" label="Paid off" value={String(closed.filter((l) => l.loan_status === "repaid").length)} />
+        </StatGrid>
       )}
 
       {(active.length > 0 || approved.length > 0) && (
@@ -149,22 +150,6 @@ export function LoansPage() {
   );
 }
 
-function Tile({ icon: Icon, label, value, sub, warn = false, className }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; sub: string; warn?: boolean; className?: string }) {
-  return (
-    <div className={cn("rounded-xl border bg-card p-4", className)}>
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <Icon className="size-4 text-muted-foreground" />
-      </div>
-      <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
-        {value}
-      </p>
-      <p className={cn("mt-0.5 truncate text-xs", warn ? "text-red-600 dark:text-red-400" : "text-muted-foreground")} title={sub}>
-        {sub}
-      </p>
-    </div>
-  );
-}
 
 /** One active loan: how far along it is, and paying the next installment. */
 function LoanCard({ loan, onPaid }: { loan: Loan; onPaid: () => void }) {
@@ -307,11 +292,11 @@ export function LoansSkeleton() {
   return (
     <div className="space-y-5">
       <Skeleton className="h-5 w-64" />
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+      <StatGrid columns={3}>
         {[0, 1, 2].map((i) => (
-          <Skeleton key={i} className="h-24 rounded-xl" />
+          <Skeleton key={i} className="h-[104px] rounded-xl" />
         ))}
-      </div>
+      </StatGrid>
       <Skeleton className="h-48 rounded-xl" />
     </div>
   );

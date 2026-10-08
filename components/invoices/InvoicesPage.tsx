@@ -8,11 +8,14 @@ import { useAppData } from "@/components/app-data";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError } from "@/lib/api";
-import { dueLabel, isUnpaid, money, moneyByCurrency, sumBy } from "@/lib/invoicing";
+import { dueLabel, isUnpaid, money, sumBy } from "@/lib/invoicing";
 import { cn } from "@/lib/utils";
 import { listAllInvoices } from "@/services/invoices";
 import { ApiInvoice, InvoiceStatus } from "@/types/invoicing";
 import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
+import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
+import { StatCard, StatGrid } from "@/components/StatCard";
+import { balanceTrend, flowTrend, invoiceBalanceAt, mainCurrency, overdueAt, paidInvoiceEvents, unpaidAt } from "@/lib/trends";
 
 type Tab = "issued" | "received";
 type Filter = "all" | InvoiceStatus;
@@ -70,12 +73,20 @@ export function InvoicesPage() {
   const stats = useMemo(() => {
     const mine = issued ?? [];
     const monthAgo = loadedAt - 30 * 86_400_000;
+    const outstanding = sumBy(mine, isUnpaid);
+    const overdue = sumBy(mine, (i) => i.invoice_status === "overdue");
+    const paid = sumBy(mine, (i) => i.invoice_status === "paid" && !!i.paid_at && new Date(i.paid_at).getTime() >= monthAgo);
     return {
-      outstanding: sumBy(mine, isUnpaid),
+      trends: {
+        outstanding: balanceTrend(invoiceBalanceAt(mine, mainCurrency(outstanding), unpaidAt), "down", loadedAt),
+        overdue: balanceTrend(invoiceBalanceAt(mine, mainCurrency(overdue), overdueAt), "down", loadedAt),
+        paid: flowTrend(paidInvoiceEvents(mine), mainCurrency(paid), "up", loadedAt),
+      },
+      outstanding,
       outstandingCount: mine.filter(isUnpaid).length,
-      overdue: sumBy(mine, (i) => i.invoice_status === "overdue"),
+      overdue,
       overdueCount: mine.filter((i) => i.invoice_status === "overdue").length,
-      paid: sumBy(mine, (i) => i.invoice_status === "paid" && !!i.paid_at && new Date(i.paid_at).getTime() >= monthAgo),
+      paid,
       drafts: mine.filter((i) => i.invoice_status === "draft").length,
     };
   }, [issued, loadedAt]);
@@ -87,17 +98,26 @@ export function InvoicesPage() {
   return (
     <div className="space-y-5">
       {/* summary */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label="Outstanding" value={issued ? moneyByCurrency(stats.outstanding) : null} hint={`${stats.outstandingCount} unpaid`} />
-        <Stat
-          label="Overdue"
-          value={issued ? moneyByCurrency(stats.overdue) : null}
-          hint={stats.overdueCount ? `${stats.overdueCount} past due` : "Nothing late"}
-          warn={stats.overdueCount > 0}
-        />
-        <Stat label="Paid, last 30 days" value={issued ? moneyByCurrency(stats.paid) : null} hint="Into your wallets" />
-        <Stat label="Drafts" value={issued ? String(stats.drafts) : null} hint="Not sent yet" />
-      </div>
+      {issued ? (
+        <StatGrid>
+          <StatCard label="Outstanding" trend={stats.trends.outstanding} value={<CurrencyAmounts totals={stats.outstanding} empty={money(0, "NGN")} />} hint={stats.outstandingCount ? `${stats.outstandingCount} unpaid` : null} />
+          <StatCard
+            label="Overdue"
+            trend={stats.trends.overdue}
+            value={<CurrencyAmounts totals={stats.overdue} empty={money(0, "NGN")} />}
+            hint={stats.overdueCount ? `${stats.overdueCount} past due` : null}
+            tone="warn"
+          />
+          <StatCard label="Paid, last 30 days" trend={stats.trends.paid} value={<CurrencyAmounts totals={stats.paid} empty={money(0, "NGN")} />} />
+          <StatCard label="Drafts" value={String(stats.drafts)} />
+        </StatGrid>
+      ) : (
+        <StatGrid>
+          {[0, 1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-[104px] rounded-xl" />
+          ))}
+        </StatGrid>
+      )}
 
       <div className="rounded-xl border bg-card">
         {/* tabs and filters */}
@@ -216,21 +236,6 @@ export function InvoicesPage() {
   );
 }
 
-function Stat({ label, value, hint, warn = false }: { label: string; value: string | null; hint: string; warn?: boolean }) {
-  return (
-    <div className="rounded-xl border bg-card p-4">
-      <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      {value === null ? (
-        <Skeleton className="mt-2 h-7 w-24" />
-      ) : (
-        <p className="mt-1 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
-          {value}
-        </p>
-      )}
-      <p className={cn("mt-0.5 text-xs text-muted-foreground", warn && "text-amber-700 dark:text-amber-300")}>{hint}</p>
-    </div>
-  );
-}
 
 function Empty({ tab, filtered }: { tab: Tab; filtered: boolean }) {
   if (filtered) return <p className="px-4 py-12 text-center text-sm text-muted-foreground">No invoices with this status.</p>;

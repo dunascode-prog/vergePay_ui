@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Banknote, CalendarClock, Search, UserPlus, Users } from "lucide-react";
+import { ArrowRight, Banknote, Search, UserPlus, Users } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppData } from "@/components/app-data";
 import { ErrorNote } from "@/components/money/parts";
@@ -9,7 +9,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError } from "@/lib/api";
-import { formatDateTime, moneyByCurrency } from "@/lib/invoicing";
+import { formatDateTime } from "@/lib/invoicing";
 import { formatMinor, walletName } from "@/lib/ledger";
 import { dueTotals, FREQUENCY_LABEL, nextPayLabel, paidSince, PAY_TYPE_LABEL, RATE_LABEL } from "@/lib/payroll";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,9 @@ import { Payee, PayrollRun } from "@/types/payroll";
 import { PayeeAvatar } from "./PayeeAvatar";
 import { PayeeFormDialog } from "./PayeeFormDialog";
 import { RunPayrollDialog } from "./RunPayrollDialog";
+import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
+import { StatCard, StatGrid } from "@/components/StatCard";
+import { flowTrend, mainCurrency } from "@/lib/trends";
 
 const primary = "bg-emerald-700 text-white hover:bg-emerald-800";
 
@@ -89,6 +92,11 @@ export function PayrollPage() {
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
   const paidThisMonth = paidSince(runs, monthStart);
   const runsThisMonth = runs.filter((r) => new Date(r.created_at) >= monthStart).length;
+  const paidTrend = flowTrend(
+    runs.map((r) => ({ at: new Date(r.created_at).getTime(), minor: r.total_minor, currency: r.currency_code })),
+    mainCurrency(paidThisMonth) ?? mainCurrency(paidSince(runs, new Date(0))),
+    "up",
+  );
 
   const addButton = (
     <PayeeFormDialog
@@ -134,11 +142,21 @@ export function PayrollPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-        <Tile icon={CalendarClock} label="Due now" value={due.length ? moneyByCurrency(dueTotals(due)) : "Nobody"} sub={due.length ? `${due.length} payee${due.length === 1 ? "" : "s"} at their usual amount` : "Everyone's paid up"} warn={due.length > 0} />
-        <Tile icon={Banknote} label="Paid this month" value={paidThisMonth.size ? moneyByCurrency(paidThisMonth) : "Nothing yet"} sub={`${runsThisMonth} run${runsThisMonth === 1 ? "" : "s"} this month`} />
-        <Tile className="col-span-2 lg:col-span-1" icon={Users} label="Payees" value={String(active.length)} sub={payees.length > active.length ? `${payees.length - active.length} inactive` : "All active"} />
-      </div>
+      <StatGrid columns={3}>
+        <StatCard
+          label="Due now"
+          value={due.length ? <CurrencyAmounts totals={dueTotals(due)} /> : "Nobody"}
+          hint={due.length ? `${due.length} payee${due.length === 1 ? "" : "s"}` : null}
+          tone="warn"
+        />
+        <StatCard label="Paid this month" trend={paidTrend} value={<CurrencyAmounts totals={paidThisMonth} empty="Nothing yet" />} hint={runsThisMonth ? `${runsThisMonth} run${runsThisMonth === 1 ? "" : "s"}` : null} />
+        <StatCard
+          className="col-span-2 lg:col-span-1"
+          label="Payees"
+          value={String(active.length)}
+          hint={payees.length > active.length ? `${payees.length - active.length} inactive` : null}
+        />
+      </StatGrid>
 
       <section className="space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -203,22 +221,6 @@ export function PayrollPage() {
   );
 }
 
-function Tile({ icon: Icon, label, value, sub, warn = false, className }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; sub: string; warn?: boolean; className?: string }) {
-  return (
-    <div className={cn("rounded-xl border bg-card p-4", className)}>
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <Icon className="size-4 text-muted-foreground" />
-      </div>
-      <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
-        {value}
-      </p>
-      <p className={cn("mt-0.5 truncate text-xs", warn ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground")} title={sub}>
-        {sub}
-      </p>
-    </div>
-  );
-}
 
 function PayeeCard({ payee, payees, onChanged }: { payee: Payee; payees: Payee[]; onChanged: () => void }) {
   const money = (minor: number) => formatMinor(minor, payee.currency_code);

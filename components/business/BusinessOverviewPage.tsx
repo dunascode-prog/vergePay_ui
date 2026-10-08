@@ -11,7 +11,8 @@ import { SegmentedToggle } from "@/components/SegmentedToggle";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { clientShares, spendingByType } from "@/lib/analytics";
-import { attentionItems, businessHealth, ledgerFrom, monthlyRevenueAndOut, receivables, startOfYear, yearTotals } from "@/lib/business";
+import { attentionItems, businessHealth, isMoneyOut, isRevenue, ledgerFrom, monthlyRevenueAndOut, receivables, startOfYear, yearTotals } from "@/lib/business";
+import { balanceTrend, flowTrend, invoiceBalanceAt, mainCurrency, MoneyEvent, unpaidAt } from "@/lib/trends";
 import { currenciesOf, lastMonths, scopedWallets, walletsOf } from "@/lib/ledger";
 import { listAllInvoices, listClients } from "@/services/invoices";
 import { listRecurringPlans } from "@/services/recurring";
@@ -81,11 +82,21 @@ export function BusinessOverviewPage() {
     const invoices = (book?.invoices ?? []).filter((i) => scoped.has(i.issuer_account_id));
     const plans = (book?.plans ?? []).filter((p) => scoped.has(p.issuer_account_id));
     const { owed, overdue } = receivables(invoices);
+    const totals = yearTotals(ledger.lines, scoped, own, now);
+    const lines = ledger.lines;
+    const events = (pick: (l: (typeof lines)[number]) => boolean): MoneyEvent[] =>
+      lines.filter(pick).map((l) => ({ at: new Date(l.created_at).getTime(), minor: l.amount_minor, currency: l.currency_code }));
+    const at = now.getTime();
     return {
+      trends: {
+        revenue: flowTrend(events((l) => isRevenue(l, scoped, own)), mainCurrency(totals.revenue), "up", at),
+        moneyOut: flowTrend(events((l) => isMoneyOut(l, scoped, own)), mainCurrency(totals.moneyOut), "down", at),
+        owed: balanceTrend(invoiceBalanceAt(invoices, mainCurrency(owed), unpaidAt), "down", at),
+      },
       plans,
       owed,
       overdue,
-      totals: yearTotals(ledger.lines, scoped, own, now),
+      totals,
       flows: monthlyRevenueAndOut(ledger.lines, scoped, own, currency, lastMonths(6, now)),
       health: businessHealth({ lines: ledger.lines, scoped, own, wallets, invoices, currency, now }),
       topClients: clientShares(invoices, startOfYear(now)).slice(0, 5),
@@ -124,7 +135,7 @@ export function BusinessOverviewPage() {
         )}
       </div>
 
-      <FinancialSummaryCards totals={data.totals} owed={data.owed} overdue={data.overdue} />
+      <FinancialSummaryCards totals={data.totals} owed={data.owed} overdue={data.overdue} trends={data.trends} />
 
       <div className="grid grid-cols-1 items-start gap-4 sm:gap-5 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-6">
         <div className="flex min-w-0 flex-col gap-4 sm:gap-5 lg:gap-6">
