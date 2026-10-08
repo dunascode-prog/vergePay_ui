@@ -6,6 +6,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarBadge,
+  AvatarImage,
 } from "@/components/ui/avatar";
 
 import {
@@ -52,6 +53,7 @@ export function UserNav({ compact = false }: { compact?: boolean }) {
 
   const avatar = (
     <Avatar className="h-8 w-8">
+      {user?.photo_url && <AvatarImage src={user.photo_url} alt="" className="object-cover" />}
       <AvatarFallback className="bg-emerald-100 text-xs font-semibold text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100">{user ? initials(user) : ""}</AvatarFallback>
 
       <AvatarBadge className="bg-emerald-500" />
