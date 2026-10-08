@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useState } from "react";
-import { Monitor, Moon, Plus, Search, Sun } from "lucide-react";
+import { Monitor, Moon, Plus, Search, Sparkles, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { AccountScopeToggle } from "./AccountScopeToggle";
+import { useAssistant } from "./assistant/AssistantProvider";
 import { useAppData } from "./app-data";
 import { CommandPalette, useCommandShortcut } from "./CommandPalette";
 import { NotificationBell } from "./notifications/NotificationBell";
@@ -83,6 +84,7 @@ const Navbar = ({ className }: React.ComponentProps<"header">) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const openSearch = useCallback(() => setSearchOpen(true), []);
   useCommandShortcut(openSearch);
+  const { openAssistant } = useAssistant();
 
   const other = Object.entries(OTHER_TITLES).find(([url]) => pathname.startsWith(url))?.[1];
   const page = pageFor(pathname);
@@ -129,6 +131,16 @@ const Navbar = ({ className }: React.ComponentProps<"header">) => {
         )}
 
         <div className="mx-0.5 hidden h-5 w-px bg-border sm:block" aria-hidden />
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => openAssistant()}
+          className="h-9 gap-1.5 px-2 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 sm:px-2.5 dark:text-emerald-400 dark:hover:bg-emerald-950"
+          aria-label="Ask VergePay"
+        >
+          <Sparkles className="size-4" />
+          <span className="hidden text-sm font-medium md:inline">Ask</span>
+        </Button>
         <NotificationBell />
         <ThemeMenu />
       </div>
