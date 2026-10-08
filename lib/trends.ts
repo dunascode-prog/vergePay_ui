@@ -11,7 +11,9 @@
 //              each point is the balance at a moment 30 days apart, the last
 //              one now; the change compares now with 30 days ago.
 
-import { ApiInvoice } from "@/types/invoicing";
+import { PER_MONTH } from "@/lib/recurring";
+import { ApiClient, ApiInvoice } from "@/types/invoicing";
+import { ApiRecurringPlan } from "@/types/recurring";
 
 const DAY = 86_400_000;
 
@@ -79,6 +81,34 @@ export function overdueAt(i: ApiInvoice, t: number): boolean {
 
 export function invoiceBalanceAt(invoices: ApiInvoice[], currency: string | null, pick: (i: ApiInvoice, t: number) => boolean) {
   return (t: number) => invoices.reduce((sum, i) => (i.currency_code === currency && pick(i, t) ? sum + i.amount_due_minor : sum), 0);
+}
+
+/** Paid invoices' money received up to t (a running total, for "paid to you, all time"). */
+export function paidByAt(invoices: ApiInvoice[], currency: string | null) {
+  return (t: number) =>
+    invoices.reduce((sum, i) => (i.currency_code === currency && i.invoice_status === "paid" && at(i.paid_at) <= t ? sum + i.amount_due_minor : sum), 0);
+}
+
+// ---- clients and plans at a moment
+
+/** Clients on the books at t: added by then and not yet archived. */
+export const clientsAt = (clients: ApiClient[]) => (t: number) =>
+  clients.filter((c) => at(c.created_at) <= t && at(c.archived_at) > t).length;
+
+// A plan's history is its creation, its latest pause and its cancellation;
+// an earlier pause that was resumed isn't recorded, so it counts as active.
+const planActiveAt = (p: ApiRecurringPlan, t: number) =>
+  at(p.created_at) <= t && at(p.cancelled_at) > t && !(p.plan_status === "paused" && at(p.paused_at) <= t);
+
+export const activePlansAt = (plans: ApiRecurringPlan[]) => (t: number) => plans.filter((p) => planActiveAt(p, t)).length;
+
+export const pausedPlansAt = (plans: ApiRecurringPlan[]) => (t: number) =>
+  plans.filter((p) => p.plan_status === "paused" && at(p.paused_at) <= t && at(p.cancelled_at) > t).length;
+
+/** Monthly recurring revenue at t, from the plans active then (at today's amounts). */
+export function recurringAt(plans: ApiRecurringPlan[], currency: string | null) {
+  return (t: number) =>
+    plans.reduce((sum, p) => (p.currency_code === currency && planActiveAt(p, t) ? sum + Math.round(p.amount_minor * PER_MONTH[p.frequency]) : sum), 0);
 }
 
 /** Money received for paid invoices, as events at the time each was paid. */

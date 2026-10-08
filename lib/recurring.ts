@@ -47,7 +47,7 @@ export const EVERY: Record<RecurringFrequency, string> = {
 export const termsLabel = (days: number) => (days === 0 ? "Due on receipt" : `Due in ${days} day${days === 1 ? "" : "s"}`);
 
 // a month is 52 weeks / 12: what a weekly plan brings in, averaged
-const PER_MONTH: Record<RecurringFrequency, number> = { weekly: 52 / 12, monthly: 1, quarterly: 1 / 3, yearly: 1 / 12 };
+export const PER_MONTH: Record<RecurringFrequency, number> = { weekly: 52 / 12, monthly: 1, quarterly: 1 / 3, yearly: 1 / 12 };
 
 /** Monthly recurring revenue of the active plans, per currency, in minor units. */
 export function monthlyRecurring(plans: ApiRecurringPlan[]): Map<string, number> {

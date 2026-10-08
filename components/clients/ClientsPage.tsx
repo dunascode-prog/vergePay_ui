@@ -5,8 +5,8 @@ import { useAppData } from "@/components/app-data";
 import { ErrorNote } from "@/components/money/parts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError } from "@/lib/api";
-import { listClients } from "@/services/invoices";
-import { ApiClient } from "@/types/invoicing";
+import { listAllInvoices, listClients } from "@/services/invoices";
+import { ApiClient, ApiInvoice } from "@/types/invoicing";
 import { ClientPortfolioAISummary } from "./ClientPortfolioAISummary";
 import { ClientSummaryCards } from "./ClientSummaryCards";
 import { ClientsGrid } from "./ClientsGrid";
@@ -16,6 +16,8 @@ export function ClientsPage() {
   const { dataVersion } = useAppData();
   const [clients, setClients] = useState<ApiClient[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // for the cards' trends only; the page works without them
+  const [invoices, setInvoices] = useState<ApiInvoice[] | null>(null);
 
   // refetched when money moves (dataVersion): a client paying changes their record
   useEffect(() => {
@@ -27,6 +29,9 @@ export function ClientsPage() {
         setError(null);
       })
       .catch((err) => live && setError(err instanceof ApiError ? err.message : "We couldn't load your clients."));
+    listAllInvoices("issued")
+      .then((list) => live && setInvoices(list))
+      .catch(() => live && setInvoices(null));
     return () => {
       live = false;
     };
@@ -60,7 +65,7 @@ export function ClientsPage() {
 
   return (
     <div className="space-y-5">
-      <ClientSummaryCards clients={active} />
+      <ClientSummaryCards clients={active} allClients={clients} invoices={invoices} />
       <ClientPortfolioAISummary clients={active} />
       <ClientsGrid clients={clients} onChanged={upsert} />
     </div>
