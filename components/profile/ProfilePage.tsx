@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { UserProfile } from "@/types/auth";
 import { EmailChangeDialog } from "./EmailChangeDialog";
 import { PersonalDetailsForm } from "./PersonalDetailsForm";
+import { ProfilePhoto } from "./ProfilePhotoDialog";
 import { TwoFactorDialog } from "./TwoFactorDialog";
 
 export function displayName(user: UserProfile) {
@@ -58,12 +59,7 @@ export function ProfilePage() {
       <Card>
         <CardContent className="space-y-5">
           <div className="flex items-center gap-3 lg:flex-col lg:items-start">
-            <span
-              aria-hidden
-              className="flex size-14 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-lg font-semibold text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100"
-            >
-              {initials(user)}
-            </span>
+            <ProfilePhoto photoUrl={user.photo_url} initials={initials(user)} />
             <div className="min-w-0">
               <p className="truncate text-base font-semibold">{displayName(user)}</p>
               <p className="truncate text-sm text-muted-foreground">@{user.username}</p>

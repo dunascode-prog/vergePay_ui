@@ -26,6 +26,15 @@ export function cancelEmailChange() {
   return api<{ cancelled: boolean }>("/v1/users/me/email", { method: "DELETE" });
 }
 
+/** The photo file itself is the body: JPG or PNG, 2 MB at most. */
+export function uploadProfilePhoto(file: File) {
+  return api<UserProfile>("/v1/users/me/photo", { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+}
+
+export function removeProfilePhoto() {
+  return api<UserProfile>("/v1/users/me/photo", { method: "DELETE" });
+}
+
 /** Turns 2FA off. Needs a code confirmed in the last 5 minutes. */
 export function disableTwoFactor() {
   return api<{ two_factor_enabled: false }>("/v1/auth/2fa", { method: "DELETE" });
