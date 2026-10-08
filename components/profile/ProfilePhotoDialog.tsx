@@ -165,7 +165,7 @@ export function Circle({ src, initials, className }: { src: string | null; initi
       )}
     >
       {showPhoto ? (
-        // a signed S3 link: next/image would need the bucket host configured, and the file is already 512 px
+        // the API's own link (with the session cookie), already a 512 px JPEG: next/image adds nothing here
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt="" className="size-full object-cover" onError={() => setFailed(src)} />
       ) : (

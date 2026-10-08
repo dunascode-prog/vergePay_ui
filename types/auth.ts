@@ -54,7 +54,7 @@ export interface UserProfile {
   default_currency_code: string | null;
   /** An email change waiting for the code sent to this address, or null. */
   pending_email: string | null;
-  /** A signed, short-lived link to the profile photo (only ever sent to its owner), or null. */
+  /** "/v1/users/me/photo/<id>": the photo, served to its owner only (kept in Postgres), or null. */
   photo_url: string | null;
   created_at: string;
   updated_at: string;
