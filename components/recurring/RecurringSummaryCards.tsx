@@ -1,7 +1,8 @@
 import { CalendarClock, Pause, Repeat, TrendingUp } from "lucide-react";
-import { formatDay, moneyByCurrency } from "@/lib/invoicing";
+import { formatDay } from "@/lib/invoicing";
 import { monthlyRecurring } from "@/lib/recurring";
 import { ApiRecurringPlan } from "@/types/recurring";
+import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
 
 /** Four headline numbers over the customer's plans. */
 export function RecurringSummaryCards({ plans }: { plans: ApiRecurringPlan[] }) {
@@ -14,7 +15,7 @@ export function RecurringSummaryCards({ plans }: { plans: ApiRecurringPlan[] }) 
   const failing = active.filter((p) => p.last_error).length;
 
   const tiles = [
-    { label: "Monthly recurring revenue", value: mrr.size ? moneyByCurrency(mrr) : "—", sub: "Active plans, as a monthly figure", icon: TrendingUp },
+    { label: "Monthly recurring revenue", value: <CurrencyAmounts totals={mrr} className="mt-1.5" />, sub: "Active plans, as a monthly figure", icon: TrendingUp },
     { label: "Active plans", value: String(active.length), sub: failing ? `${failing} couldn't send its last invoice` : `${plans.length} in all`, icon: Repeat, warn: failing > 0 },
     { label: "Next invoice", value: next ? formatDay(next.next_billing_date!, false) : "—", sub: next ? next.client.name : "No active plans", icon: CalendarClock },
     { label: "Paused", value: String(paused.length), sub: paused.length ? "Not billing until you resume" : "None paused", icon: Pause },
@@ -28,7 +29,7 @@ export function RecurringSummaryCards({ plans }: { plans: ApiRecurringPlan[] }) 
             <p className="text-xs text-muted-foreground">{t.label}</p>
             <t.icon className="size-4 text-muted-foreground" aria-hidden />
           </div>
-          <p className="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums">{t.value}</p>
+          {typeof t.value === "string" ? <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums">{t.value}</p> : t.value}
           <p className={t.warn ? "mt-0.5 text-xs text-amber-700 dark:text-amber-300" : "mt-0.5 truncate text-xs text-muted-foreground"}>{t.sub}</p>
         </div>
       ))}

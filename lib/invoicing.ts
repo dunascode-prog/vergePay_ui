@@ -67,12 +67,16 @@ export const STATUS_LABEL: Record<InvoiceStatus, string> = {
 export const money = (minor: number, currency: string) => formatMinor(minor, currency);
 
 /** "₦1.2M + $300" for totals that span currencies. */
+/**
+ * Amounts in several currencies as words, for sentences: "₦65,050.10 and
+ * $2,000.00". Headline figures use <CurrencyAmounts> instead.
+ */
 export function moneyByCurrency(totals: Map<string, number>, compact = false): string {
   if (totals.size === 0) return money(0, "NGN");
-  return [...totals.entries()]
+  const parts = [...totals.entries()]
     .sort(([a], [b]) => (a === "NGN" ? -1 : b === "NGN" ? 1 : a.localeCompare(b)))
-    .map(([currency, minor]) => formatMinor(minor, currency, { compact }))
-    .join(" + ");
+    .map(([currency, minor]) => formatMinor(minor, currency, { compact }));
+  return parts.length < 3 ? parts.join(" and ") : `${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}`;
 }
 
 export function sumBy(invoices: ApiInvoice[], pick: (i: ApiInvoice) => boolean): Map<string, number> {

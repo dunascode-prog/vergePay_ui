@@ -1,6 +1,7 @@
 import { ArrowDownLeft, ArrowUpRight, HandCoins, Scale } from "lucide-react";
 import { moneyByCurrency } from "@/lib/invoicing";
 import { YearTotals } from "@/lib/business";
+import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
 
 /** Four headline numbers for the year so far, per currency (never converted). */
 export function FinancialSummaryCards({
@@ -12,7 +13,7 @@ export function FinancialSummaryCards({
   owed: Map<string, number>;
   overdue: Map<string, number>;
 }) {
-  const shown = (m: Map<string, number>) => (m.size ? moneyByCurrency(m) : "—");
+  const shown = (m: Map<string, number>) => <CurrencyAmounts totals={m} className="mt-1.5" />;
   const loss = [...totals.net.values()].some((v) => v < 0);
 
   const tiles = [
@@ -42,9 +43,7 @@ export function FinancialSummaryCards({
             <p className="text-xs text-muted-foreground">{t.label}</p>
             <t.icon className="size-4 text-muted-foreground" aria-hidden />
           </div>
-          <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums" title={t.value}>
-            {t.value}
-          </p>
+          {t.value}
           <p className={t.warn ? "mt-0.5 truncate text-xs text-amber-700 dark:text-amber-300" : "mt-0.5 truncate text-xs text-muted-foreground"} title={t.sub}>
             {t.sub}
           </p>

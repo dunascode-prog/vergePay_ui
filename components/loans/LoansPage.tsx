@@ -8,13 +8,14 @@ import { ErrorNote } from "@/components/money/parts";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError } from "@/lib/api";
-import { formatDay, moneyByCurrency } from "@/lib/invoicing";
+import { formatDay } from "@/lib/invoicing";
 import { formatMinor, walletName } from "@/lib/ledger";
 import { applicationToShow, dueIn, isOverdue, LOAN_TYPE_LABEL, nextPayment, owedByCurrency, rateLabel, termLabel } from "@/lib/loans";
 import { cn } from "@/lib/utils";
 import { devDecideApplication, listLoanApplications, listLoans } from "@/services/loans";
 import { Loan, LoanApplication } from "@/types/loan";
 import { RepayDialog } from "./RepayDialog";
+import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
 
 const primary = "bg-emerald-700 text-white hover:bg-emerald-800";
 
@@ -95,7 +96,7 @@ export function LoansPage() {
 
       {loans.length > 0 && (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-          <Tile icon={HandCoins} label="You owe" value={owed.size ? moneyByCurrency(owed) : "Nothing"} sub={`Across ${active.length} active loan${active.length === 1 ? "" : "s"}, interest included`} />
+          <Tile icon={HandCoins} label="You owe" value={<CurrencyAmounts totals={owed} empty="Nothing" className="mt-1.5" />} sub={`Across ${active.length} active loan${active.length === 1 ? "" : "s"}, interest included`} />
           <Tile
             icon={CalendarClock}
             label="Next payment"
@@ -149,16 +150,20 @@ export function LoansPage() {
   );
 }
 
-function Tile({ icon: Icon, label, value, sub, warn = false, className }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; sub: string; warn?: boolean; className?: string }) {
+function Tile({ icon: Icon, label, value, sub, warn = false, className }: { icon: React.ComponentType<{ className?: string }>; label: string; value: React.ReactNode; sub: string; warn?: boolean; className?: string }) {
   return (
     <div className={cn("rounded-xl border bg-card p-4", className)}>
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs text-muted-foreground">{label}</p>
         <Icon className="size-4 text-muted-foreground" />
       </div>
-      <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
-        {value}
-      </p>
+      {typeof value === "string" ? (
+        <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
+          {value}
+        </p>
+      ) : (
+        value
+      )}
       <p className={cn("mt-0.5 truncate text-xs", warn ? "text-red-600 dark:text-red-400" : "text-muted-foreground")} title={sub}>
         {sub}
       </p>

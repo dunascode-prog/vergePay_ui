@@ -158,6 +158,10 @@ Calculations live in small, pure modules in `lib/` rather than inside JSX:
 - `expense-category.ts`: category totals from line items, with colours shared across Analytics, Business and Expenses so a category looks the same everywhere
 - `format.ts`: currency formatting and per-currency sums
 
+### Money in more than one currency
+
+Amounts in different currencies are never added together or converted. A headline figure (`components/money/CurrencyAmounts.tsx`) shows the main currency, naira first, as the big number, with any others as small tags under it (`$44,400.00 USD`). In a sentence they read "₦65,050.10 and $2,000.00" (`moneyByCurrency`).
+
 ### One type scale
 Every screen uses the same handful of sizes, each for one job, so the app reads as one product:
 

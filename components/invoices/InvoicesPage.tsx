@@ -8,11 +8,12 @@ import { useAppData } from "@/components/app-data";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError } from "@/lib/api";
-import { dueLabel, isUnpaid, money, moneyByCurrency, sumBy } from "@/lib/invoicing";
+import { dueLabel, isUnpaid, money, sumBy } from "@/lib/invoicing";
 import { cn } from "@/lib/utils";
 import { listAllInvoices } from "@/services/invoices";
 import { ApiInvoice, InvoiceStatus } from "@/types/invoicing";
 import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
+import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
 
 type Tab = "issued" | "received";
 type Filter = "all" | InvoiceStatus;
@@ -88,14 +89,14 @@ export function InvoicesPage() {
     <div className="space-y-5">
       {/* summary */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label="Outstanding" value={issued ? moneyByCurrency(stats.outstanding) : null} hint={`${stats.outstandingCount} unpaid`} />
+        <Stat label="Outstanding" value={issued ? <CurrencyAmounts totals={stats.outstanding} empty={money(0, "NGN")} className="mt-1" /> : null} hint={`${stats.outstandingCount} unpaid`} />
         <Stat
           label="Overdue"
-          value={issued ? moneyByCurrency(stats.overdue) : null}
+          value={issued ? <CurrencyAmounts totals={stats.overdue} empty={money(0, "NGN")} className="mt-1" /> : null}
           hint={stats.overdueCount ? `${stats.overdueCount} past due` : "Nothing late"}
           warn={stats.overdueCount > 0}
         />
-        <Stat label="Paid, last 30 days" value={issued ? moneyByCurrency(stats.paid) : null} hint="Into your wallets" />
+        <Stat label="Paid, last 30 days" value={issued ? <CurrencyAmounts totals={stats.paid} empty={money(0, "NGN")} className="mt-1" /> : null} hint="Into your wallets" />
         <Stat label="Drafts" value={issued ? String(stats.drafts) : null} hint="Not sent yet" />
       </div>
 
@@ -216,16 +217,18 @@ export function InvoicesPage() {
   );
 }
 
-function Stat({ label, value, hint, warn = false }: { label: string; value: string | null; hint: string; warn?: boolean }) {
+function Stat({ label, value, hint, warn = false }: { label: string; value: React.ReactNode | null; hint: string; warn?: boolean }) {
   return (
     <div className="rounded-xl border bg-card p-4">
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
       {value === null ? (
         <Skeleton className="mt-2 h-7 w-24" />
-      ) : (
+      ) : typeof value === "string" ? (
         <p className="mt-1 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
           {value}
         </p>
+      ) : (
+        value
       )}
       <p className={cn("mt-0.5 text-xs text-muted-foreground", warn && "text-amber-700 dark:text-amber-300")}>{hint}</p>
     </div>

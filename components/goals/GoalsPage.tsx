@@ -9,13 +9,14 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError } from "@/lib/api";
 import { goalPace, GoalPace, MAX_ACTIVE_GOALS, monthlyNeeded, PACE_LABEL, savedByCurrency, timeLeft } from "@/lib/goals";
-import { formatDay, moneyByCurrency } from "@/lib/invoicing";
+import { formatDay } from "@/lib/invoicing";
 import { formatMinor } from "@/lib/ledger";
 import { cn } from "@/lib/utils";
 import { listGoals } from "@/services/goals";
 import { Goal, GoalCategory } from "@/types/goal";
 import { GoalFormDialog } from "./GoalFormDialog";
 import { GoalMoneyDialog } from "./GoalMoneyDialog";
+import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
 
 const primary = "bg-emerald-700 text-white hover:bg-emerald-800";
 
@@ -112,7 +113,7 @@ export function GoalsPage() {
 
       {active.length > 0 && (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-          <Tile icon={PiggyBank} label="Saved in goals" value={moneyByCurrency(saved)} sub={`Across ${active.length} goal${active.length === 1 ? "" : "s"}`} />
+          <Tile icon={PiggyBank} label="Saved in goals" value={<CurrencyAmounts totals={saved} className="mt-1.5" />} sub={`Across ${active.length} goal${active.length === 1 ? "" : "s"}`} />
           <Tile icon={CircleCheck} label="Fully funded" value={`${funded} of ${active.length}`} sub={funded ? "Target reached" : "None yet"} />
           <Tile
             className="col-span-2 lg:col-span-1"
@@ -160,16 +161,20 @@ export function GoalsPage() {
   );
 }
 
-function Tile({ icon: Icon, label, value, sub, warn = false, className }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; sub: string; warn?: boolean; className?: string }) {
+function Tile({ icon: Icon, label, value, sub, warn = false, className }: { icon: React.ComponentType<{ className?: string }>; label: string; value: React.ReactNode; sub: string; warn?: boolean; className?: string }) {
   return (
     <div className={cn("rounded-xl border bg-card p-4", className)}>
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs text-muted-foreground">{label}</p>
         <Icon className="size-4 text-muted-foreground" />
       </div>
-      <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
-        {value}
-      </p>
+      {typeof value === "string" ? (
+        <p className="mt-1.5 truncate text-2xl font-semibold tracking-tight tabular-nums" title={value}>
+          {value}
+        </p>
+      ) : (
+        value
+      )}
       <p className={cn("mt-0.5 truncate text-xs", warn ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground")} title={sub}>
         {sub}
       </p>
