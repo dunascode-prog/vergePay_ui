@@ -20,6 +20,7 @@ import { PayeeFormDialog } from "./PayeeFormDialog";
 import { RunPayrollDialog } from "./RunPayrollDialog";
 import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
 import { StatCard, StatGrid } from "@/components/StatCard";
+import { flowTrend, mainCurrency } from "@/lib/trends";
 
 const primary = "bg-emerald-700 text-white hover:bg-emerald-800";
 
@@ -91,6 +92,11 @@ export function PayrollPage() {
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
   const paidThisMonth = paidSince(runs, monthStart);
   const runsThisMonth = runs.filter((r) => new Date(r.created_at) >= monthStart).length;
+  const paidTrend = flowTrend(
+    runs.map((r) => ({ at: new Date(r.created_at).getTime(), minor: r.total_minor, currency: r.currency_code })),
+    mainCurrency(paidThisMonth) ?? mainCurrency(paidSince(runs, new Date(0))),
+    "up",
+  );
 
   const addButton = (
     <PayeeFormDialog
@@ -143,7 +149,7 @@ export function PayrollPage() {
           hint={due.length ? `${due.length} payee${due.length === 1 ? "" : "s"}` : null}
           tone="warn"
         />
-        <StatCard label="Paid this month" value={<CurrencyAmounts totals={paidThisMonth} empty="Nothing yet" />} hint={runsThisMonth ? `${runsThisMonth} run${runsThisMonth === 1 ? "" : "s"}` : null} />
+        <StatCard label="Paid this month" trend={paidTrend} value={<CurrencyAmounts totals={paidThisMonth} empty="Nothing yet" />} hint={runsThisMonth ? `${runsThisMonth} run${runsThisMonth === 1 ? "" : "s"}` : null} />
         <StatCard
           className="col-span-2 lg:col-span-1"
           label="Payees"

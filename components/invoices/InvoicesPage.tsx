@@ -15,6 +15,7 @@ import { ApiInvoice, InvoiceStatus } from "@/types/invoicing";
 import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
 import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
 import { StatCard, StatGrid } from "@/components/StatCard";
+import { balanceTrend, flowTrend, invoiceBalanceAt, mainCurrency, overdueAt, paidInvoiceEvents, unpaidAt } from "@/lib/trends";
 
 type Tab = "issued" | "received";
 type Filter = "all" | InvoiceStatus;
@@ -72,12 +73,20 @@ export function InvoicesPage() {
   const stats = useMemo(() => {
     const mine = issued ?? [];
     const monthAgo = loadedAt - 30 * 86_400_000;
+    const outstanding = sumBy(mine, isUnpaid);
+    const overdue = sumBy(mine, (i) => i.invoice_status === "overdue");
+    const paid = sumBy(mine, (i) => i.invoice_status === "paid" && !!i.paid_at && new Date(i.paid_at).getTime() >= monthAgo);
     return {
-      outstanding: sumBy(mine, isUnpaid),
+      trends: {
+        outstanding: balanceTrend(invoiceBalanceAt(mine, mainCurrency(outstanding), unpaidAt), "down", loadedAt),
+        overdue: balanceTrend(invoiceBalanceAt(mine, mainCurrency(overdue), overdueAt), "down", loadedAt),
+        paid: flowTrend(paidInvoiceEvents(mine), mainCurrency(paid), "up", loadedAt),
+      },
+      outstanding,
       outstandingCount: mine.filter(isUnpaid).length,
-      overdue: sumBy(mine, (i) => i.invoice_status === "overdue"),
+      overdue,
       overdueCount: mine.filter((i) => i.invoice_status === "overdue").length,
-      paid: sumBy(mine, (i) => i.invoice_status === "paid" && !!i.paid_at && new Date(i.paid_at).getTime() >= monthAgo),
+      paid,
       drafts: mine.filter((i) => i.invoice_status === "draft").length,
     };
   }, [issued, loadedAt]);
@@ -91,14 +100,15 @@ export function InvoicesPage() {
       {/* summary */}
       {issued ? (
         <StatGrid>
-          <StatCard label="Outstanding" value={<CurrencyAmounts totals={stats.outstanding} empty={money(0, "NGN")} />} hint={stats.outstandingCount ? `${stats.outstandingCount} unpaid` : null} />
+          <StatCard label="Outstanding" trend={stats.trends.outstanding} value={<CurrencyAmounts totals={stats.outstanding} empty={money(0, "NGN")} />} hint={stats.outstandingCount ? `${stats.outstandingCount} unpaid` : null} />
           <StatCard
             label="Overdue"
+            trend={stats.trends.overdue}
             value={<CurrencyAmounts totals={stats.overdue} empty={money(0, "NGN")} />}
             hint={stats.overdueCount ? `${stats.overdueCount} past due` : null}
             tone="warn"
           />
-          <StatCard label="Paid, last 30 days" value={<CurrencyAmounts totals={stats.paid} empty={money(0, "NGN")} />} />
+          <StatCard label="Paid, last 30 days" trend={stats.trends.paid} value={<CurrencyAmounts totals={stats.paid} empty={money(0, "NGN")} />} />
           <StatCard label="Drafts" value={String(stats.drafts)} />
         </StatGrid>
       ) : (
