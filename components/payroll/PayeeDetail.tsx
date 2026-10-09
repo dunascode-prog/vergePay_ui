@@ -17,6 +17,7 @@ import { Payee, PayeeDetail as PayeeDetailData } from "@/types/payroll";
 import { PayeeAvatar } from "./PayeeAvatar";
 import { PayeeFormDialog } from "./PayeeFormDialog";
 import { RunPayrollDialog } from "./RunPayrollDialog";
+import { pageClass } from "@/lib/layout";
 
 const primary = "bg-emerald-700 text-white hover:bg-emerald-800";
 
@@ -62,7 +63,7 @@ export function PayeeDetail({ payeeId }: { payeeId: string }) {
 
   if (error) {
     return (
-      <div className="mx-auto max-w-5xl space-y-3">
+      <div className={pageClass("narrow")}>
         {back}
         <ErrorNote>{error.notFound ? "This payee doesn't exist, or isn't yours." : error.message}</ErrorNote>
         {!error.notFound && (
@@ -75,7 +76,7 @@ export function PayeeDetail({ payeeId }: { payeeId: string }) {
   }
   if (!payee) {
     return (
-      <div className="mx-auto max-w-5xl space-y-4">
+      <div className={pageClass("narrow")}>
         <Skeleton className="h-5 w-24" />
         <Skeleton className="h-48 rounded-xl" />
         <Skeleton className="h-64 rounded-xl" />
@@ -100,7 +101,7 @@ export function PayeeDetail({ payeeId }: { payeeId: string }) {
   };
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className={pageClass("narrow", { stack: false })}>
       {back}
 
       <section className="rounded-xl border bg-card p-4 sm:p-6">
@@ -162,7 +163,7 @@ export function PayeeDetail({ payeeId }: { payeeId: string }) {
         {statusError && <div className="mt-3"><ErrorNote>{statusError}</ErrorNote></div>}
       </section>
 
-      <section className="mt-5 space-y-2">
+      <section className="mt-5 space-y-2 sm:mt-6">
         <h2 className="text-sm font-semibold">Payments</h2>
         {payee.payments.length === 0 ? (
           <p className="rounded-xl border bg-card px-4 py-8 text-center text-sm text-muted-foreground">You haven&apos;t paid {payee.name} yet.</p>

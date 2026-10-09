@@ -10,6 +10,7 @@ import { ApiClient, ApiInvoice } from "@/types/invoicing";
 import { ClientPortfolioAISummary } from "./ClientPortfolioAISummary";
 import { ClientSummaryCards } from "./ClientSummaryCards";
 import { ClientsGrid } from "./ClientsGrid";
+import { pageClass } from "@/lib/layout";
 
 /** /dashboard/clients: who you bill and how they pay, from your invoices. */
 export function ClientsPage() {
@@ -47,7 +48,7 @@ export function ClientsPage() {
   if (error) return <ErrorNote>{error}</ErrorNote>;
   if (clients === null) {
     return (
-      <div className="space-y-5">
+      <div className={pageClass()}>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {[0, 1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-24 rounded-xl" />
@@ -64,7 +65,7 @@ export function ClientsPage() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className={pageClass()}>
       <ClientSummaryCards clients={active} allClients={clients} invoices={invoices} />
       <ClientPortfolioAISummary clients={active} />
       <ClientsGrid clients={clients} onChanged={upsert} />
