@@ -1,11 +1,12 @@
+import { pageClass } from "@/lib/layout";
 function Pulse({ className }: { className?: string }) {
   return <div className={`animate-pulse rounded-md bg-gray-200 ${className ?? ""}`} />;
 }
 
 export default function EnvelopesLoading() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-6xl px-6 py-8">
+    <div>
+      <div className={pageClass("wide", { stack: false })}>
         <div className="mb-6">
           <Pulse className="h-4 w-40 mb-3" />
           <Pulse className="h-8 w-32" />

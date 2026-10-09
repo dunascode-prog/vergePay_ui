@@ -25,6 +25,7 @@ import { NeedsAttentionCard } from "./NeedsAttentionCard";
 import { RecurringRevenueCard } from "./RecurringRevenueCard";
 import { TopClientsCard } from "./TopClientsCard";
 import { WalletBalancesCard } from "./WalletBalancesCard";
+import { pageClass } from "@/lib/layout";
 
 interface Book {
   invoices: ApiInvoice[];
@@ -125,7 +126,7 @@ export function BusinessOverviewPage() {
   if (accountsState === "loading" || book === null || ledger.state === "loading") return <BusinessSkeleton />;
 
   return (
-    <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 sm:gap-5 lg:gap-6">
+    <div className={pageClass()}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
           This year so far{scope !== "combined" ? ` · ${scope} wallet` : ""}. Moves between your own wallets aren&apos;t counted.
@@ -201,7 +202,7 @@ function NoWalletInView() {
 /** Also the route's loading.tsx. */
 export function BusinessSkeleton() {
   return (
-    <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 sm:gap-5 lg:gap-6" aria-busy>
+    <div className={pageClass()} aria-busy>
       <Skeleton className="h-5 w-72" />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (

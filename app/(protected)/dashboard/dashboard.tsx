@@ -35,6 +35,7 @@ import {
   scopedWallets,
   walletsOf,
 } from "@/lib/ledger";
+import { pageClass } from "@/lib/layout";
 
 const MONTHS = 6;
 const RECENT = 8;
@@ -55,7 +56,7 @@ function ErrorCard({ message, onRetry }: { message: string; onRetry: () => void 
 
 function DashboardSkeleton() {
   return (
-    <div className="flex flex-col gap-4 sm:gap-5 lg:gap-6" aria-busy="true" aria-label="Loading your dashboard">
+    <div className={pageClass()} aria-busy="true" aria-label="Loading your dashboard">
       <Skeleton className="h-44 w-full rounded-xl" />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Skeleton className="h-44 rounded-xl" />
@@ -134,7 +135,7 @@ export default function Dashboard() {
     ) : null;
 
   return (
-    <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 sm:gap-5 lg:gap-6">
+    <div className={pageClass()}>
       <BrokerageResult />
       <LinkReminder brokerage={brokerage} />
 

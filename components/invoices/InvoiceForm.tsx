@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { createInvoice, getInvoice, listClients, sendInvoice, updateInvoice } from "@/services/invoices";
 import { ApiClient, ApiInvoice } from "@/types/invoicing";
 import { NewClientDialog } from "./NewClientDialog";
+import { pageClass } from "@/lib/layout";
 
 interface Line {
   key: number;
@@ -140,7 +141,7 @@ export function InvoiceForm({ invoiceId }: { invoiceId?: string }) {
 
   if (!loaded || accountsState === "loading") {
     return (
-      <div className="mx-auto max-w-5xl space-y-4">
+      <div className={pageClass("narrow")}>
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-96 w-full rounded-xl" />
       </div>
@@ -152,13 +153,13 @@ export function InvoiceForm({ invoiceId }: { invoiceId?: string }) {
   }
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className={pageClass("narrow", { stack: false })}>
       <Link href={invoiceId ? `/dashboard/invoices/${invoiceId}` : "/dashboard/invoices"} className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="size-4" /> {invoiceId ? "Back to invoice" : "Invoices"}
       </Link>
-      <h1 className="mb-5 text-xl font-semibold tracking-tight">{invoiceId ? "Edit draft" : "New invoice"}</h1>
+      <h1 className="mb-5 text-xl font-semibold tracking-tight sm:mb-6">{invoiceId ? "Edit draft" : "New invoice"}</h1>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_20rem] lg:items-start">
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-[1fr_20rem] lg:items-start">
         <div className="space-y-5">
           {/* who and where */}
           <section className="space-y-4 rounded-xl border bg-card p-4 sm:p-5">

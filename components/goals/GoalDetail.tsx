@@ -18,6 +18,7 @@ import { CloseGoalDialog } from "./CloseGoalDialog";
 import { GoalFormDialog } from "./GoalFormDialog";
 import { GoalMoneyDialog } from "./GoalMoneyDialog";
 import { CATEGORY_ICON, GoalProgress, PaceBadge } from "./GoalsPage";
+import { pageClass } from "@/lib/layout";
 
 const primary = "bg-emerald-700 text-white hover:bg-emerald-800";
 
@@ -58,7 +59,7 @@ export function GoalDetail({ goalId }: { goalId: string }) {
 
   if (error) {
     return (
-      <div className="mx-auto max-w-5xl space-y-3">
+      <div className={pageClass("narrow")}>
         {back}
         <ErrorNote>{error.notFound ? "This goal doesn't exist, or isn't yours." : error.message}</ErrorNote>
         {!error.notFound && (
@@ -71,7 +72,7 @@ export function GoalDetail({ goalId }: { goalId: string }) {
   }
   if (!goal) {
     return (
-      <div className="mx-auto max-w-5xl space-y-4">
+      <div className={pageClass("narrow")}>
         <Skeleton className="h-5 w-24" />
         <Skeleton className="h-48 rounded-xl" />
         <Skeleton className="h-72 rounded-xl" />
@@ -85,7 +86,7 @@ export function GoalDetail({ goalId }: { goalId: string }) {
   const pace = goalPace(goal);
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className={pageClass("narrow", { stack: false })}>
       {back}
 
       <section className="rounded-xl border bg-card p-4 sm:p-6">
@@ -143,7 +144,7 @@ export function GoalDetail({ goalId }: { goalId: string }) {
         )}
       </section>
 
-      <section className="mt-5 space-y-2">
+      <section className="mt-5 space-y-2 sm:mt-6">
         <h2 className="text-sm font-semibold">Activity</h2>
         {goal.activity.length === 0 ? (
           <p className="rounded-xl border bg-card px-4 py-8 text-center text-sm text-muted-foreground">Nothing added yet.</p>

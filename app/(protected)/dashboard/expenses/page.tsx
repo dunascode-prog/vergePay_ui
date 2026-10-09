@@ -5,13 +5,14 @@ import { AIExpenseInsightBanner } from "@/components/expenses/AIExpenseInsightBa
 import { ExpenseTrendChart } from "@/components/expenses/ExpenseTrendChart";
 import { CategoryBreakdownCard } from "@/components/expenses/CategoryBreakdownCard";
 import { ExpenseTable } from "@/components/expenses/ExpenseTable";
+import { pageClass } from "@/lib/layout";
 
 export default async function ExpensesPage() {
   const expenses = await getExpenses();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="">
+    <div>
+      <div className={pageClass("wide", { stack: false })}>
         <PageHeader
           backHref="/dashboard/business"
           backLabel="Back to business overview"

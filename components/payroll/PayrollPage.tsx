@@ -21,6 +21,7 @@ import { RunPayrollDialog } from "./RunPayrollDialog";
 import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
 import { StatCard, StatGrid } from "@/components/StatCard";
 import { flowTrend, mainCurrency } from "@/lib/trends";
+import { pageClass } from "@/lib/layout";
 
 const primary = "bg-emerald-700 text-white hover:bg-emerald-800";
 
@@ -125,7 +126,7 @@ export function PayrollPage() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className={pageClass()}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">Paid instantly into each payee&apos;s VergePay wallet.</p>
         <div className="flex flex-wrap gap-2">
@@ -289,7 +290,7 @@ function PayeeCard({ payee, payees, onChanged }: { payee: Payee; payees: Payee[]
 
 export function PayrollSkeleton() {
   return (
-    <div className="space-y-5">
+    <div className={pageClass()}>
       <Skeleton className="h-5 w-64" />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         {[0, 1, 2].map((i) => (

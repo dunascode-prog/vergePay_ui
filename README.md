@@ -163,6 +163,17 @@ Calculations live in small, pure modules in `lib/` rather than inside JSX:
 
 Amounts in different currencies are never added together or converted. A headline figure (`components/money/CurrencyAmounts.tsx`) shows the main currency, naira first, as the big number, with any others in a quiet line under it (`$44,400.00`). Every summary row uses one card, `components/StatCard.tsx`: a label, the number, and a hint only when it adds something (a count, a warning), with no corner icons. Where the page has the history, a card also shows a **trend** (`lib/trends.ts`): a sparkline of six 30-day steps and the change over the last one ("▲ 12% vs prior 30 days"). It's green when the change is good news and red when it isn't (a rise in overdue is red), and it's in the card's main currency. Money that moves (paid, revenue, money out, payroll) is totalled per 30 days. Balances (outstanding, overdue, owed) are worked out at each moment from invoice dates. Client counts come from when each client was added and archived. Recurring revenue, active and paused plans come from each plan's creation, latest pause and cancellation, at today's amounts. Cards without real history (drafts, net, need attention, next invoice, goals, loans) show no trend rather than an invented one. In a sentence they read "₦65,050.10 and $2,000.00" (`moneyByCurrency`).
 
+### One page layout
+
+Every dashboard tab uses the same spacing, set in one place (`lib/layout.ts`):
+
+| | Phones | Tablets | Wide screens |
+|---|---|---|---|
+| Workspace padding (the top bar's sides match) | 16px | 24px | 32px |
+| Space between a page's sections | 20px | 24px | 24px |
+
+Pages come in two widths, centred: `pageClass()` (1440px) for overviews and lists, and `pageClass("narrow")` (1024px) for detail pages and forms. A new page uses one of them instead of its own `max-w` or `space-y`.
+
 ### One type scale
 Every screen uses the same handful of sizes, each for one job, so the app reads as one product:
 
