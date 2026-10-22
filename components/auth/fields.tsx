@@ -7,21 +7,24 @@ import { cn } from "@/lib/utils";
 
 // Shared pieces of the sign-in and sign-up forms, so both screens look the same.
 
+// The dark: variants are for the dark public pages (AuthShell dark), styled
+// like the landing page: near-black, one green accent, a glowing pill button.
+
 /** Taller than the app's default controls, as on most fintech auth screens. */
-export const authInputClass = "h-11 rounded-lg px-3 text-base md:text-sm";
+export const authInputClass = "h-11 rounded-lg px-3 text-base md:text-sm dark:bg-[#0d0d0d]";
 export const authSubmitClass =
-  "mt-1 h-11 w-full rounded-lg bg-emerald-700 text-sm font-medium text-white hover:bg-emerald-800";
-export const authLinkClass = "font-medium text-emerald-700 hover:underline";
+  "mt-1 h-11 w-full rounded-lg bg-emerald-700 text-sm font-medium text-white hover:bg-emerald-800 dark:rounded-full dark:bg-(--vp-accent) dark:text-[#050505] dark:shadow-[0_0_32px_-6px_var(--vp-accent)] dark:transition-shadow dark:duration-500 dark:hover:bg-(--vp-accent) dark:hover:shadow-[0_0_48px_-2px_var(--vp-accent)]";
+export const authLinkClass = "font-medium text-emerald-700 hover:underline dark:text-(--vp-accent)";
 
 export function AuthHeader({ title, subtitle, icon }: { title: string; subtitle: string; icon?: React.ReactNode }) {
   return (
     <header className="mb-8 space-y-2">
       {icon && (
-        <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
+        <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 dark:bg-(--vp-accent)/10 dark:text-(--vp-accent)">
           {icon}
         </span>
       )}
-      <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+      <h1 className="text-2xl font-semibold tracking-tight dark:text-[1.75rem] dark:font-medium dark:tracking-[-0.04em]">{title}</h1>
       <p className="text-sm text-muted-foreground">{subtitle}</p>
     </header>
   );
@@ -35,7 +38,7 @@ export function AuthNotice({ tone, children }: { tone: "info" | "error"; childre
         "rounded-lg border px-3 py-2.5 text-sm",
         tone === "error"
           ? "border-destructive/20 bg-destructive/5 text-destructive"
-          : "border-emerald-200 bg-emerald-50 text-emerald-800",
+          : "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-(--vp-accent)/25 dark:bg-(--vp-accent)/10 dark:text-(--vp-accent)",
       )}
     >
       {children}
@@ -98,7 +101,7 @@ export function PasswordChecklist({
             key={rule.label}
             className={cn(
               "flex items-center gap-1.5",
-              met ? "text-emerald-700" : showErrors ? "text-destructive" : "text-muted-foreground",
+              met ? "text-emerald-700 dark:text-(--vp-accent)" : showErrors ? "text-destructive" : "text-muted-foreground",
             )}
           >
             {met || !showErrors ? (

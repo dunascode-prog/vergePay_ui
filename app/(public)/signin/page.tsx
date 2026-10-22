@@ -12,7 +12,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/signin">) 
   const params = await searchParams;
 
   return (
-    <AuthShell>
+    <AuthShell dark>
       <LoginForm
         // just signed up: straight on to creating their first wallet
         next={params.registered === "1" ? "/onboarding" : safeNext(params.next)}
