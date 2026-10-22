@@ -79,6 +79,8 @@
 }
 
 :root {
+  /* VergePay's green, the one accent of the dark public pages (ACCENT in components/landing/Landing.tsx). */
+  --vp-accent: #63d16b;
   --background: oklch(0.99 0.002 145);
   --foreground: oklch(0.12 0.008 145);
   --card: oklch(1 0 0);
@@ -354,4 +356,34 @@ html.lenis body {
   .vp-faq-icon {
     transition: none;
   }
+}
+
+/* The dark public pages before sign-in (sign in, sign up, forgot password),
+   matching the landing page. Set with `dark vp-auth-dark` on AuthShell: the
+   app's dark tokens and dark: variants switch on, and these values (declared
+   after .dark, so they win) bring them
+   to the landing page's near-black and green. */
+.vp-auth-dark {
+  color-scheme: dark;
+  --background: #050505;
+  --foreground: #ffffff;
+  --card: #0d0d0d;
+  --card-foreground: #ffffff;
+  --primary: var(--vp-accent);
+  --primary-foreground: #050505;
+  --muted-foreground: rgb(255 255 255 / 0.6);
+  --border: rgb(255 255 255 / 0.08);
+  --input: rgb(255 255 255 / 0.12);
+  --ring: var(--vp-accent);
+  --destructive: oklch(0.72 0.17 25);
+  background-color: var(--background);
+  color: var(--foreground);
+}
+/* Keep the browser's autofill from painting the inputs pale yellow. */
+.vp-auth-dark input:-webkit-autofill,
+.vp-auth-dark input:-webkit-autofill:hover,
+.vp-auth-dark input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff;
+  box-shadow: 0 0 0 1000px #0d0d0d inset;
+  caret-color: #ffffff;
 }

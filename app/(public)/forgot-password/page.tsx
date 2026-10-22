@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Reset your password · VergePay" };
 
 export default function ForgotPasswordPage() {
   return (
-    <AuthShell>
+    <AuthShell dark>
       <ForgotPasswordForm />
     </AuthShell>
   );

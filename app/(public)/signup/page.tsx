@@ -3,7 +3,7 @@ import { SignupForm } from "@/components/signup-form";
 
 export default function SignupPage() {
   return (
-    <AuthShell>
+    <AuthShell dark>
       <SignupForm />
     </AuthShell>
   );
