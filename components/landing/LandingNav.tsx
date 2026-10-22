@@ -48,7 +48,7 @@ export function LandingNav({ signedIn }: { signedIn: boolean }) {
         <ul className="hidden items-center gap-1 lg:flex">
           {LINKS.map((l) => (
             <li key={l.href}>
-              <a href={l.href} className="rounded-full px-4 py-2 text-[15px] font-medium text-white/80 transition-colors hover:text-white">
+              <a href={l.href} className="rounded-full px-4 py-2 text-[15px] font-medium text-white/80 transition-colors duration-300 hover:text-(--vp-accent)">
                 {l.label}
               </a>
             </li>
@@ -58,15 +58,15 @@ export function LandingNav({ signedIn }: { signedIn: boolean }) {
         <div className="hidden items-center gap-2 lg:flex">
           <Link
             href={signedIn ? "/dashboard" : "/signin"}
-            className="inline-flex items-center gap-2 rounded-full bg-[#171717] px-5 py-2.5 text-[15px] font-medium text-white transition-colors hover:bg-[#222]"
+            className="group inline-flex items-center gap-2 rounded-full bg-[#171717] px-5 py-2.5 text-[15px] font-medium text-white transition-[background-color,color,box-shadow] duration-500 ease-(--vp-soft) hover:bg-(--vp-accent) hover:text-[#050505] hover:shadow-[0_0_28px_-6px_var(--vp-accent)]"
           >
-            {signedIn ? "Dashboard" : "Sign in"} <ArrowUpRight className="size-4" />
+            {signedIn ? "Dashboard" : "Sign in"} <ArrowUpRight className="size-4 transition-transform duration-500 ease-(--vp-bouncy) group-hover:rotate-45" />
           </Link>
           <Link
             href="/signup"
-            className="inline-flex items-center gap-2 rounded-full bg-(--vp-accent) px-5 py-2.5 text-[15px] font-medium text-[#050505] shadow-[0_0_24px_-4px_var(--vp-accent)] transition-[filter] hover:brightness-110"
+            className="group inline-flex items-center gap-2 rounded-full bg-(--vp-accent) px-5 py-2.5 text-[15px] font-medium text-[#050505] shadow-[0_0_24px_-4px_var(--vp-accent)] transition-shadow duration-500 ease-(--vp-soft) hover:shadow-[0_0_44px_-2px_var(--vp-accent)]"
           >
-            Get started <ArrowUpRight className="size-4" />
+            Get started <ArrowUpRight className="size-4 transition-transform duration-500 ease-(--vp-bouncy) group-hover:rotate-45" />
           </Link>
         </div>
 
@@ -76,24 +76,24 @@ export function LandingNav({ signedIn }: { signedIn: boolean }) {
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? "Close menu" : "Open menu"}
-          className="flex size-10 items-center justify-center rounded-full text-white hover:bg-white/10 lg:hidden"
+          className="flex size-10 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 lg:hidden"
         >
           {open ? <X className="size-5" /> : <Menu className="size-5" />}
         </button>
       </nav>
 
       {open && (
-        <div id="mobile-menu" className="h-[calc(100dvh-72px)] overflow-y-auto border-t border-white/[0.06] bg-[#050505] px-4 pt-4 pb-10 lg:hidden">
-          <ul className="space-y-1">
-            {LINKS.map((l) => (
-              <li key={l.href}>
+        <div id="mobile-menu" data-lenis-prevent className="vp-sheet h-[calc(100dvh-72px)] overflow-y-auto border-t border-white/[0.06] bg-[#050505] px-4 pt-4 pb-10 lg:hidden">
+          <ul className="vp-stagger space-y-1">
+            {LINKS.map((l, i) => (
+              <li key={l.href} style={{ "--i": i } as React.CSSProperties}>
                 <a href={l.href} onClick={() => setOpen(false)} className="block rounded-xl px-3 py-3.5 text-lg font-medium text-white hover:bg-white/5">
                   {l.label}
                 </a>
               </li>
             ))}
           </ul>
-          <div className="mt-6 grid gap-3">
+          <div className="vp-stagger mt-6 grid gap-3" style={{ "--i": LINKS.length } as React.CSSProperties}>
             <Link href="/signup" className="rounded-full bg-(--vp-accent) py-3.5 text-center font-semibold text-[#050505]">
               Get started
             </Link>

@@ -5,7 +5,6 @@ import {
   Fingerprint,
   KeyRound,
   Lock,
-  Plus,
   Repeat,
   Scale,
   UserCheck,
@@ -25,6 +24,7 @@ import {
   StepVerifyMock,
   WalletsMini,
 } from "./Mockups";
+import { Faq, Reveal, SmoothScroll } from "./Motion";
 
 // Where investors and partners reach the team. Change it in one place.
 export const CONTACT_EMAIL = "hello@vergepay.com";
@@ -44,41 +44,51 @@ function Pill({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** Heading slides in from the left, its text from the right, as in Clario. */
 function SectionTitle({ eyebrow, title, body, center = true, className }: { eyebrow: string; title: React.ReactNode; body?: React.ReactNode; center?: boolean; className?: string }) {
   return (
     <div className={cn("max-w-3xl", center && "mx-auto text-center", className)}>
-      <Pill>{eyebrow}</Pill>
-      <h2 className="mt-5 text-[2rem] leading-[1.1] font-medium tracking-[-0.04em] text-white sm:text-5xl">{title}</h2>
-      {body && <p className={cn("mt-4 max-w-2xl text-base leading-relaxed text-white/65 sm:text-lg", center && "mx-auto")}>{body}</p>}
+      <Reveal from="left">
+        <Pill>{eyebrow}</Pill>
+        <h2 className="mt-5 text-[2rem] leading-[1.1] font-medium tracking-[-0.04em] text-white sm:text-5xl">{title}</h2>
+      </Reveal>
+      {body && (
+        <Reveal from="right" delay={0.1}>
+          <p className={cn("mt-4 max-w-2xl text-base leading-relaxed text-white/65 sm:text-lg", center && "mx-auto")}>{body}</p>
+        </Reveal>
+      )}
     </div>
   );
 }
 
-/** The glowing accent button, Clario's one strong action. */
+/** The glowing accent button, Clario's one strong action: the glow grows on hover. */
 function PrimaryButton({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) {
   return (
     <Link
       href={href}
       className={cn(
-        "group inline-flex items-center justify-center gap-2 rounded-full bg-(--vp-accent) px-6 py-3.5 text-base font-medium text-[#050505] shadow-[0_0_32px_-6px_var(--vp-accent)] transition-[filter] hover:brightness-110",
+        "group inline-flex items-center justify-center gap-2 rounded-full bg-(--vp-accent) px-6 py-3.5 text-base font-medium text-[#050505] shadow-[0_0_32px_-6px_var(--vp-accent)] transition-[box-shadow,scale] duration-500 ease-(--vp-soft) hover:shadow-[0_0_56px_-2px_var(--vp-accent)] active:scale-[0.97]",
         className,
       )}
     >
       {children}
-      <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+      <ArrowUpRight className="size-4 transition-transform duration-500 ease-(--vp-bouncy) group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:rotate-45" />
     </Link>
   );
 }
 
+/** The dark button: fills with the accent and glows on hover. */
 function SecondaryButton({ href, children }: { href: string; children: React.ReactNode }) {
-  const cls = "inline-flex items-center justify-center gap-2 rounded-full bg-[#171717] px-6 py-3.5 text-base font-medium text-white transition-colors hover:bg-[#222]";
+  const cls =
+    "group inline-flex items-center justify-center gap-2 rounded-full bg-[#171717] px-6 py-3.5 text-base font-medium text-white transition-[background-color,color,box-shadow,scale] duration-500 ease-(--vp-soft) hover:bg-(--vp-accent) hover:text-[#050505] hover:shadow-[0_0_32px_-6px_var(--vp-accent)] active:scale-[0.97]";
+  const arrow = <ArrowUpRight className="size-4 transition-transform duration-500 ease-(--vp-bouncy) group-hover:rotate-45" />;
   return href.startsWith("/") ? (
     <Link href={href} className={cls}>
-      {children} <ArrowUpRight className="size-4" />
+      {children} {arrow}
     </Link>
   ) : (
     <a href={href} className={cls}>
-      {children} <ArrowUpRight className="size-4" />
+      {children} {arrow}
     </a>
   );
 }
@@ -97,12 +107,17 @@ const investorMail = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Verg
 export function Landing({ signedIn }: { signedIn: boolean }) {
   return (
     <div className="bg-[#050505] text-white antialiased" style={{ "--vp-accent": ACCENT } as React.CSSProperties}>
+      <SmoothScroll />
+      {/* without JavaScript nothing waits to be revealed */}
+      <noscript>
+        <style>{`.vp-reveal{opacity:1!important;transform:none!important}`}</style>
+      </noscript>
       <LandingNav signedIn={signedIn} />
 
       <main className="overflow-x-clip">
         {/* ---------------------------------------------------------------- hero */}
         <section className="relative pt-36 sm:pt-44">
-          <div className={cn(container, "text-center motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3 motion-safe:duration-700")}>
+          <div className={cn(container, "vp-hero-text text-center")}>
             <Pill>Wallets · Invoices · Insights</Pill>
             <h1 className="mx-auto mt-6 max-w-4xl text-[2.6rem] leading-[1.02] font-medium tracking-[-0.05em] sm:text-6xl lg:text-[4.5rem]">
               Get paid, keep business apart, see every naira
@@ -115,13 +130,13 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
               <SecondaryButton href={signedIn ? "/dashboard" : "/signin"}>{signedIn ? "Go to your dashboard" : "Sign in"}</SecondaryButton>
             </div>
           </div>
-          <div className={cn(container, "mt-20 sm:mt-24 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-1000")}>
+          <div className={cn(container, "vp-hero-visual mt-20 sm:mt-24")}>
             <HeroDashboardMock />
           </div>
         </section>
 
         {/* -------------------------------------------------------- how it works */}
-        <section id="how" className="scroll-mt-20 py-20 sm:py-28">
+        <section id="how" className="py-20 sm:py-28">
           <div className={container}>
             <SectionTitle eyebrow="How it works" title="Up and running in three steps" body="No paperwork and no branch visits. Open your account from your phone in minutes." />
             <ol className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -130,32 +145,32 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
                 { title: "Verify once", body: "Confirm who you are with your BVN, and your personal and business wallets open with their own account numbers.", mock: <StepVerifyMock /> },
                 { title: "Start earning", body: "Share your account number or send your first invoice, and watch the money land.", mock: <StepPaidMock /> },
               ].map((s, i) => (
-                <li key={s.title} className="flex flex-col rounded-[20px] border border-white/[0.06] bg-[#0d0d0d] p-6">
+                <Reveal as="li" key={s.title} spring="bouncy" delay={0.2 * (i + 1)} className="flex flex-col rounded-[20px] border border-white/[0.06] bg-[#0d0d0d] p-6">
                   <span className="w-fit rounded-full bg-[#171717] px-3 py-1 text-xs font-medium text-white/70">Step {i + 1}</span>
                   <h3 className="mt-5 text-xl font-medium tracking-tight">{s.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-white/60">{s.body}</p>
                   <div className="mt-auto pt-6">{s.mock}</div>
-                </li>
+                </Reveal>
               ))}
             </ol>
           </div>
         </section>
 
         {/* ---------------------------------------------------- feature showcase */}
-        <section id="product" className="scroll-mt-20 pb-24 sm:pb-32">
+        <section id="product" className="pb-20 sm:pb-28">
           <div className={container}>
             <SectionTitle eyebrow="One app" title="See your money move in real time" body="From the first invoice to the end-of-month review, VergePay replaces the spreadsheets, the screenshots of transfers and the guesswork." />
             <div className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-2">
-              <ShowcaseCard title="Personal and business wallets" body="Two wallets with their own account numbers, so business money never mixes with rent and groceries.">
+              <ShowcaseCard delay={0} title="Personal and business wallets" body="Two wallets with their own account numbers, so business money never mixes with rent and groceries.">
                 <WalletsMini />
               </ShowcaseCard>
-              <ShowcaseCard title="Invoices clients pay in one tap" body="A secure pay link, emailed for you. Clients pay by card, transfer or USSD, with no VergePay account needed.">
+              <ShowcaseCard delay={0.15} title="Invoices clients pay in one tap" body="A secure pay link, emailed for you. Clients pay by card, transfer or USSD, with no VergePay account needed.">
                 <InvoiceMini />
               </ShowcaseCard>
-              <ShowcaseCard title="Know where every naira goes" body="Income, spending and net for the month, and six months of cash flow, straight from your ledger.">
+              <ShowcaseCard delay={0} title="Know where every naira goes" body="Income, spending and net for the month, and six months of cash flow, straight from your ledger.">
                 <CashFlowMini />
               </ShowcaseCard>
-              <ShowcaseCard title="Live alerts" body="The moment money lands or leaves, your balance updates and you get an alert on every device.">
+              <ShowcaseCard delay={0.15} title="Live alerts" body="The moment money lands or leaves, your balance updates and you get an alert on every device.">
                 <AlertsMini />
               </ShowcaseCard>
             </div>
@@ -165,18 +180,18 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
         {/* ---------------------------------------------------------- stat band */}
         <section className="relative py-20 sm:py-28">
           <div aria-hidden className="pointer-events-none absolute top-1/2 left-1/2 h-64 w-[min(42rem,90vw)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--vp-accent) opacity-[0.12] blur-[90px]" />
-          <div className={cn(container, "relative text-center")}>
+          <Reveal spring="bouncy" className={cn(container, "relative text-center")}>
             <Pill>Free to open</Pill>
             <p className="mt-6 text-7xl font-medium tracking-[-0.06em] sm:text-9xl">₦0</p>
             <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-white/65 sm:text-lg">
               to open your account and both wallets. Moving money between your own wallets is free, always.
             </p>
             <PrimaryButton href="/signup" className="mt-8">Get started</PrimaryButton>
-          </div>
+          </Reveal>
         </section>
 
         {/* -------------------------------------------------------- features grid */}
-        <section id="security" className="scroll-mt-20 py-20 sm:py-28">
+        <section id="security" className="py-20 sm:py-28">
           <div className={container}>
             <SectionTitle eyebrow="Security" title="Built like a bank, from the ledger up" body="Moving money is the one thing that can't go wrong. VergePay was engineered so it doesn't." />
             <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -187,28 +202,28 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
                 { icon: UserCheck, title: "Name check before you send", body: "See who owns an account number before you pay, and get a receipt after." },
                 { icon: KeyRound, title: "Two-factor where it matters", body: "Linking a card, changing limits and other sensitive actions ask for a fresh code." },
                 { icon: Fingerprint, title: "Verified by BVN", body: "Every account holder is verified. Your BVN is encrypted in a separate vault and never shown back." },
-              ].map(({ icon: Icon, title, body }) => (
-                <div key={title} className="rounded-[20px] border border-white/[0.06] bg-[#0d0d0d] p-6">
-                  <span className="flex size-11 items-center justify-center rounded-xl bg-(--vp-accent)/10 text-(--vp-accent)">
+              ].map(({ icon: Icon, title, body }, i) => (
+                <Reveal key={title} spring="bouncy" delay={0.1 * (i % 3)} className="group rounded-[20px] border border-white/[0.06] bg-[#0d0d0d] p-6 hover:border-(--vp-accent)/25">
+                  <span className="flex size-11 items-center justify-center rounded-xl bg-(--vp-accent)/10 text-(--vp-accent) transition-transform duration-500 ease-(--vp-bouncy) group-hover:scale-110">
                     <Icon className="size-5" />
                   </span>
                   <h3 className="mt-5 text-lg font-medium tracking-tight">{title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-white/60">{body}</p>
-                </div>
+                </Reveal>
               ))}
             </div>
-            <div className="mt-10 flex justify-center">
+            <Reveal className="mt-10 flex justify-center">
               <PrimaryButton href="/signup">Get started</PrimaryButton>
-            </div>
+            </Reveal>
           </div>
         </section>
 
         {/* ---------------------------------------------------------- comparison */}
-        <section id="why" className="scroll-mt-20 py-20 sm:py-28">
+        <section id="why" className="py-20 sm:py-28">
           <div className={container}>
             <SectionTitle eyebrow="Why VergePay?" title="A smarter way to run your money" body="What getting paid usually looks like, and what it looks like on VergePay." />
             <div className="mx-auto mt-14 grid max-w-4xl grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="rounded-[20px] border border-white/[0.06] bg-[#0d0d0d] p-6 sm:p-8">
+              <Reveal spring="bouncy" className="rounded-[20px] border border-white/[0.06] bg-[#0d0d0d] p-6 sm:p-8">
                 <p className="text-lg font-medium text-white/60">The usual way</p>
                 <ul className="mt-6 space-y-4 text-sm text-white/55">
                   {[
@@ -227,8 +242,8 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
                     </li>
                   ))}
                 </ul>
-              </div>
-              <div className="relative rounded-[20px] border border-(--vp-accent)/30 bg-[#0d0d0d] p-6 shadow-[0_0_60px_-24px_var(--vp-accent)] sm:p-8">
+              </Reveal>
+              <Reveal spring="bouncy" delay={0.15} className="relative rounded-[20px] border border-(--vp-accent)/30 bg-[#0d0d0d] p-6 shadow-[0_0_60px_-24px_var(--vp-accent)] sm:p-8">
                 <BrandMark onDark />
                 <ul className="mt-5 space-y-4 text-sm text-white/85">
                   {[
@@ -242,16 +257,16 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
                     <Tick key={t}>{t}</Tick>
                   ))}
                 </ul>
-              </div>
+              </Reveal>
             </div>
           </div>
         </section>
 
         {/* ------------------------------------------------------------- mission */}
-        <section className="py-24 sm:py-32">
+        <section className="py-20 sm:py-28">
           <div className={container}>
             <SectionTitle eyebrow="Our mission" title="Built for Africa's independent workforce" body="For investors, partners and anyone who works for themselves." />
-            <figure className="relative mx-auto mt-14 max-w-4xl overflow-hidden rounded-[28px] border border-white/[0.06] bg-[#0d0d0d] p-8 sm:p-14">
+            <Reveal as="figure" spring="bouncy" className="relative mx-auto mt-14 max-w-4xl overflow-hidden rounded-[28px] border border-white/[0.06] bg-[#0d0d0d] p-8 sm:p-14">
               <div aria-hidden className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full bg-(--vp-accent) opacity-15 blur-[90px]" />
               <blockquote className="relative text-2xl leading-snug font-medium tracking-[-0.03em] sm:text-[2rem]">
                 &ldquo;More people across Nigeria earn for themselves than ever, yet their money is split across banks, transfers and screenshots. VergePay is the one place to get paid, keep business apart and see the whole picture.&rdquo;
@@ -263,12 +278,12 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
                 </span>
                 <SecondaryButton href={investorMail}>Talk to the team</SecondaryButton>
               </figcaption>
-            </figure>
+            </Reveal>
           </div>
         </section>
 
         {/* ------------------------------------------------------------- pricing */}
-        <section id="pricing" className="scroll-mt-20 py-20 sm:py-28">
+        <section id="pricing" className="py-20 sm:py-28">
           <div className={container}>
             <SectionTitle eyebrow="Pricing" title="Simple pricing." body="No monthly fees. You only pay when money leaves VergePay for another bank, and you always see the amount first." />
             <div className="mx-auto mt-14 grid max-w-4xl grid-cols-1 gap-4 md:grid-cols-2">
@@ -282,6 +297,7 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
               />
               <PlanCard
                 highlight
+                delay={0.15}
                 badge="We pay half"
                 name="Transfers to other banks"
                 price="½"
@@ -291,51 +307,42 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
                 features={["The exact fee shown before you confirm", "The recipient's name checked first", "A receipt for every payment", "Never charged twice"]}
               />
             </div>
-            <div className="mx-auto mt-4 flex max-w-4xl flex-col gap-5 rounded-[20px] border border-white/[0.06] bg-[#0d0d0d] p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+            <Reveal delay={0.1} className="mx-auto mt-4 flex max-w-4xl flex-col gap-5 rounded-[20px] border border-white/[0.06] bg-[#0d0d0d] p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
               <div>
                 <p className="text-lg font-medium">Paying a team?</p>
                 <p className="mt-1 text-sm text-white/60">Payroll is built in. Talk to us about running salaries from your Business wallet.</p>
               </div>
               <SecondaryButton href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("VergePay: payroll for my team")}`}>Talk to us</SecondaryButton>
-            </div>
+            </Reveal>
           </div>
         </section>
 
         {/* ------------------------------------------------------------------ faq */}
-        <section id="faq" className="scroll-mt-20 py-20 sm:py-28">
+        <section id="faq" className="py-20 sm:py-28">
           <div className={cn(container, "grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]")}>
             <div>
               <SectionTitle center={false} eyebrow="FAQ" title="Got questions? We've got answers." />
-              <div className="mt-8">
+              <Reveal from="right" delay={0.1} className="mt-8">
                 <SecondaryButton href={`mailto:${CONTACT_EMAIL}`}>Contact us</SecondaryButton>
-              </div>
+              </Reveal>
             </div>
-            <div className="space-y-3">
-              {[
+            <Faq
+              items={[
                 ["Is it free to open an account?", "Yes. Opening VergePay and both wallets is free, and moving money between your own wallets costs nothing."],
                 ["What does a transfer to another bank cost?", "Our payment processor charges a small fee to send money to another Nigerian bank. You pay half of it and VergePay covers the rest. You see the exact amount before you confirm."],
                 ["Do my clients need VergePay to pay me?", "No. Every invoice has a secure pay link. Your client pays by card, bank transfer or USSD on a page made for them, and gets a receipt by email."],
                 ["Why do you need my BVN?", "To confirm you are who you say you are before money can move, as every financial service must. It's encrypted in a separate vault, used only to verify you, and never shown back."],
                 ["Is my money safe?", "Payments are processed by Flutterwave, every movement is recorded on a double-entry ledger, and sensitive actions need two-factor authentication. Card numbers never touch our servers."],
                 ["Can I keep business and personal money apart?", "That's the point. You get a personal and a business wallet, each with its own account number, and can view them separately or together."],
-              ].map(([q, a], i) => (
-                <details key={q} className="group rounded-[20px] border border-white/[0.06] bg-[#0d0d0d] px-6 py-5 open:bg-[#111]">
-                  <summary className="flex cursor-pointer list-none items-center gap-4 font-medium">
-                    <span className="text-sm text-(--vp-accent) tabular-nums">{String(i + 1).padStart(2, "0")}</span>
-                    <span className="flex-1">{q}</span>
-                    <Plus className="size-4 shrink-0 text-white/50 transition-transform group-open:rotate-45" />
-                  </summary>
-                  <p className="mt-3 pl-9 text-sm leading-relaxed text-white/60">{a}</p>
-                </details>
-              ))}
-            </div>
+              ]}
+            />
           </div>
         </section>
 
         {/* ------------------------------------------------------------ final cta */}
         <section className="pb-20 sm:pb-28">
           <div className={container}>
-            <div className="relative overflow-hidden rounded-[28px] border border-white/[0.06] bg-[#0d0d0d] px-6 py-16 text-center sm:px-12 sm:py-24">
+            <Reveal spring="bouncy" className="relative overflow-hidden rounded-[28px] border border-white/[0.06] bg-[#0d0d0d] px-6 py-16 text-center sm:px-12 sm:py-24">
               <div aria-hidden className="pointer-events-none absolute -top-32 left-1/2 h-64 w-2/3 -translate-x-1/2 rounded-full bg-(--vp-accent) opacity-25 blur-[90px]" />
               <h2 className="relative mx-auto max-w-2xl text-[2rem] leading-[1.1] font-medium tracking-[-0.04em] sm:text-5xl">Ready to run your money smarter?</h2>
               <p className="relative mx-auto mt-4 max-w-lg text-white/65 sm:text-lg">Open your free account in minutes and send your first invoice today.</p>
@@ -343,7 +350,7 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
                 <PrimaryButton href="/signup">Get started free</PrimaryButton>
                 <SecondaryButton href={signedIn ? "/dashboard" : "/signin"}>{signedIn ? "Go to your dashboard" : "Sign in"}</SecondaryButton>
               </div>
-            </div>
+            </Reveal>
           </div>
         </section>
       </main>
@@ -372,19 +379,19 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
   );
 }
 
-function ShowcaseCard({ title, body, children }: { title: string; body: string; children: React.ReactNode }) {
+function ShowcaseCard({ title, body, delay, children }: { title: string; body: string; delay: number; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col rounded-[20px] border border-white/[0.06] bg-[#0d0d0d] p-6 sm:p-8">
+    <Reveal spring="bouncy" delay={delay} className="flex flex-col rounded-[20px] border border-white/[0.06] bg-[#0d0d0d] p-6 hover:border-white/[0.12] sm:p-8">
       <h3 className="text-xl font-medium tracking-tight">{title}</h3>
       <p className="mt-2 max-w-md text-sm leading-relaxed text-white/60">{body}</p>
       <div className="mt-auto pt-8">{children}</div>
-    </div>
+    </Reveal>
   );
 }
 
-function PlanCard({ name, price, unit, body, cta, features, badge, highlight = false }: { name: string; price: string; unit: string; body: string; cta: React.ReactNode; features: string[]; badge?: string; highlight?: boolean }) {
+function PlanCard({ name, price, unit, body, cta, features, badge, delay = 0, highlight = false }: { name: string; price: string; unit: string; body: string; cta: React.ReactNode; features: string[]; badge?: string; delay?: number; highlight?: boolean }) {
   return (
-    <div className={cn("flex flex-col rounded-[20px] border bg-[#0d0d0d] p-6 sm:p-8", highlight ? "border-(--vp-accent)/30 shadow-[0_0_60px_-24px_var(--vp-accent)]" : "border-white/[0.06]")}>
+    <Reveal spring="bouncy" delay={delay} className={cn("flex flex-col rounded-[20px] border bg-[#0d0d0d] p-6 sm:p-8", highlight ? "border-(--vp-accent)/30 shadow-[0_0_60px_-24px_var(--vp-accent)]" : "border-white/[0.06]")}>
       <div className="flex items-center justify-between gap-3">
         <p className="text-lg font-medium">{name}</p>
         {badge && <span className="rounded-full bg-(--vp-accent) px-2.5 py-0.5 text-xs font-medium text-[#050505]">{badge}</span>}
@@ -400,7 +407,7 @@ function PlanCard({ name, price, unit, body, cta, features, badge, highlight = f
           <Tick key={f}>{f}</Tick>
         ))}
       </ul>
-    </div>
+    </Reveal>
   );
 }
 
@@ -412,9 +419,9 @@ function FooterColumn({ title, links }: { title: string; links: [string, string]
         {links.map(([href, label]) => (
           <li key={label}>
             {href.startsWith("/") ? (
-              <Link href={href} className="text-white/55 hover:text-white">{label}</Link>
+              <Link href={href} className="text-white/55 transition-colors duration-300 hover:text-(--vp-accent)">{label}</Link>
             ) : (
-              <a href={href} className="text-white/55 hover:text-white">{label}</a>
+              <a href={href} className="text-white/55 transition-colors duration-300 hover:text-(--vp-accent)">{label}</a>
             )}
           </li>
         ))}
