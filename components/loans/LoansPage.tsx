@@ -17,6 +17,7 @@ import { Loan, LoanApplication } from "@/types/loan";
 import { RepayDialog } from "./RepayDialog";
 import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
 import { StatCard, StatGrid } from "@/components/StatCard";
+import { pageClass } from "@/lib/layout";
 
 const primary = "bg-emerald-700 text-white hover:bg-emerald-800";
 
@@ -87,7 +88,7 @@ export function LoansPage() {
   const owed = owedByCurrency(loans);
 
   return (
-    <div className="space-y-5">
+    <div className={pageClass()}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">Fixed monthly installments, paid from your wallet.</p>
         {applyButton}
@@ -290,7 +291,7 @@ function DevDecision({ applicationId, onDecided }: { applicationId: string; onDe
 
 export function LoansSkeleton() {
   return (
-    <div className="space-y-5">
+    <div className={pageClass()}>
       <Skeleton className="h-5 w-64" />
       <StatGrid columns={3}>
         {[0, 1, 2].map((i) => (

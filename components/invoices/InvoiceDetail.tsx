@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { cancelInvoice, deleteInvoice, getInvoice, payInvoice, refundInvoice, remindInvoice, sendInvoice } from "@/services/invoices";
 import { ApiInvoice, InvoiceEmail } from "@/types/invoicing";
 import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
+import { pageClass } from "@/lib/layout";
 
 type DialogKind = "send" | "remind" | "cancel" | "delete" | "refund" | "pay" | null;
 
@@ -56,7 +57,7 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
 
   if (loadError) {
     return (
-      <div className="mx-auto max-w-5xl space-y-4">
+      <div className={pageClass("narrow")}>
         <BackLink />
         <ErrorNote>{loadError}</ErrorNote>
       </div>
@@ -64,7 +65,7 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
   }
   if (!invoice) {
     return (
-      <div className="mx-auto max-w-5xl space-y-4">
+      <div className={pageClass("narrow")}>
         <Skeleton className="h-6 w-32" />
         <Skeleton className="h-10 w-64" />
         <div className="grid gap-5 lg:grid-cols-[1fr_20rem]">
@@ -85,9 +86,9 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
   };
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className={pageClass("narrow", { stack: false })}>
       <BackLink />
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
@@ -154,7 +155,7 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
         </div>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_20rem] lg:items-start">
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-[1fr_20rem] lg:items-start">
         <InvoiceDocument invoice={invoice} />
         <div className="space-y-5">
           {issued && unpaid && invoice.pay_url && <PayLinkCard invoice={invoice} onRemind={() => setDialog("remind")} />}

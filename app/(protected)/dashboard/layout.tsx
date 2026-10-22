@@ -34,7 +34,7 @@ export default async function DashboardLayout({
             <AppSidebar />
             <div className="w-full min-w-0">
               <Navbar className="sticky top-0 z-40" />
-              <main className="overflow-y-auto px-3 py-3 sm:px-4 md:py-4 lg:px-4 lg:py-4">
+              <main className="overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 xl:px-8">
                 <RequireWallet>{children}</RequireWallet>
               </main>
             </div>

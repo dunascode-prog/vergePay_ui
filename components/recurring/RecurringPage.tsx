@@ -9,6 +9,7 @@ import { listRecurringPlans } from "@/services/recurring";
 import { ApiRecurringPlan } from "@/types/recurring";
 import { RecurringPlansTable } from "./RecurringPlansTable";
 import { RecurringSummaryCards } from "./RecurringSummaryCards";
+import { pageClass } from "@/lib/layout";
 
 /** /dashboard/recurring: plans that invoice clients on a schedule. */
 export function RecurringPage() {
@@ -35,7 +36,7 @@ export function RecurringPage() {
   const replace = (updated: ApiRecurringPlan) => setPlans((ps) => (ps ?? []).map((p) => (p.plan_id === updated.plan_id ? updated : p)));
 
   return (
-    <div className="space-y-5">
+    <div className={pageClass()}>
       <p className="max-w-xl text-sm text-muted-foreground">
         Bill a client the same amount on a schedule. Each invoice goes out by itself, with a pay link, and you&apos;re told when it does.
       </p>

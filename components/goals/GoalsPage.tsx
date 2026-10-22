@@ -18,6 +18,7 @@ import { GoalFormDialog } from "./GoalFormDialog";
 import { GoalMoneyDialog } from "./GoalMoneyDialog";
 import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
 import { StatCard, StatGrid } from "@/components/StatCard";
+import { pageClass } from "@/lib/layout";
 
 const primary = "bg-emerald-700 text-white hover:bg-emerald-800";
 
@@ -104,7 +105,7 @@ export function GoalsPage() {
   const behind = active.filter((g) => ["behind", "past_date"].includes(goalPace(g))).length;
 
   return (
-    <div className="space-y-5">
+    <div className={pageClass()}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
           {atLimit ? `You have ${MAX_ACTIVE_GOALS} goals, the most at once. Close one to start another.` : "Each goal holds real money, apart from your wallet."}
@@ -253,7 +254,7 @@ function GoalCard({ goal, onChanged }: { goal: Goal; onChanged: () => void }) {
 
 export function GoalsSkeleton() {
   return (
-    <div className="space-y-5">
+    <div className={pageClass()}>
       <Skeleton className="h-5 w-64" />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         {[0, 1, 2].map((i) => (

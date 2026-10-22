@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { cancelRecurringPlan, getRecurringPlan, pauseRecurringPlan, resumeRecurringPlan, updateRecurringPlan } from "@/services/recurring";
 import { ApiRecurringPlan } from "@/types/recurring";
 import { RecurringStatusBadge } from "./RecurringStatusBadge";
+import { pageClass } from "@/lib/layout";
 
 type DialogKind = "edit" | "cancel" | null;
 const TERMS = [0, 7, 14, 30];
@@ -75,7 +76,7 @@ export function RecurringPlanDetail({ planId }: { planId: string }) {
 
   if (loadError) {
     return (
-      <div className="mx-auto max-w-5xl space-y-4">
+      <div className={pageClass("narrow")}>
         <BackLink />
         <ErrorNote>{loadError}</ErrorNote>
       </div>
@@ -83,7 +84,7 @@ export function RecurringPlanDetail({ planId }: { planId: string }) {
   }
   if (!plan) {
     return (
-      <div className="mx-auto max-w-5xl space-y-4">
+      <div className={pageClass("narrow")}>
         <Skeleton className="h-6 w-32" />
         <Skeleton className="h-10 w-64" />
         <div className="grid gap-5 lg:grid-cols-[1fr_20rem]">
@@ -99,9 +100,9 @@ export function RecurringPlanDetail({ planId }: { planId: string }) {
   const dates = plan.plan_status === "active" ? upcoming(plan) : [];
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className={pageClass("narrow", { stack: false })}>
       <BackLink />
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex items-center gap-2.5">
             <h1 className="truncate text-xl font-semibold tracking-tight">{plan.description}</h1>
@@ -157,7 +158,7 @@ export function RecurringPlanDetail({ planId }: { planId: string }) {
         </Banner>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_20rem] lg:items-start">
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-[1fr_20rem] lg:items-start">
         <div className="space-y-5">
           <section className="rounded-xl border bg-card">
             <dl className="grid gap-x-6 gap-y-4 p-5 text-sm sm:grid-cols-2">

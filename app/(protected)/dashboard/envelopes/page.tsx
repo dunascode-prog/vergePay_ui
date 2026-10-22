@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/envelopes/PageHeader";
 import { EnvelopeSummaryCards } from "@/components/envelopes/EnvelopeSummaryCards";
 import { AIEnvelopeInsightBanner } from "@/components/envelopes/AIEnvelopeInsightBanner";
 import { EnvelopeGrid } from "@/components/envelopes/EnvelopeGrid";
+import { pageClass } from "@/lib/layout";
 
 export default async function EnvelopesPage() {
   const [envelopes, wallets] = await Promise.all([getEnvelopeViews(), getWalletBalances()]);
@@ -16,8 +17,8 @@ export default async function EnvelopesPage() {
   const availableCash = businessWallet?.amounts.find((a) => a.currency === "NGN")?.amount ?? 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-6xl px-6 py-8">
+    <div>
+      <div className={pageClass("wide", { stack: false })}>
         <PageHeader
           backHref="/dashboard/business"
           backLabel="Back to business overview"

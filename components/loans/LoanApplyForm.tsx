@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { applyForLoan, listLoanApplications } from "@/services/loans";
 import { LoanTermsDialog } from "./LoanTermsDialog";
 import { LoanType } from "@/types/loan";
+import { pageClass } from "@/lib/layout";
 
 const TERMS = [3, 6, 12, 24, 36];
 
@@ -128,7 +129,7 @@ export function LoanApplyForm() {
 
   if (accountsState === "loading" || hasPending === null) {
     return (
-      <div className="mx-auto max-w-5xl space-y-4">
+      <div className={pageClass("narrow")}>
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-96 w-full rounded-xl" />
       </div>
@@ -151,12 +152,12 @@ export function LoanApplyForm() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className={pageClass("narrow", { stack: false })}>
       {back}
       <h1 className="text-xl font-semibold tracking-tight">Apply for a loan</h1>
-      <p className="mb-5 mt-1 text-sm text-muted-foreground">It takes a minute. Nothing is paid out or charged until it&apos;s approved.</p>
+      <p className="mb-5 mt-1 text-sm text-muted-foreground sm:mb-6">It takes a minute. Nothing is paid out or charged until it&apos;s approved.</p>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_20rem] lg:items-start">
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-[1fr_20rem] lg:items-start">
         <div className="space-y-5">
           <section className="space-y-3 rounded-xl border bg-card p-4 sm:p-5">
             <fieldset>

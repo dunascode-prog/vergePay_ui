@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { getLoan, getLoanSchedule } from "@/services/loans";
 import { Installment, Loan } from "@/types/loan";
 import { RepayDialog } from "./RepayDialog";
+import { pageClass } from "@/lib/layout";
 
 const STATE_LABEL: Record<InstallmentState, string> = { paid: "Paid", overdue: "Overdue", due_soon: "Due soon", upcoming: "Upcoming" };
 const STATE_TONE: Record<InstallmentState, string> = {
@@ -56,7 +57,7 @@ export function LoanDetail({ loanId }: { loanId: string }) {
 
   if (error) {
     return (
-      <div className="mx-auto max-w-5xl space-y-3">
+      <div className={pageClass("narrow")}>
         {back}
         <ErrorNote>{error.notFound ? "This loan doesn't exist, or isn't yours." : error.message}</ErrorNote>
         {!error.notFound && (
@@ -69,7 +70,7 @@ export function LoanDetail({ loanId }: { loanId: string }) {
   }
   if (!loan || !schedule) {
     return (
-      <div className="mx-auto max-w-5xl space-y-4">
+      <div className={pageClass("narrow")}>
         <Skeleton className="h-5 w-24" />
         <Skeleton className="h-36 rounded-xl" />
         <Skeleton className="h-80 rounded-xl" />
@@ -97,9 +98,9 @@ export function LoanDetail({ loanId }: { loanId: string }) {
   ];
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className={pageClass("narrow", { stack: false })}>
       {back}
-      <div className="grid gap-5 lg:grid-cols-[1fr_20rem] lg:items-start">
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-[1fr_20rem] lg:items-start">
         <div className="min-w-0 space-y-5">
           <section className="rounded-xl border bg-card p-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-2">

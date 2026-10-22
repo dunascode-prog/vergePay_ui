@@ -94,7 +94,7 @@ const Navbar = ({ className }: React.ComponentProps<"header">) => {
   const isHome = !other && page.url === "/dashboard";
 
   return (
-    <header className={cn("flex h-14 items-center gap-2 border-b bg-background/85 px-3 backdrop-blur supports-backdrop-filter:bg-background/70 sm:px-4", className)}>
+    <header className={cn("flex h-14 items-center gap-2 border-b bg-background/85 px-4 backdrop-blur supports-backdrop-filter:bg-background/70 sm:px-6 xl:px-8", className)}>
       <SidebarTrigger className="size-9 text-muted-foreground hover:text-foreground" />
       <div className="mx-1 hidden h-5 w-px bg-border sm:block" aria-hidden />
       <div className="min-w-0 flex-1">

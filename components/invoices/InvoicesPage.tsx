@@ -16,6 +16,7 @@ import { InvoiceStatusBadge } from "./InvoiceStatusBadge";
 import { CurrencyAmounts } from "@/components/money/CurrencyAmounts";
 import { StatCard, StatGrid } from "@/components/StatCard";
 import { balanceTrend, flowTrend, invoiceBalanceAt, mainCurrency, overdueAt, paidInvoiceEvents, unpaidAt } from "@/lib/trends";
+import { pageClass } from "@/lib/layout";
 
 type Tab = "issued" | "received";
 type Filter = "all" | InvoiceStatus;
@@ -96,7 +97,7 @@ export function InvoicesPage() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className={pageClass()}>
       {/* summary */}
       {issued ? (
         <StatGrid>

@@ -37,6 +37,7 @@ import { PeriodSelector } from "./PeriodSelector";
 import { RevenueTrendChart } from "./RevenueTrendChart";
 // no backend for the health score yet: shown as sample data, and tagged so
 import { currentHealthScore, healthScoreFactors, healthScoreHistory } from "@/data/mock-analytics";
+import { pageClass } from "@/lib/layout";
 
 /**
  * /dashboard/analytics: everything here comes from your ledger and invoices,
@@ -106,7 +107,7 @@ export function AnalyticsPage() {
   const failed = invoiceError || ledger.state === "error";
 
   return (
-    <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 sm:gap-5 lg:gap-6">
+    <div className={pageClass()}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">From your invoices and transactions{scope !== "combined" ? ` · ${scope} wallet` : ""}.</p>
         <div className="overflow-x-auto">

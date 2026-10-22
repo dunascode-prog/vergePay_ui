@@ -13,6 +13,7 @@ import { EmailChangeDialog } from "./EmailChangeDialog";
 import { PersonalDetailsForm } from "./PersonalDetailsForm";
 import { ProfilePhoto } from "./ProfilePhotoDialog";
 import { TwoFactorDialog } from "./TwoFactorDialog";
+import { pageClass } from "@/lib/layout";
 
 export function displayName(user: UserProfile) {
   return [user.first_name, user.last_name].filter(Boolean).join(" ") || user.username;
@@ -54,7 +55,7 @@ export function ProfilePage() {
   const kyc = KYC[user.kyc_status] ?? KYC.unverified;
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)] lg:items-start">
+    <div className={cn(pageClass("wide", { stack: false }), "grid gap-5 sm:gap-6 lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)] lg:items-start")}>
       {/* who you are, at a glance */}
       <Card>
         <CardContent className="space-y-5">
@@ -80,7 +81,7 @@ export function ProfilePage() {
         </CardContent>
       </Card>
 
-      <div className="space-y-5">
+      <div className="flex flex-col gap-5 sm:gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Personal details</CardTitle>
@@ -194,9 +195,9 @@ function Fact({ icon: Icon, label, value }: { icon: React.ComponentType<{ classN
 
 function ProfileSkeleton() {
   return (
-    <div className="grid gap-5 lg:grid-cols-[300px_1fr]" aria-busy="true">
+    <div className={cn(pageClass("wide", { stack: false }), "grid gap-5 sm:gap-6 lg:grid-cols-[300px_1fr]")} aria-busy="true">
       <Skeleton className="h-64 rounded-xl" />
-      <div className="space-y-5">
+      <div className="flex flex-col gap-5 sm:gap-6">
         <Skeleton className="h-96 rounded-xl" />
         <Skeleton className="h-36 rounded-xl" />
       </div>

@@ -1,8 +1,9 @@
+import { pageClass } from "@/lib/layout";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function RecurringBillingLoading() {
   return (
-    <div className="space-y-5">
+    <div className={pageClass()}>
       <Skeleton className="h-5 w-96 max-w-full" />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
