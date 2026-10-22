@@ -52,11 +52,13 @@ function MiniBars({ dark = false, labels = false, className }: { dark?: boolean;
 export function HeroDashboardMock() {
   const rail = [LayoutGrid, Wallet, ArrowLeftRight, FileText, Users, PiggyBank, LineChart, Settings];
   return (
-    <div className="relative mx-auto w-full max-w-5xl" role="img" aria-label="The VergePay dashboard: total balance, quick actions, invoices collected this month, cash flow, wallets and recent activity">
-      {/* the glow behind the frame */}
-      <div aria-hidden className="pointer-events-none absolute -top-24 left-1/2 h-48 w-2/3 -translate-x-1/2 rounded-full bg-(--vp-accent) opacity-25 blur-[80px]" />
-      <div className="relative rounded-[28px] border border-white/10 bg-[#0d0d0d] p-2 sm:p-2.5 [mask-image:linear-gradient(to_bottom,black_55%,transparent)]">
-        <div className="flex h-[460px] overflow-hidden rounded-[20px] bg-white sm:h-[560px]">
+    <div className="relative mx-auto w-full max-w-[1000px]" role="img" aria-label="The VergePay dashboard: total balance, quick actions, invoices collected this month, cash flow, wallets and recent activity">
+      {/* Clario's frame: a tight glow behind the top edge and a 1px light line across it */}
+      <div aria-hidden className="pointer-events-none absolute top-2 left-1/2 h-[53px] w-[211px] -translate-x-1/2 rounded-full bg-(--vp-accent) blur-[50px] sm:top-0 sm:w-[285px]" />
+      <div aria-hidden className="absolute top-0 left-1/2 z-20 h-px w-[35%] -translate-x-1/2 bg-[linear-gradient(90deg,transparent,var(--vp-accent)_50%,transparent)] sm:w-[30%]" />
+      {/* the whole frame fades from the top edge to nothing at the bottom */}
+      <div className="relative z-10 rounded-[20px] border border-white/5 bg-[#0d0d0d] p-[5px] backdrop-blur-[2px] [mask-image:linear-gradient(to_bottom,black_2%,transparent)] sm:rounded-[30px] sm:p-2.5">
+        <div className="flex h-[460px] overflow-hidden rounded-[15px] bg-white ring-1 ring-white/10 sm:h-[580px] sm:rounded-[20px]">
           {/* side rail */}
           <div className="hidden w-20 shrink-0 flex-col items-center gap-5 bg-[#0d0d0d] py-6 sm:flex">
             <Image src="/final_vergepay_logoc.svg" alt="" width={32} height={32} />

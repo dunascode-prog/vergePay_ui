@@ -287,17 +287,25 @@ html.lenis body {
     transform: translateY(40px);
   }
 }
-@keyframes vp-enter-rise {
+@keyframes vp-fade-in {
   from {
     opacity: 0;
+  }
+}
+@keyframes vp-enter-rise {
+  from {
     transform: translateY(150px);
   }
 }
 .vp-hero-text {
   animation: vp-enter-up 1s var(--vp-bouncy) 0.2s both;
 }
+/* Clario's timing: hidden until 0.6s, faded in and settled by about 1.2s */
 .vp-hero-visual {
-  animation: vp-enter-rise 1.4s var(--vp-soft) 0.6s both;
+  animation: vp-fade-in 0.6s ease-in-out 0.6s both;
+}
+.vp-hero-rise {
+  animation: vp-enter-rise 0.8s var(--vp-soft) 0.6s both;
 }
 
 /* Phone menu: the sheet drops in and its links follow one after another. */
@@ -334,6 +342,7 @@ html.lenis body {
   .vp-reveal,
   .vp-hero-text,
   .vp-hero-visual,
+  .vp-hero-rise,
   .vp-sheet,
   .vp-stagger > * {
     opacity: 1;

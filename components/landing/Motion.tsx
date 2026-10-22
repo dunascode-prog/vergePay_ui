@@ -22,6 +22,54 @@ export function SmoothScroll() {
   return null;
 }
 
+/**
+ * Clario's hero dashboard tilt: tipped back 30° and scaled 1.2× while its top
+ * edge is at the bottom of the screen, flattening as it scrolls up to a third
+ * of the way down. A light spring smooths it between frames.
+ */
+export function ScrollTilt({ className, children }: { className?: string; children: React.ReactNode }) {
+  const outer = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = outer.current, card = inner.current;
+    if (!el || !card || reducedMotion()) return;
+    let current = -1, raf = 0;
+    // the entrance moves the card without a scroll event, so keep checking through it
+    const watchUntil = performance.now() + 2500;
+    const target = () => {
+      const vh = window.innerHeight;
+      return Math.min(1, Math.max(0, (el.getBoundingClientRect().top - vh / 3) / ((vh * 2) / 3)));
+    };
+    const tick = () => {
+      const t = target();
+      current = current < 0 ? t : current + (t - current) * 0.2;
+      if (Math.abs(t - current) < 0.0005) current = t;
+      card.style.transform = `perspective(1200px) rotateX(${(current * 30).toFixed(2)}deg) scale(${(1 + current * 0.2).toFixed(4)})`;
+      raf = current !== t || performance.now() < watchUntil ? requestAnimationFrame(tick) : 0;
+    };
+    const start = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+    start();
+    window.addEventListener("scroll", start, { passive: true });
+    window.addEventListener("resize", start);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", start);
+      window.removeEventListener("resize", start);
+    };
+  }, []);
+
+  return (
+    <div ref={outer} className={className}>
+      <div ref={inner} className="will-change-transform">
+        {children}
+      </div>
+    </div>
+  );
+}
+
 type From = "up" | "left" | "right" | "rise";
 
 /**

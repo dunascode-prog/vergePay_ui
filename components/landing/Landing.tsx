@@ -24,7 +24,7 @@ import {
   StepVerifyMock,
   WalletsMini,
 } from "./Mockups";
-import { Faq, Reveal, SmoothScroll } from "./Motion";
+import { Faq, Reveal, ScrollTilt, SmoothScroll } from "./Motion";
 
 // Where investors and partners reach the team. Change it in one place.
 export const CONTACT_EMAIL = "hello@vergepay.com";
@@ -116,22 +116,25 @@ export function Landing({ signedIn }: { signedIn: boolean }) {
 
       <main className="overflow-x-clip">
         {/* ---------------------------------------------------------------- hero */}
-        <section className="relative pt-36 sm:pt-44">
+        <section className="relative pt-32 sm:pt-40">
           <div className={cn(container, "vp-hero-text text-center")}>
             <Pill>Wallets · Invoices · Insights</Pill>
-            <h1 className="mx-auto mt-6 max-w-4xl text-[2.6rem] leading-[1.02] font-medium tracking-[-0.05em] sm:text-6xl lg:text-[4.5rem]">
+            <h1 className="mx-auto mt-5 max-w-4xl text-[2.6rem] leading-[1.02] font-medium tracking-[-0.05em] sm:text-6xl lg:text-[4rem]">
               Get paid, keep business apart, see every naira
             </h1>
-            <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-white/65 sm:text-lg">
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/65 sm:text-lg">
               VergePay gives Nigeria&apos;s freelancers and small businesses a personal and a business wallet, invoices clients pay in one tap, and a live picture of their money.
             </p>
-            <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <PrimaryButton href="/signup">Get started free</PrimaryButton>
               <SecondaryButton href={signedIn ? "/dashboard" : "/signin"}>{signedIn ? "Go to your dashboard" : "Sign in"}</SecondaryButton>
             </div>
           </div>
-          <div className={cn(container, "vp-hero-visual mt-20 sm:mt-24")}>
-            <HeroDashboardMock />
+          {/* fades in, rises 150px, and tilts flat as you scroll, as in Clario */}
+          <div className={cn(container, "vp-hero-visual mt-10 sm:mt-7")}>
+            <ScrollTilt className="vp-hero-rise">
+              <HeroDashboardMock />
+            </ScrollTilt>
           </div>
         </section>
 
